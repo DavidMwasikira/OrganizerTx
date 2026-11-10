@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+node_modules/
+*.png.tmp
+.DS_Store
+tests/*.png
+tests/app.js
+.env
+*.key

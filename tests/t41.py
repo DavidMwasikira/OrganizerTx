@@ -1,0 +1,30 @@
+import asyncio
+from playwright.async_api import async_playwright
+async def main():
+    async with async_playwright() as p:
+        b=await p.chromium.launch(executable_path='/usr/bin/google-chrome',args=['--no-sandbox'])
+        pg=await (await b.new_context(viewport={'width':1670,'height':900})).new_page(); errs=[]; pg.on('pageerror',lambda e:errs.append(str(e)))
+        await pg.goto('http://localhost:8765/index.html'); await pg.wait_for_timeout(1500)
+        await pg.fill('#name','David'); await pg.fill('#country','Kenya'); await pg.fill('#key','k'); await pg.click('text=Start'); await pg.wait_for_timeout(400)
+        await pg.evaluate("""S.plans.push({id:'pb',name:'Building new site office',what:'x',custom:true,started:Date.now(),acts:[],log:[],miles:[{name:'Foundation complete',date:'2026-11-20',done:true},{name:'Roofing complete',date:'2026-12-20',done:false}],
+          budget:{lines:[{cat:'Other',item:'Overall budget',planned:16500000,actual:14950000},{cat:'Materials',item:'Cement and steel',planned:500000,actual:0}]}});S.brief={day:dash(Date.now()),at:Date.now(),summary:'x',pri:[],ai:false};V.view='plan';V.plan='pb';V.ptab='budget';save();render()""")
+        await pg.wait_for_timeout(200)
+        print('old single actual migrated -> log rows',await pg.locator('table.dt >> nth=0 >> tbody tr').count(),'| tiles',[x.replace('\n',' ') for x in await pg.locator('.btile').all_inner_texts()])
+        await pg.click('.page [data-act=spend-new] >> nth=0'); print('default VAT (Kenya)',await pg.locator('#svat [aria-pressed=true]').inner_text())
+        await pg.fill('#sdesc','First payment to contractor'); await pg.select_option('#smile',label='Foundation complete'); await pg.select_option('#sline',index=2); await pg.fill('#samt','1,000,000'); await pg.wait_for_timeout(100)
+        print('16% box:',(await pg.locator('#svout').inner_text()).replace('\n',' ')); await pg.click('#svat [data-vat="18"]'); print('18% box:',(await pg.locator('#svout').inner_text()).replace('\n',' '))
+        await pg.select_option('#sinc','gross'); await pg.click('#svat [data-vat="16"]'); print('1,000,000 incl 16%:',(await pg.locator('#svout').inner_text()).replace('\n',' '))
+        await pg.select_option('#sinc','net'); await pg.screenshot(path='sp-modal.png'); await pg.click('[data-x=save]'); await pg.wait_for_timeout(200)
+        await pg.click('.page [data-act=spend-new] >> nth=0'); await pg.fill('#sdesc','County levy'); await pg.fill('#samt','50000'); await pg.click('#svat [data-vat="0"]'); await pg.click('[data-x=save]'); await pg.wait_for_timeout(200)
+        print('log footer:',(await pg.locator('table.dt >> nth=0 >> tfoot').inner_text()).replace('\n',' ').replace('\t',' '),'| tiles',[x.replace('\n',' ') for x in await pg.locator('.btile').all_inner_texts()][1:3])
+        print('line spent:',[ (await x.inner_text()).replace('\n',' ') for x in await pg.locator('table.bt tbody tr td:nth-child(4)').all()])
+        await pg.screenshot(path='sp-budget.png',full_page=False)
+        await pg.uncheck('#vatin'); await pg.wait_for_timeout(200); print('budget excludes VAT -> spent tile',(await pg.locator('.btile >> nth=1').inner_text()).replace('\n',' ')); await pg.check('#vatin')
+        await pg.click('[data-act=spend-open] >> nth=0'); await pg.fill('#samt','2000000'); await pg.click('[data-x=save]'); await pg.wait_for_timeout(200); print('edited entry -> net total',(await pg.locator('table.dt >> nth=0 >> tfoot td >> nth=1').inner_text()))
+        await pg.click('[data-act=ptab][data-v=miles]'); await pg.wait_for_timeout(200); print('milestone rows:',[ (await x.inner_text()).replace('\n',' ')[:60] for x in await pg.locator('.mact').all()])
+        await pg.click('[data-act=spend-new][data-v^="mile:"] >> nth=1'); print('+Spend presets milestone:',await pg.locator('#smile option:checked').inner_text()); await pg.fill('#sdesc','Roof trusses'); await pg.fill('#samt','300000'); await pg.click('[data-x=save]'); await pg.wait_for_timeout(200)
+        print('after: milestone 2 spend',(await pg.locator('.mact >> nth=1').inner_text()).replace('\n',' ')[:70]); await pg.screenshot(path='sp-miles.png')
+        await pg.reload(); await pg.wait_for_timeout(1500); print('after reload: entries',await pg.evaluate("S.plans.find(p=>p.id==='pb').spend.length"),'| no double migration',await pg.evaluate("(budOf(S.plans.find(p=>p.id==='pb')),S.plans.find(p=>p.id==='pb').spend.length)"))
+        await pg.set_viewport_size({'width':390,'height':800}); await pg.evaluate("V.view='plan';V.plan='pb';V.ptab='budget';render()"); await pg.wait_for_timeout(200); print('phone overflow-x',await pg.evaluate('document.documentElement.scrollWidth>innerWidth'),'errors',errs)
+        await b.close()
+asyncio.run(main())

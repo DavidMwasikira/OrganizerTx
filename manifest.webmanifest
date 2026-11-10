@@ -1,0 +1,14 @@
+{
+  "name": "OrganizerTX",
+  "short_name": "OrganizerTX",
+  "description": "Research any topic, keep the documents in a project folder, and get regular one-page updates.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F1F4F6",
+  "theme_color": "#0A6B7A",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

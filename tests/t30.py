@@ -1,0 +1,33 @@
+import asyncio
+from playwright.async_api import async_playwright
+exec(open('t.py').read().split('calls=[]')[0])
+async def main():
+    async with async_playwright() as p:
+        b=await p.chromium.launch(executable_path='/usr/bin/google-chrome',args=['--no-sandbox'])
+        pg=await (await b.new_context(viewport={'width':1670,'height':900})).new_page(); errs=[]; pg.on('pageerror',lambda e:errs.append(str(e)))
+        await pg.route('https://api.anthropic.com/**',lambda r:r.fulfill(status=200,content_type='text/event-stream',body=sse([{'type':'text','text':'[]'}])))
+        await pg.goto('http://localhost:8765/index.html'); await pg.wait_for_timeout(1500)
+        await pg.fill('#name','David'); await pg.fill('#country','Kenya'); await pg.fill('#key','k'); await pg.click('text=Start')
+        await pg.evaluate("S.weekly={kind:'ai',date:Date.now(),items:Array.from({length:10},(_,i)=>({name:'Idea '+i,what:'What it is',why:'Why it works',funds:'US$100',earn:'US$500'}))};S.plans[0].acts.push({name:'Design page X',status:'todo',due:new Date().toISOString().slice(0,10)});render()")
+        await pg.wait_for_timeout(300)
+        print('page height',await pg.evaluate("document.querySelector('main').scrollHeight"),'| home strip visible',await pg.locator('.caphome').is_visible(),'| tabs',await pg.locator('.htabs button').all_inner_texts())
+        await pg.wait_for_timeout(2500); print('placeholder now:',await pg.evaluate("document.querySelector('#ask').placeholder"))
+        await pg.screenshot(path='lean-home.png')
+        x0=await pg.evaluate("document.querySelector('.scar').scrollLeft"); await pg.click('[data-act=sug-scroll][data-v="1"]'); await pg.wait_for_timeout(700); print('carousel moved',x0,'->',await pg.evaluate("document.querySelector('.scar').scrollLeft"))
+        await pg.mouse.move(800,700); await pg.wait_for_timeout(5300); print('auto step ->',await pg.evaluate("document.querySelector('.scar').scrollLeft"))
+        await pg.hover('.capnav'); await pg.wait_for_timeout(300); print('flyout on hover',await pg.locator('.capfly').is_visible(),await pg.locator('.capfly').bounding_box()); await pg.screenshot(path='lean-fly.png')
+        await pg.hover('.capfly .capbtn.cam'); print('flyout stays when moving onto it',await pg.locator('.capfly').is_visible())
+        await pg.click('.capnav'); await pg.mouse.move(800,300); await pg.wait_for_timeout(300); print('pinned float',await pg.locator('.capfloat').is_visible(),'flyout hidden',not await pg.locator('.capfly').is_visible())
+        await pg.click('nav [data-v=tasks]'); print('float stays on Tasks',await pg.locator('.capfloat').is_visible())
+        bb=await pg.locator('.capfloat .hd').bounding_box(); await pg.mouse.move(bb['x']+40,bb['y']+12); await pg.mouse.down(); await pg.mouse.move(700,300,steps=5); await pg.mouse.up(); await pg.wait_for_timeout(200)
+        print('dragged to',await pg.evaluate("S.capPos")); await pg.screenshot(path='lean-float.png')
+        await pg.click('.capfloat [data-v=note]'); await pg.fill('#captext','from float'); await pg.click('[data-x=save]'); await pg.wait_for_timeout(300); print('capture from float saved',await pg.evaluate('logCount()'))
+        await pg.click('.capfloat .x'); print('closed',await pg.locator('.capfloat').count()==0)
+        await pg.click('nav [data-v=home]')
+        for k in ['links','updates','weekly']:
+            await pg.click(f'.htabs [data-v={k}]'); await pg.wait_for_timeout(150); print(k,'->',(await pg.locator('.htabs ~ section').first.inner_text())[:50].replace('\n',' | '))
+        await pg.fill('#ask','borehole'); print('controls row buttons:',await pg.locator('.card.ask button').all_inner_texts())
+        await pg.set_viewport_size({'width':390,'height':800}); await pg.evaluate("render()"); await pg.wait_for_timeout(200)
+        print('phone: strip visible',await pg.locator('.caphome').is_visible(),'| capnav visible',await pg.locator('.capnav').is_visible(),'| overflow-x',await pg.evaluate('document.documentElement.scrollWidth>innerWidth'),'| errors',errs); await pg.screenshot(path='lean-phone.png')
+        await b.close()
+asyncio.run(main())
