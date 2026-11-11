@@ -1,9 +1,18 @@
-ORGANIZERTX v0.51
+ORGANIZERTX v0.52
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.52 New Analytics tab on Home, in six steps: Import (Load Data from
+        Excel, CSV, PDF, Word, scans), Extract (tables, where each came
+        from, review queue), Clean and combine (reviewable fixes saved as
+        rerunnable steps, link or stack tables), Analyse (ask a question;
+        the figures are calculated in the app and the calculation is
+        shown), Visualise (bar, line, grouped, share, scatter, table;
+        click for the records; pin to a dashboard; copy or download),
+        Refresh and share (replace a file and the steps rerun; exports;
+        history).
   v0.51 The copy button on the Gantt charts and WBS copies the chart as a
         picture, exactly as shown (whole chart, not just the visible
         part). The icon flickers while it works, then shows a green tick
