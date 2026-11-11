@@ -1,9 +1,13 @@
-ORGANIZERTX v0.36
+ORGANIZERTX v0.37
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.37 Home is now four tabs. My Day (the default) shows the briefing on the
+        left with Quick links and Latest updates beside it. Folders and Tasks
+        Board show those pages inside Home. Research holds the research box,
+        Suggested for you and the weekly AI business ideas.
   v0.36 Budget tiles are uniform: equal size, each amount on one line with
         the currency as a small label, shrinking to fit narrow screens.
   v0.35 Spend log. Project spend is recorded as separate payments, each tied

@@ -617,7 +617,7 @@ nav .capnav[aria-expanded="true"]{background:rgba(255,255,255,.15);color:#fff}
 .dpri .n{flex:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 .9rem var(--display);color:var(--accent-ink);background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 70%,var(--ink)))}
 .dpri .t{font-weight:600}.dpri li.done .t{text-decoration:line-through;color:var(--muted)}.dpri li.done .n{background:var(--s-done)}
 .dchg{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:8px 0}.dchg:first-of-type{border-top:0}
-@media (max-width:760px){.hgrid>.hside{order:-1}.dchips{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.dchips{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){.dchip{transition:none}}
 .asst .alay{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start}
 .asst .amain{display:flex;flex-direction:column;gap:14px;min-width:0}
@@ -683,6 +683,8 @@ table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt 
 @media (max-width:760px){.rembar{margin:10px 14px 0}.cal .cc{min-height:74px;padding:2px}.cal .ce{font-size:.66rem;padding:1px 3px}.cal .ch{padding:4px 2px;font-size:.6rem;text-align:center}.bcat>div{grid-template-columns:minmax(0,1fr)}.bcat b{text-align:left}}
 @media (prefers-reduced-motion:reduce){.cal .cc{transition:none}}
 @media print{.rembar{display:none!important}}
+.page.hhead{padding-bottom:0;gap:12px}.hhead+.page{padding-top:14px}.hhead+.ws{margin-top:6px;border-top:1px solid var(--line)}
+.hgrid.day .hside{display:flex;flex-direction:column;gap:12px}
 .hgrid>*{min-width:0}
 @media (max-width:760px){.hgrid{grid-template-columns:minmax(0,1fr)}}
 .scar{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;padding:6px 4px 14px;scrollbar-width:none}
@@ -719,7 +721,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.36';
+const VERSION='v0.37';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2143,27 +2145,27 @@ function sugBlock(){return `<div class="row" style="justify-content:space-betwee
 function viewHome(){
   const depth=V.depth||S.profile.depth,first=(S.profile.name||'').split(' ')[0];
   const recent=S.topics.flatMap(t=>t.docs.map(d=>({t,d}))).sort((a,b)=>b.d.date-a.d.date).slice(0,5);
-  const today=todayTasks(),open=allTasks().filter(x=>!isDone(x.a)).length,ht=V.htab||'weekly';
-  return `<div class="page wide">
+  const open=allTasks().filter(x=>!isDone(x.a)).length,ht=V.htab==='updates'?'updates':'links',hv=['folders','tasks','research'].includes(V.hview)?V.hview:'day';
+  const head=`<div class="page wide hhead">
   ${!hosted()?'<div class="banner">Preview inside Claude. Research here uses what Claude already knows, without live web search, and nothing is kept for long. The installed version searches the web and keeps your folders.</div>':''}
-  <div class="row" style="justify-content:space-between;align-items:flex-start"><div><h1 class="hello">${(h=>h<12?'Good morning':h<17?'Good afternoon':'Good evening')(new Date().getHours())}${first?', <em>'+esc(first)+'</em>':''}</h1></div></div>
+  <h1 class="hello">${(h=>h<12?'Good morning':h<17?'Good afternoon':'Good evening')(new Date().getHours())}${first?', <em>'+esc(first)+'</em>':''}</h1>
+  <div class="htabs" role="group" aria-label="Home sections">${[['day','My Day',''],['folders','Folders',S.topics.length],['tasks','Tasks Board',open],['research','Research','']].map(([k,l,n])=>`<button data-act="hview" data-v="${k}" aria-pressed="${hv===k}">${l}${n===''?'':`<b>${n}</b>`}</button>`).join('')}</div></div>`;
+  if(hv==='tasks')return head+viewTasks();
+  if(hv==='folders')return head+wsWrap(viewTopics());
+  if(hv==='research')return head+`<div class="page wide hbody">${askCard()}${sugBlock()}${weeklyHtml()}</div>`;
+  return head+`<div class="page wide hbody">
   <div class="caphome">${capStrip()}</div>
-  <div class="hgrid">
-    <div class="list">
-      ${askCard()}
-      ${sugBlock()}
-    </div>
+  <div class="hgrid day">
+    <div class="list">${myDayHtml()}</div>
     <div class="hside">
-      ${myDayHtml()}
-    </div>
-  </div>
-  <div class="htabs" role="group" aria-label="More on Home">${[['weekly','AI ideas this week',S.weekly?S.weekly.items.length:0],['links','Quick links',quickLinks().length],['updates','Latest updates',recent.length]].map(([k,l,n])=>`<button data-act="htab" data-v="${k}" aria-pressed="${ht===k}">${l}<b>${n}</b></button>`).join('')}</div>
+  <div class="htabs" role="group" aria-label="Links and updates">${[['links','Quick links',quickLinks().length],['updates','Latest updates',recent.length]].map(([k,l,n])=>`<button data-act="htab" data-v="${k}" aria-pressed="${ht===k}">${l}<b>${n}</b></button>`).join('')}</div>
   ${ht==='links'?`<section class="card"><div class="row" style="justify-content:flex-end"><button class="btn" data-act="pin">+ Pin item</button></div>
     <div class="qgrid">${quickLinks().map(l=>`<button class="qcard ${l.cls}" data-act="${l.act}" data-v="${esc(l.v)}"><span class="ic">${l.icon}</span><span class="grow"><span class="b" style="font-weight:600;overflow-wrap:anywhere">${esc(l.title)}</span><span class="b small muted">${esc(l.sub)}</span></span></button>`).join('')}</div></section>`:''}
   ${ht==='updates'?`<section class="card"><div class="row" style="justify-content:flex-end"><button class="btn ghost small" data-act="nav" data-v="topics">Open folders</button></div><div class="list" style="margin-top:12px">
     ${recent.length?recent.map(({t,d})=>`<button class="item" data-act="open-topic" data-v="${t.id}">${t.unread&&d===t.docs[t.docs.length-1]?'<span class="dot" title="Unread"></span>':''}<span class="grow"><span class="t">${esc(d.title)}</span><br><span class="mono muted">${esc(d.ref)}</span></span><span class="pill ${d.type==='U'?'due':'on'}">${kindOf(d)}</span></button>`).join(''):'<p class="muted small">Your reports and updates will appear here.</p>'}
   </div></section>`:''}
-  ${ht==='weekly'?weeklyHtml():''}</div>`;
+    </div>
+  </div></div>`;
 }
 function weeklyHtml(){
   const w=S.weekly,mine=busy&&busy.topicId==='weekly',at=S.dailyAt||'07:00';
@@ -2743,8 +2745,8 @@ function wsItems(){
   ].filter(g=>g.items.length);
 }
 function wsWrap(body){
-  const wk=[V.view,V.topic,V.plan,V.guide].join('|');if(V.view!=='topics'&&wk!==wsWrap.key)V.wsg='';wsWrap.key=wk;
-  const gs=wsItems(),none=V.view==='topics',cur=gs.find(g=>g.items.some(x=>x.on)),sel=gs.find(g=>g.label===V.wsg)||cur||gs[0];
+  const wk=[V.view,V.topic,V.plan,V.guide].join('|');if(!['topics','home'].includes(V.view)&&wk!==wsWrap.key)V.wsg='';wsWrap.key=wk;
+  const gs=wsItems(),none=V.view==='topics'||V.view==='home',cur=gs.find(g=>g.items.some(x=>x.on)),sel=gs.find(g=>g.label===V.wsg)||cur||gs[0];
   const side=`<aside class="wsside" aria-label="Your chats and projects">${none&&HIST.length?'<div><button class="btn ghost" data-act="back" style="padding-left:0">&larr; Back</button></div>':''}<div class="row" style="justify-content:space-between"><h1 style="font-size:1.7rem">Folders</h1><button class="btn ghost small" data-act="nav" data-v="settings">${DISK.root&&DISK.ok?'Saved to '+esc(DISK.root.name)+'/projects/':DISK.root?'Computer folder not connected':canDisk()?'Save as folders on this computer':''}</button></div>
     <div class="htabs wstabs" role="group" aria-label="Show">${gs.map(g=>`<button data-act="wsg" data-v="${g.label}" aria-pressed="${g===sel}" style="--band:${g.band}"><i></i>${g.label}<b>${g.items.length}</b></button>`).join('')}</div>
     ${(sel?[sel]:[]).map(g=>`${g.items.map(x=>`<button class="it" style="--band:${g.band}" data-act="${x.act}" data-v="${esc(x.v)}" aria-current="${!!x.on}"><span class="n">${x.dot?'<span class="dot" title="Unread update"></span> ':''}${esc(x.name)}</span><span class="m">${esc(x.meta)}${x.bar!==undefined?`<span class="bar"><i style="width:${x.bar}%"></i></span>`:''}</span></button>`).join('')}`).join('')}</aside>`;
@@ -2768,7 +2770,7 @@ function render(){
   if(HIST.length&&!V.doc&&['tasks','actions','brain','help','settings','rules','field','assist'].includes(V.view)&&!(V.view==='assist'&&V.paper))bodyHtml=body.replace(/^(\s*<div class="page[^"]*"[^>]*>)/,'$1<div><button class="btn ghost" data-act="back" style="padding-left:0">&larr; Back</button></div>');
   if(!V.doc&&['topic','plan','guide','topics'].includes(V.view))bodyHtml=wsWrap(body);
   const cp=curPlan(),cur=V.view==='topic'||V.view==='guide'?'topics':V.view==='plan'?'topics':V.view;
-  const where=[V.view,V.topic,V.guide,V.plan,V.tab,V.tmode,V.doc,V.btab,V.bsec,V.lib,V.slide,V.dcat,V.dmode,V.atab,V.paper,V.ptab,V.calM].join('|'),old=$('main'),keep=old&&where===render.where?old.scrollTop:0;render.where=where;
+  const where=[V.view,V.topic,V.guide,V.plan,V.tab,V.tmode,V.doc,V.btab,V.bsec,V.lib,V.slide,V.dcat,V.dmode,V.atab,V.paper,V.ptab,V.calM,V.hview].join('|'),old=$('main'),keep=old&&where===render.where?old.scrollTop:0;render.where=where;
   const themeBtn=`<button data-act="theme" class="${'T'}" aria-label="Switch to ${isDark()?'light':'dark'} theme" title="Switch to ${isDark()?'light':'dark'} theme">${isDark()?ICON.sun:ICON.moon}</button>`;
   const rail=`<nav aria-label="Main"><button class="create" data-act="create"><i>+</i><span>Create</span></button>${tabs.map(([k,l])=>`<button data-act="nav" data-v="${k}" ${k==='assist'?'class="only-wide"':''} ${cur===k?'aria-current="page"':''}>${ICON[k]}<span>${l}</span>${k==='topics'&&unreadTotal()?'<span class="dot" title="Unread updates"></span>':''}</button>`).join('')}<button class="only-wide capnav" data-act="cap-pin" aria-expanded="${!!S.capPin}" aria-label="Data Capture: photo, voice note, web page note, text note">${ICON.camera}<span>Data Capture</span></button><span class="sp"></span><span class="only-wide mono" style="color:var(--rail-ink);text-align:center;font-size:.7rem;opacity:.8">${VERSION}</span><span class="util only-wide">${themeBtn}<button data-act="rail-hide" aria-label="Hide the sidebar" title="Hide the sidebar">${ICON.hide}</button></span><button class="only-wide" data-act="nav" data-v="help" ${cur==='help'?'aria-current="page"':''}>${ICON.help}<span>Help</span></button><button class="only-wide" data-act="nav" data-v="settings" ${cur==='settings'?'aria-current="page"':''}>${ICON.settings}<span>Settings</span></button></nav>`;
   const strip=`<div class="topstrip only-narrow"><span class="mono small">OrganizerTX ${VERSION}</span><span class="row" style="gap:6px"><button class="btn" data-act="theme" aria-label="Switch theme">${isDark()?ICON.sun:ICON.moon}</button><button class="btn" data-act="nav" data-v="assist" aria-label="Assistant" title="Assistant">${ICON.assist}</button><button class="btn" data-act="nav" data-v="help" aria-label="Help">${ICON.help}</button><button class="btn" data-act="nav" data-v="settings" aria-label="Settings">${ICON.settings}</button></span></div>`;
@@ -3022,7 +3024,7 @@ function createMenu(){
     <button class="btn" data-x="project"><span><strong>Project</strong><br><span class="small muted">A plan with activities, a timeline and progress</span></span></button>
   </div><div class="row" style="justify-content:flex-end"><button class="btn ghost" data-x="cancel">Close</button></div></div>`,{
     cancel(){},
-    research(){V.view='home';render();setTimeout(()=>{const a=$('#ask');if(a)a.focus()},50)},
+    research(){V.view='home';V.hview='research';render();setTimeout(()=>{const a=$('#ask');if(a)a.focus()},50)},
     assist(){V.view='assist';V.paper=null;render()},
     task(){setTimeout(()=>taskModal(),0)},
     project(){setTimeout(projectModal,0)},
@@ -3322,6 +3324,7 @@ const ACT={
   dcat(v){V.dcat=V.dcat===v?'all':v},
   dtab(v){V.dtab=v},
   wsg(v){V.wsg=v},
+  hview(v){V.hview=v},
   ptab(v){V.ptab=v},
   'cal-nav'(v){if(v==='0'){V.calM=dash(Date.now()).slice(0,7);return}const [Y,M]=(/^\d{4}-\d\d$/.test(V.calM||'')?V.calM:dash(Date.now()).slice(0,7)).split('-').map(Number),d=new Date(Y,M-1+ +v,1);V.calM=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')},
   'task-new-day'(v){taskModal(null,'todo',V.tfilter!=='all'?V.tfilter:null,v)},
