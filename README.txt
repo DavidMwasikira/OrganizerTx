@@ -1,9 +1,12 @@
-ORGANIZERTX v0.39
+ORGANIZERTX v0.40
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.40 Research tab: two columns under the research box. Left: "Current News
+        Flash" (Suggested for you). Right: "Week NN: Tidbits" (10 best AI
+        business ideas).
   v0.39 Sidebar tidied: Folders is reached from the Home tabs, and Rules and
         skills from a new "Rules & Skills" tab beside "Settings" on the
         Settings page. Both buttons are removed from the sidebar.

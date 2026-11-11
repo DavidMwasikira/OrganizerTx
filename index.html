@@ -683,6 +683,13 @@ table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt 
 @media (max-width:760px){.rembar{margin:10px 14px 0}.cal .cc{min-height:74px;padding:2px}.cal .ce{font-size:.66rem;padding:1px 3px}.cal .ch{padding:4px 2px;font-size:.6rem;text-align:center}.bcat>div{grid-template-columns:minmax(0,1fr)}.bcat b{text-align:left}}
 @media (prefers-reduced-motion:reduce){.cal .cc{transition:none}}
 @media print{.rembar{display:none!important}}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}.rgrid>*{min-width:0}
+.rsug{display:flex;flex-direction:column;gap:10px}
+.ttl2{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;font-size:1rem}
+.ttl2 b{font:700 1.15rem/1.25 var(--display);color:var(--ink)}
+.ttl2 small{font:500 .8rem var(--body);color:var(--muted);letter-spacing:0;text-transform:none}
+.fold:has(.ttl2){align-items:flex-start}.fold:has(.ttl2) svg{margin-top:5px}
+@media (max-width:900px){.rgrid{grid-template-columns:minmax(0,1fr)}}
 .settop button{font-family:var(--display);font-size:1.25rem;padding:8px 16px}
 .page.hhead{padding-bottom:0;gap:12px;flex:none}.hhead+.desk{margin-top:10px}.hhead+.page{padding-top:14px}.hhead+.ws{margin-top:6px;border-top:1px solid var(--line)}
 .hgrid.day .hside{display:flex;flex-direction:column;gap:12px}
@@ -722,7 +729,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.39';
+const VERSION='v0.40';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2141,7 +2148,7 @@ function askCard(){const depth=V.depth||S.profile.depth;return `<div class="card
           <button class="btn ghost small" data-act="refine" ${busy?'disabled':''}>${busy&&busy.topicId==='refine'?'<span class="spin"></span>Refining...':'Refine prompt'}</button>
           ${V.askPrev?'<button class="btn ghost small" data-act="refine-undo">Undo refine</button>':''}<button class="btn primary" data-act="research">Research</button></span></div>
       </div>`}
-function sugBlock(){return `<div class="row" style="justify-content:space-between"><button class="fold" data-act="sug-toggle" aria-expanded="${S.sugOpen!==false}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg><span class="lbl">Suggested for you</span></button><span class="row"><button class="btn ghost small" data-act="fresh-ideas" ${busy?'disabled':''}>${busy&&busy.topicId==='ideas'?'Finding ideas...':'Fresh ideas'}</button>${S.sugOpen!==false?'<button class="btn wknav" data-act="sug-scroll" data-v="-1" aria-label="Previous suggestions">&lsaquo;</button><button class="btn wknav" data-act="sug-scroll" data-v="1" aria-label="Next suggestions">&rsaquo;</button>':''}</span></div>
+function sugBlock(){return `<div class="row" style="justify-content:space-between"><button class="fold" data-act="sug-toggle" aria-expanded="${S.sugOpen!==false}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg><span class="ttl2"><b>Current News Flash</b><small>Suggested for you</small></span></button><span class="row"><button class="btn ghost small" data-act="fresh-ideas" ${busy?'disabled':''}>${busy&&busy.topicId==='ideas'?'Finding ideas...':'Fresh ideas'}</button>${S.sugOpen!==false?'<button class="btn wknav" data-act="sug-scroll" data-v="-1" aria-label="Previous suggestions">&lsaquo;</button><button class="btn wknav" data-act="sug-scroll" data-v="1" aria-label="Next suggestions">&rsaquo;</button>':''}</span></div>
       ${S.sugOpen!==false?`<div class="scar" tabindex="0" aria-label="Suggestions, scroll sideways">${ideas().map(x=>`<button class="scard" data-act="idea" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>`:''}`}
 /* the greeting and the four Home tabs stay at the top of every page; the tab that matches the current page is highlighted */
 function homeHead(){
@@ -2159,7 +2166,7 @@ function viewHome(){
   const head='';
   if(hv==='tasks')return head+viewTasks();
   if(hv==='folders')return head+wsWrap(viewTopics());
-  if(hv==='research')return head+`<div class="page wide hbody">${askCard()}${sugBlock()}${weeklyHtml()}</div>`;
+  if(hv==='research')return head+`<div class="page wide hbody">${askCard()}<div class="rgrid"><section class="card rsug">${sugBlock()}</section>${weeklyHtml()}</div></div>`;
   return head+`<div class="page wide hbody">
   <div class="caphome">${capStrip()}</div>
   <div class="hgrid day">
@@ -2177,7 +2184,7 @@ function viewHome(){
 function weeklyHtml(){
   const w=S.weekly,mine=busy&&busy.topicId==='weekly',at=S.dailyAt||'07:00';
   const when=w?'Updated '+fmtShort(w.date)+', '+new Date(w.date).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' · ':'';
-  return `<section class="card"><div class="row" style="justify-content:space-between"><h2 style="font-size:1.15rem">${esc(weeklyTitle())}</h2><span class="row"><span class="small muted">${mine?'<span class="working"><span class="spin"></span>Updating now</span>':when+'refreshes daily at '+esc(at)}</span><button class="btn ghost small" data-act="weekly-now" ${busy?'disabled':''}>Update now</button>${w?'<button class="btn ghost small" data-act="weekly-email">Email this list</button><button class="btn wknav" data-act="wk-scroll" data-v="-1" aria-label="Scroll left">&lsaquo;</button><button class="btn wknav" data-act="wk-scroll" data-v="1" aria-label="Scroll right">&rsaquo;</button>':''}</span></div>
+  return `<section class="card"><div class="row" style="justify-content:space-between"><h2 class="ttl2"><b>Week ${isoWeek(S.weekly?S.weekly.date:Date.now())}: Tidbits</b><small>10 best AI business ideas</small></h2><span class="row"><span class="small muted">${mine?'<span class="working"><span class="spin"></span>Updating now</span>':when+'refreshes daily at '+esc(at)}</span><button class="btn ghost small" data-act="weekly-now" ${busy?'disabled':''}>Update now</button>${w?'<button class="btn ghost small" data-act="weekly-email">Email this list</button><button class="btn wknav" data-act="wk-scroll" data-v="-1" aria-label="Scroll left">&lsaquo;</button><button class="btn wknav" data-act="wk-scroll" data-v="1" aria-label="Scroll right">&rsaquo;</button>':''}</span></div>
     ${w?`<ol class="wk" tabindex="0" aria-label="Ideas, scroll sideways">${w.items.map((x,i)=>`<li><button data-act="idea" data-v="${esc(x.name+': '+x.what)}"><span class="num">${i+1}</span><span class="grow"><span class="b" style="font-weight:600">${esc(x.name)}</span><span class="b small">${esc(x.what)}</span><span class="b small muted">${esc(x.why)}</span><span class="facts">${x.funds?`<span><b>Funds</b>${esc(x.funds)}</span>`:''}${x.earn?`<span><b>Could earn</b>${esc(x.earn)}</span>`:''}</span></span></button></li>`).join('')}</ol>
       <p class="small muted" style="margin:6px 0 0">${w.items.length} idea${w.items.length===1?'':'s'}${w.items.length<10?' (the answer was cut short; press Update now for a full list)':''}. Scroll sideways to see them all, and choose one to research it. ${w.kind==='ai'?'':'This is the earlier general list; it is replaced at the next update. '}AI suggestions, not financial advice.</p>
       ${S.weeklyMail?`<p class="small muted" style="margin:6px 0 0">${esc(S.weeklyMail)}</p>`:''}`
