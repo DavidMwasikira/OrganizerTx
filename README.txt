@@ -1,9 +1,11 @@
-ORGANIZERTX v0.37
+ORGANIZERTX v0.38
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.38 The greeting and the four Home tabs (My Day, Folders, Tasks Board,
+        Research) now stay at the top of every page.
   v0.37 Home is now four tabs. My Day (the default) shows the briefing on the
         left with Quick links and Latest updates beside it. Folders and Tasks
         Board show those pages inside Home. Research holds the research box,

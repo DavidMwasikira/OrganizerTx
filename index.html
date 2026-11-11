@@ -683,7 +683,7 @@ table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt 
 @media (max-width:760px){.rembar{margin:10px 14px 0}.cal .cc{min-height:74px;padding:2px}.cal .ce{font-size:.66rem;padding:1px 3px}.cal .ch{padding:4px 2px;font-size:.6rem;text-align:center}.bcat>div{grid-template-columns:minmax(0,1fr)}.bcat b{text-align:left}}
 @media (prefers-reduced-motion:reduce){.cal .cc{transition:none}}
 @media print{.rembar{display:none!important}}
-.page.hhead{padding-bottom:0;gap:12px}.hhead+.page{padding-top:14px}.hhead+.ws{margin-top:6px;border-top:1px solid var(--line)}
+.page.hhead{padding-bottom:0;gap:12px;flex:none}.hhead+.desk{margin-top:10px}.hhead+.page{padding-top:14px}.hhead+.ws{margin-top:6px;border-top:1px solid var(--line)}
 .hgrid.day .hside{display:flex;flex-direction:column;gap:12px}
 .hgrid>*{min-width:0}
 @media (max-width:760px){.hgrid{grid-template-columns:minmax(0,1fr)}}
@@ -721,7 +721,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.37';
+const VERSION='v0.38';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2142,14 +2142,20 @@ function askCard(){const depth=V.depth||S.profile.depth;return `<div class="card
       </div>`}
 function sugBlock(){return `<div class="row" style="justify-content:space-between"><button class="fold" data-act="sug-toggle" aria-expanded="${S.sugOpen!==false}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg><span class="lbl">Suggested for you</span></button><span class="row"><button class="btn ghost small" data-act="fresh-ideas" ${busy?'disabled':''}>${busy&&busy.topicId==='ideas'?'Finding ideas...':'Fresh ideas'}</button>${S.sugOpen!==false?'<button class="btn wknav" data-act="sug-scroll" data-v="-1" aria-label="Previous suggestions">&lsaquo;</button><button class="btn wknav" data-act="sug-scroll" data-v="1" aria-label="Next suggestions">&rsaquo;</button>':''}</span></div>
       ${S.sugOpen!==false?`<div class="scar" tabindex="0" aria-label="Suggestions, scroll sideways">${ideas().map(x=>`<button class="scard" data-act="idea" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>`:''}`}
-function viewHome(){
-  const depth=V.depth||S.profile.depth,first=(S.profile.name||'').split(' ')[0];
-  const recent=S.topics.flatMap(t=>t.docs.map(d=>({t,d}))).sort((a,b)=>b.d.date-a.d.date).slice(0,5);
-  const open=allTasks().filter(x=>!isDone(x.a)).length,ht=V.htab==='updates'?'updates':'links',hv=['folders','tasks','research'].includes(V.hview)?V.hview:'day';
-  const head=`<div class="page wide hhead">
+/* the greeting and the four Home tabs stay at the top of every page; the tab that matches the current page is highlighted */
+function homeHead(){
+  const first=(S.profile.name||'').split(' ')[0],open=allTasks().filter(x=>!isDone(x.a)).length;
+  const hv=V.view==='home'?(['folders','tasks','research'].includes(V.hview)?V.hview:'day'):['topics','topic','plan','guide'].includes(V.view)||V.doc?'folders':V.view==='tasks'?'tasks':'';
+  return `<div class="page wide hhead noprint">
   ${!hosted()?'<div class="banner">Preview inside Claude. Research here uses what Claude already knows, without live web search, and nothing is kept for long. The installed version searches the web and keeps your folders.</div>':''}
   <h1 class="hello">${(h=>h<12?'Good morning':h<17?'Good afternoon':'Good evening')(new Date().getHours())}${first?', <em>'+esc(first)+'</em>':''}</h1>
   <div class="htabs" role="group" aria-label="Home sections">${[['day','My Day',''],['folders','Folders',S.topics.length],['tasks','Tasks Board',open],['research','Research','']].map(([k,l,n])=>`<button data-act="hview" data-v="${k}" aria-pressed="${hv===k}">${l}${n===''?'':`<b>${n}</b>`}</button>`).join('')}</div></div>`;
+}
+function viewHome(){
+  const depth=V.depth||S.profile.depth,first=(S.profile.name||'').split(' ')[0];
+  const recent=S.topics.flatMap(t=>t.docs.map(d=>({t,d}))).sort((a,b)=>b.d.date-a.d.date).slice(0,5);
+  const ht=V.htab==='updates'?'updates':'links',hv=['folders','tasks','research'].includes(V.hview)?V.hview:'day';
+  const head='';
   if(hv==='tasks')return head+viewTasks();
   if(hv==='folders')return head+wsWrap(viewTopics());
   if(hv==='research')return head+`<div class="page wide hbody">${askCard()}${sugBlock()}${weeklyHtml()}</div>`;
@@ -2774,7 +2780,7 @@ function render(){
   const themeBtn=`<button data-act="theme" class="${'T'}" aria-label="Switch to ${isDark()?'light':'dark'} theme" title="Switch to ${isDark()?'light':'dark'} theme">${isDark()?ICON.sun:ICON.moon}</button>`;
   const rail=`<nav aria-label="Main"><button class="create" data-act="create"><i>+</i><span>Create</span></button>${tabs.map(([k,l])=>`<button data-act="nav" data-v="${k}" ${k==='assist'?'class="only-wide"':''} ${cur===k?'aria-current="page"':''}>${ICON[k]}<span>${l}</span>${k==='topics'&&unreadTotal()?'<span class="dot" title="Unread updates"></span>':''}</button>`).join('')}<button class="only-wide capnav" data-act="cap-pin" aria-expanded="${!!S.capPin}" aria-label="Data Capture: photo, voice note, web page note, text note">${ICON.camera}<span>Data Capture</span></button><span class="sp"></span><span class="only-wide mono" style="color:var(--rail-ink);text-align:center;font-size:.7rem;opacity:.8">${VERSION}</span><span class="util only-wide">${themeBtn}<button data-act="rail-hide" aria-label="Hide the sidebar" title="Hide the sidebar">${ICON.hide}</button></span><button class="only-wide" data-act="nav" data-v="help" ${cur==='help'?'aria-current="page"':''}>${ICON.help}<span>Help</span></button><button class="only-wide" data-act="nav" data-v="settings" ${cur==='settings'?'aria-current="page"':''}>${ICON.settings}<span>Settings</span></button></nav>`;
   const strip=`<div class="topstrip only-narrow"><span class="mono small">OrganizerTX ${VERSION}</span><span class="row" style="gap:6px"><button class="btn" data-act="theme" aria-label="Switch theme">${isDark()?ICON.sun:ICON.moon}</button><button class="btn" data-act="nav" data-v="assist" aria-label="Assistant" title="Assistant">${ICON.assist}</button><button class="btn" data-act="nav" data-v="help" aria-label="Help">${ICON.help}</button><button class="btn" data-act="nav" data-v="settings" aria-label="Settings">${ICON.settings}</button></span></div>`;
-  $('#app').innerHTML=`${S.railHidden?'<style>@media (min-width:761px){nav{display:none}}</style><button class="btn railshow" data-act="rail-show" aria-label="Show the sidebar" title="Show the sidebar">'+ICON.menu+'</button>':''}${rail}${capFly()}<main>${strip}${remBar()}${bodyHtml}</main>${S.capPin?capFloat():''}${!V.doc&&['home','tasks','actions','topics','field'].includes(V.view)?'<button class="fab only-narrow" data-act="create" aria-label="Create">+</button>':''}`;
+  $('#app').innerHTML=`${S.railHidden?'<style>@media (min-width:761px){nav{display:none}}</style><button class="btn railshow" data-act="rail-show" aria-label="Show the sidebar" title="Show the sidebar">'+ICON.menu+'</button>':''}${rail}${capFly()}<main>${strip}${remBar()}${homeHead()}${bodyHtml}</main>${S.capPin?capFloat():''}${!V.doc&&['home','tasks','actions','topics','field'].includes(V.view)?'<button class="fab only-narrow" data-act="create" aria-label="Create">+</button>':''}`;
   $('#layer').innerHTML='';
   if(V.view==='brain'&&V.btab!=='notes'&&!V.doc)startBrainMap();
   if(V.view==='desk'&&navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(e=>{const el=$('#deskstore');if(el&&e&&e.usage!==undefined)el.textContent='The browser reports about '+fmtSize(e.usage)+' stored for this app in all (its own figure, which can lag behind recent changes)'+(e.quota?', '+(100*e.usage/e.quota<0.1?'under 0.1':(100*e.usage/e.quota).toFixed(1))+'% of the '+fmtSize(e.quota)+' it allows.':'.')}).catch(()=>{const el=$('#deskstore');if(el)el.textContent=''});
@@ -3324,7 +3330,7 @@ const ACT={
   dcat(v){V.dcat=V.dcat===v?'all':v},
   dtab(v){V.dtab=v},
   wsg(v){V.wsg=v},
-  hview(v){V.hview=v},
+  hview(v){V.hview=v;V.view='home';V.doc=null},
   ptab(v){V.ptab=v},
   'cal-nav'(v){if(v==='0'){V.calM=dash(Date.now()).slice(0,7);return}const [Y,M]=(/^\d{4}-\d\d$/.test(V.calM||'')?V.calM:dash(Date.now()).slice(0,7)).split('-').map(Number),d=new Date(Y,M-1+ +v,1);V.calM=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')},
   'task-new-day'(v){taskModal(null,'todo',V.tfilter!=='all'?V.tfilter:null,v)},
