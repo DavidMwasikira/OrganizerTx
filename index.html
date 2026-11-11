@@ -655,7 +655,7 @@ nav .capnav[aria-expanded="true"]{background:rgba(255,255,255,.15);color:#fff}
 .cal .ce[data-s="doing"]{border-left-color:var(--s-doing)}.cal .ce[data-s="blocked"]{border-left-color:var(--s-blocked)}.cal .ce[data-s="done"]{border-left-color:var(--s-done);text-decoration:line-through;color:var(--muted)}
 .cal .ce.ms{border-left-color:var(--k5);background:color-mix(in srgb,var(--k5) 14%,var(--surface));font-weight:600}
 .cal .cm{padding-left:6px}
-.bstrip{display:flex;align-items:center;gap:22px;flex-wrap:wrap;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:4px var(--r) var(--r) 4px;padding:12px 16px;transition:box-shadow .15s}
+.bstrip{display:flex;align-items:center;gap:14px 48px;flex-wrap:wrap;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:4px var(--r) var(--r) 4px;padding:12px 16px;transition:box-shadow .15s}
 .bstrip:hover{box-shadow:0 0 0 2px var(--glow)}
 .bstrip>span{display:flex;flex-direction:column;gap:2px;min-width:0}.bstrip b{font:700 1.15rem var(--display);font-variant-numeric:tabular-nums}.bstrip .grow{flex:1;min-width:160px}.bstrip .bar{display:block;width:100%;flex:none}
 table.dt td[style*="text-align:right"]{white-space:nowrap}
@@ -723,6 +723,16 @@ table.rt td{vertical-align:top;padding-top:10px;padding-bottom:10px}table.rt but
 .aglinks path.hit{stroke:transparent;stroke-width:10;fill:none;pointer-events:stroke;cursor:pointer}.aglinks path.hit:hover{stroke:color-mix(in srgb,var(--link) 22%,transparent)}
 .agnow b{position:absolute;top:2px;left:4px;white-space:nowrap;font:600 .64rem var(--body);color:var(--surface);background:var(--signal);border-radius:4px;padding:1px 5px}
 .agout{position:absolute;top:4px;left:8px;background:var(--surface);padding:1px 6px;border-radius:4px;z-index:3}
+.bstrip .ring{width:58px;height:58px;flex:none}.ring .tr{stroke:var(--sunk)}.ring .fg{stroke:var(--accent)}.ring .ov{stroke:var(--bad)}.ring text{font:700 11.5px var(--display);fill:var(--ink)}
+.bstrip .go{margin-left:auto;color:var(--accent);font-weight:600;flex-direction:row}
+.ptabs{flex-wrap:wrap}.ptabs button{padding:10px 11px}
+.sech{font-size:1.1rem;margin:6px 0 -4px}
+@media (max-width:760px){.htog .only-wide{display:none}.bstrip{gap:12px 26px}}
+@media (max-width:860px){.htog [data-act=ws-hide]{display:none}}
+.htabs .htog{margin-left:auto;display:flex;gap:4px;align-items:center;padding-bottom:4px}.htabs .htog .btn{min-height:32px;font-weight:500;white-space:nowrap}
+.btn.icon{width:36px;min-height:36px;padding:0;justify-content:center}.btn.icon svg{width:17px;height:17px}
+.agzoom{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.agzoom input[type=range]{width:min(320px,50vw);accent-color:var(--accent)}
+.agbody.nogrid{background-image:none}.agbody .vl{position:absolute;top:0;bottom:0;width:1px;background:var(--line);z-index:0}
 .pviews{display:flex;flex-direction:column;gap:12px;min-width:0}
 .ag{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);min-width:0}
 .agl{flex:0 0 auto;max-width:64%;overflow-x:auto;border-right:2px solid var(--line)}.agr{flex:1;min-width:0;overflow-x:auto}
@@ -818,7 +828,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.46';
+const VERSION='v0.47';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1533,14 +1543,19 @@ function openItem(key,i){
 function buildPlan(p){
   const G=guideOf(p);
   return job('plan:'+p.id,'Preparing the activity plan',async(signal,onText,onStatus)=>{
-    const r=await callAI({system:systemPrompt(),depth:'moderate',search:hosted()?2:0,maxTokens:7500,signal,onStatus,messages:[{role:'user',content:
+    const gen=p.gen||{};
+    const r=await callAI({system:systemPrompt(),depth:'moderate',search:hosted()?2:0,maxTokens:gen.budget||gen.extras?12000:7500,signal,onStatus,messages:[{role:'user',content:
 `Prepare a practical activity plan for this${p.guide?', from the guide "'+G.title+'"':' project of the user'}:
 ${p.name}${p.what?': '+p.what:''}
 ${p.guide?G.a+': '+(p.a||'not stated')+'. ':''}The user is starting from zero in ${place()}.
 ${searchLine()}
 Reply with only a JSON object, with no text before or after it:
 {"summary": "two sentences on the approach and what done looks like", "activities": [{"name": "at most 6 words", "detail": "one sentence saying exactly what to do and what it produces", "start": <week number it starts, counting from 1>, "weeks": <how many weeks it takes>, "cost": "estimated cost${moneyFmt()}, or empty", "after": [<numbers of the activities, counting from 1, that must be finished before this one can be finished; empty if none>], "phase": "the stage it belongs to: one of 3 to 5 short stage names you choose for this plan, such as Preparation, Approvals, Construction, Handover"}]}
-Give 8 to 12 activities in working order. Let activities overlap where that is realistic. The whole plan must fit in ${G.maxWeeks} weeks.`}]});
+Give 8 to 12 activities in working order. Let activities overlap where that is realistic. The whole plan must fit in ${G.maxWeeks} weeks.${gen.budget||gen.extras?`
+Also add these keys to the same JSON object:`:''}${gen.budget?`
+"budget": [{"category": one of ${JSON.stringify(BCATS)}, "item": "clear title of the cost", "planned": <amount as a plain number in ${curSym()||'the local currency'}, no separators>}] with 6 to 14 realistic lines for ${place()}${gen.total?', adding up to exactly '+gen.total:''}; be conservative and do not invent precise quotes.
+"milestones": [{"name": "a checkpoint, at most 6 words", "week": <the week number it is reached>}] with 4 to 7 milestones in order.`:''}${gen.extras?`
+"risks": [{"type": "risk" or "issue", "level": "high", "med" or "low", "title": "what could go wrong, one short sentence", "response": "what to do about it, one short sentence"}] with 5 to 8 entries specific to this project and place.`:''}`}]});
     const o=grab(r.text,'{','}')||{},acts=(Array.isArray(o.activities)&&o.activities.length?o.activities:grabList(r.text)).map(a=>{
       const st=Math.min(Math.max(parseInt(a&&a.start,10)||1,1),G.maxWeeks),w=Math.min(Math.max(parseInt(a&&a.weeks,10)||1,1),G.maxWeeks-st+1);
       return {id:uid(),name:str(a&&a.name),detail:str(a&&a.detail),cost:str(a&&a.cost),start:st,weeks:w,status:'todo',phase:clip(str(a&&a.phase),40),_after:Array.isArray(a&&a.after)?a.after:[]};
@@ -1548,6 +1563,10 @@ Give 8 to 12 activities in working order. Let activities overlap where that is r
     acts.forEach((a,i)=>{a.deps=[];a._after.forEach(k=>{const pre=acts[(+k)-1];if(pre&&pre!==a&&(+k)-1<i&&!a.deps.includes(pre.id))a.deps.push(pre.id)});delete a._after});
     if(!acts.some(a=>a.deps.length))acts.forEach((a,i)=>{if(i)a.deps=[acts[i-1].id]});
     if(!acts.length)throw new Error('The plan came back in a form that could not be read. Try again.'+snippet(r.text));
+    if(gen.budget&&Array.isArray(o.budget)){const L=o.budget.filter(l=>l&&str(l.item)).slice(0,30).map(l=>({id:uid(),cat:BCATS.includes(l.category)?l.category:'Other',item:clip(str(l.item),120),planned:num(l.planned),actual:0}));if(L.length)p.budget={lines:L,vatIn:(p.budget||{}).vatIn}}
+    if(gen.budget&&Array.isArray(o.milestones)){const t0=p.started||Date.now(),M=o.milestones.filter(x=>x&&str(x.name)).slice(0,12).map(x=>({id:uid(),name:clip(str(x.name),80),date:dash(t0+Math.max(1,Math.min(520,parseInt(x.week,10)||1))*7*DAY-DAY),done:false}));if(M.length)p.miles=M}
+    if(gen.extras&&Array.isArray(o.risks)){const R=o.risks.filter(x=>x&&str(x.title)).slice(0,12).map(x=>({type:x.type==='issue'?'issue':'risk',level:['high','med','low'].includes(x.level)?x.level:'med',title:clip(str(x.title),160),action:clip(str(x.response),200),owner:'',due:'',status:'open'}));if(R.length)p.risks=R}
+    delete p.gen;
     p.acts=acts;p.phases=[...new Set(acts.map(a=>a.phase).filter(Boolean))];if(p.phases.length<2){p.phases=[];acts.forEach(a=>{a.phase=''})}else orderActs(p);p.summary=str(o.summary);p.weeks=Math.max(...acts.map(a=>a.start+a.weeks-1));p.sources=r.sources;
   }).then(()=>{
     if(!p.acts.length&&p.guide){S.plans=S.plans.filter(x=>x!==p);if(V.view==='plan'&&V.plan===p.id){V.view='guide';V.guide=p.guide}save();render()}
@@ -2196,7 +2215,7 @@ function simpleGantt(p,S0){
   <p class="small muted" style="margin:10px 0 0">W1 is the first week. Filled bars are finished tasks; the orange line is today.</p>`;
 }
 function advGantt(p,S0){
-  const RH=34,WK=30,W=S0.W,groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,cols=V.gcols!==false,m=taskIndex(),crit=(criticalPaths(m).get(p.id)||{ids:new Set()}).ids;
+  const RH=34,WK=Math.max(3,Math.min(40,+V.gzoom||30)),zm=WK>=18?'w':WK>=7?'m':'q',W=S0.W,groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,cols=V.gcols!==false,m=taskIndex(),crit=(criticalPaths(m).get(p.id)||{ids:new Set()}).ids;
   const left=[],right=[],pos=new Map();let r=0;
   const miles=(p.miles||[]).filter(x=>isoOk(x.date));
   if(miles.length){left.push(`<div class="agrow ms"><span></span><span class="nm"><b>Milestones</b></span><span class="x"></span><span class="x"></span><span class="x"></span><span class="x"></span><span class="x"></span></div>`);
@@ -2210,31 +2229,41 @@ function advGantt(p,S0){
       right.push(`<div class="agline"><button class="bar ${isDone(a)?'done':a.status==='doing'?'doing':''} ${crit.has(a.id)&&!isDone(a)?'crit':''}" style="--c:${c};left:${(x.start-1)*WK}px;width:${x.weeks*WK}px" data-act="task-open" data-v="${p.id}:${i}" title="${i+1}. ${esc(a.name)}: ${fmtShort(weekDate(S0,x.start))}, ${x.weeks} week${x.weeks===1?'':'s'}${crit.has(a.id)?' · on the critical path':''}" aria-label="${esc(a.name)}" data-bid="${a.id}"></button><button class="lk" style="left:${(x.start-1+x.weeks)*WK-5}px" data-lk="${a.id}" aria-label="Link from ${esc(a.name)}" title="Drag to another bar, or click and then click the bar that follows"></button></div>`);r++})});
   const links=[];p.acts.forEach(a=>predsOf(a,m).filter(x=>x.p===p).forEach(pr=>{const A=pos.get(pr.a.id),B=pos.get(a.id);if(!A||!B)return;const y1=A.r*RH+RH/2,y2=B.r*RH+RH/2,x1=A.x2,x2=B.x1,cl=crit.has(a.id)&&crit.has(pr.a.id)?'c':'';
     const d=x2>=x1+12?`M${x1} ${y1}h6V${y2}H${x2-1}`:`M${x1} ${y1}h6V${y2-(y2>y1?RH/2:-RH/2)+0.5}H${x2-8}V${y2}H${x2-1}`;links.push(`<path d="${d}" class="${cl}" marker-end="url(#ah${cl})"/><path d="${d}" class="hit" data-unlink="${pr.a.id}|${a.id}"><title>Task ${pr.n} must finish before task ${p.acts.indexOf(a)+1}. Click to remove this link.</title></path>`)}));
-  const step=W<=12?1:W<=26?2:4,head=[];for(let w=1;w<=W;w++)head.push(`<span style="left:${(w-1)*WK}px;width:${WK}px" class="${(w-1)%step?'':'t'}">${(w-1)%step?'':`<b>W${w}</b><small>${fmtShort(weekDate(S0,w))}</small>`}</span>`);
+  const head=[],vl=[],xOf=t=>(t-S0.t0)/(7*DAY)*WK,endT0=S0.t0+W*7*DAY;
+  if(zm==='w'){const step=W<=12||WK>=34?1:W<=26?2:4;for(let w=1;w<=W;w++)head.push(`<span style="left:${(w-1)*WK}px;width:${WK}px" class="${(w-1)%step?'':'t'}">${(w-1)%step?'':`<b>W${w}</b><small>${fmtShort(weekDate(S0,w))}</small>`}</span>`)}
+  else{const d0=new Date(S0.t0),stepM=zm==='m'?1:3;let d=new Date(d0.getFullYear(),zm==='m'?d0.getMonth():Math.floor(d0.getMonth()/3)*3,1);
+    while(d.getTime()<endT0){const nx=new Date(d.getFullYear(),d.getMonth()+stepM,1),x1=Math.max(0,xOf(d.getTime())),x2=Math.min(W*WK,xOf(nx.getTime())),lab=zm==='m'?d.toLocaleDateString('en-GB',{month:'short'}):'Q'+(Math.floor(d.getMonth()/3)+1);
+      if(x2-x1>1){head.push(`<span style="left:${x1}px;width:${x2-x1}px" class="t">${x2-x1>=30?`<b>${lab}</b><small>${d.getFullYear()}</small>`:''}</span>`);if(x1>0)vl.push(`<i class="vl" style="left:${x1}px"></i>`)}d=nx}}
   const now=(Date.now()-S0.t0)/(7*DAY)*WK,endT=S0.t0+W*7*DAY-DAY,lf=V.linkFrom&&V.linkFrom.pid===p.id?p.acts.find(a=>a.id===V.linkFrom.id):null,depJob=busy&&busy.topicId==='deps';
   return `<div class="agdates"><div class="field"><label for="pstart">Project start date</label><input type="date" id="pstart" data-change="pstart" value="${dash(S0.t0)}"></div><div class="field"><label for="pend">Project end date</label><input type="date" id="pend" data-change="pend" value="${dash(endT)}"></div><span class="small muted grow">Changing either date moves every task, due date and milestone by the same number of days. The length is ${W} week${W===1?'':'s'}.</span>
-      <span class="row"><button class="btn primary small" data-act="dep-opt" ${busy?'disabled':''} title="The AI works out which tasks depend on which, connects them all and re-times the plan">Link and optimise with AI</button>${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small" data-act="gcols" aria-pressed="${!cols}">${cols?'Hide the detail columns':'Show the detail columns'}</button></span></div>
+      <span class="row"><button class="btn primary small" data-act="dep-opt" ${busy?'disabled':''} title="The AI works out which tasks depend on which, connects them all and re-times the plan">Link and optimise with AI</button>${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small" data-act="gcols" aria-pressed="${!cols}">${cols?'Hide the detail columns':'Show the detail columns'}</button>${copyBtn('gantt')}</span></div>
+    <div class="agzoom"><label for="gzoom" class="lbl">Timeline scale</label><span class="small muted">Quarters</span><input type="range" id="gzoom" min="3" max="40" step="1" value="${WK}" data-change="gzoom" aria-label="Timeline scale, from quarters to weeks"><span class="small muted">Weeks</span><span class="pill on">${zm==='w'?'Showing weeks':zm==='m'?'Showing months':'Showing quarters'}</span></div>
     ${depJob?`<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`:''}
     ${lf?`<div class="banner linking">Linking from task ${p.acts.indexOf(lf)+1}, "${esc(clip(lf.name,50))}". Now click the task that can only finish after it. <button class="btn ghost small" data-act="link-cancel">Cancel</button></div>`:`<span class="small muted">Type in any cell to change it. To link two tasks, drag from the dot at the end of a bar to another bar (or click the dot, then the other bar). Click a line to remove it. Thin red lines are the critical path; blue lines are the rest.</span>`}
   <div class="ag ${cols?'':'nocols'}"><div class="agl"><div class="agrow hd"><span>#</span><span>Task name</span><span class="x">WBS</span><span class="x">Planned start</span><span class="x">Weeks</span><span class="x">Planned cost</span><span class="x">Work hours</span></div>${left.join('')}</div>
-    <div class="agr" tabindex="0" aria-label="Gantt chart, scroll sideways"><div class="agtl" style="width:${W*WK}px"><div class="aghd">${head.join('')}</div><div class="agbody" style="background-size:${WK}px 100%">${right.join('')}<svg class="aglinks" width="${W*WK}" height="${r*RH}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z"/></marker><marker id="ahc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" class="c"/></marker></defs>${links.join('')}</svg>${now>=0&&now<=W*WK?`<u class="agnow" style="left:${now}px" title="Today, ${fmtShort(Date.now())}"><b>Today ${fmtShort(Date.now())}</b></u>`:`<span class="agout small muted">${now<0?'Today is before the project starts':'Today is after the project ends'}</span>`}</div></div></div></div>`;
+    <div class="agr" tabindex="0" aria-label="Gantt chart, scroll sideways"><div class="agtl" style="width:${W*WK}px"><div class="aghd">${head.join('')}</div><div class="agbody ${zm==='w'?'':'nogrid'}" style="background-size:${WK}px 100%">${vl.join('')}${right.join('')}<svg class="aglinks" width="${W*WK}" height="${r*RH}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z"/></marker><marker id="ahc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" class="c"/></marker></defs>${links.join('')}</svg>${now>=0&&now<=W*WK?`<u class="agnow" style="left:${now}px" title="Today, ${fmtShort(Date.now())}"><b>Today ${fmtShort(Date.now())}</b></u>`:`<span class="agout small muted">${now<0?'Today is before the project starts':'Today is after the project ends'}</span>`}</div></div></div></div>`;
 }
 function wbsHtml(p){
   const groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,s=budSum(p),hrs=p.acts.reduce((t,a)=>t+num(a.hours),0);
-  return `<div class="row" style="justify-content:space-between"><span class="small muted">Type in a box to rename it. Drag a task onto another task or phase to move it. Changes show at once on the board and both timelines.</span><span class="row">${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small primary" data-act="ph-add">+ Add phase</button></span></div>
+  return `<div class="row" style="justify-content:space-between"><span class="small muted">Type in a box to rename it. Drag a task onto another task or phase to move it. Changes show at once on the board and both timelines.</span><span class="row">${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small primary" data-act="ph-add">+ Add phase</button>${copyBtn('wbs')}</span></div>
   <div class="wbswrap" tabindex="0" aria-label="Work breakdown structure, scroll sideways"><div class="wbs">
     <div class="wroot"><b>${esc(p.name)}</b><span class="small">${pct(p)}% done · ${p.acts.length} task${p.acts.length===1?'':'s'}${hrs?' · '+hrs+' h':''}${s.n?' · '+money(s.planned):''}</span></div>
     <div class="wcols ${groups.length===1?'one':''}">${groups.map((g,gi)=>{const c=PHC[(g.idx<0?groups.length-1:g.idx)%PHC.length],dn=g.acts.filter(({a})=>isDone(a)).length;
       return `<div class="wcol" data-ph="${g.idx}" style="--c:${c}"><div class="wph">${g.idx<0?`<b>${named?(p.phases.length+1)+'. Not in a phase':'Tasks'}</b>`:`<span class="code">${g.idx+1}.</span><span class="ed" contenteditable="plaintext-only" spellcheck="false" role="textbox" aria-label="Phase name" data-gpe="${g.idx}">${esc(g.name)}</span><button class="x" data-act="ph-del" data-v="${g.idx}" aria-label="Remove this phase" title="Remove this phase (its tasks are kept)">&times;</button>`}<span class="small">${g.acts.length?Math.round(100*dn/g.acts.length):0}% · ${g.acts.length} task${g.acts.length===1?'':'s'}</span></div>
         <div class="wts">${g.acts.map(({a,i},k)=>`<div class="wt ${isDone(a)?'done':''}" draggable="true" data-wi="${i}" title="Drag to move"><span class="code">${wbsCode(p,g,k)}</span><span class="ed" contenteditable="plaintext-only" spellcheck="false" role="textbox" aria-label="Task name" data-ge="${i}">${esc(a.name)}</span><button class="o" data-act="task-open" data-v="${p.id}:${i}" aria-label="Open this task" title="Open this task">&rsaquo;</button></div>`).join('')}<button class="wadd" data-act="ph-task" data-v="${g.idx}">+ Add task</button></div></div>`}).join('')}</div></div></div>`;
 }
-function planViews(p){
-  if(!p.acts.length)return p.summary?`<p style="margin:0">${esc(p.summary)}</p>`:'';
-  const tab=['brief','adv','wbs'].includes(V.gtab)?V.gtab:'simple',S0=schedOf(p),mine=busy&&busy.topicId==='phases';
-  return `<section class="card pviews"><div class="htabs" role="group" aria-label="Project views">${[['brief','Project Brief'],['simple','Simple'],['adv','Advanced'],['wbs','WBS']].map(([k,l])=>`<button data-act="gtab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>
-    ${mine?`<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`:''}
-    ${tab==='brief'?`<div><button class="fold" data-act="brief-fold" aria-expanded="${V.briefShut!==true}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg><span class="lbl">Project brief</span></button>${V.briefShut===true?'':`<p style="margin:8px 0 0">${p.summary?esc(p.summary):'<span class="muted">No brief yet. Draft the plan with AI, or describe the project when you create it.</span>'}</p><div class="facts" style="margin-top:10px"><span><b>Timeline</b>${S0.W} week${S0.W===1?'':'s'}</span><span><b>Starts</b>${fmtShort(S0.t0)}</span><span><b>Ends about</b>${fmtShort(weekDate(S0,S0.W+1))}</span><span><b>Tasks</b>${p.acts.length}</span></div>`}</div>`
-      :tab==='simple'?simpleGantt(p,S0):tab==='adv'?advGantt(p,S0):wbsHtml(p)}</section>`;
+const copyBtn=k=>`<button class="btn small icon" data-act="pv-copy" data-v="${k}" aria-label="Copy as text" title="Copy as text, to paste into Excel, Word, an email or WhatsApp">${ICON.copy}</button>`;
+function planText(p,kind){
+  const S0=schedOf(p),m=taskIndex(),groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0;
+  if(kind==='wbs')return [p.name,...groups.flatMap(g=>[...(named?[(g.idx<0?p.phases.length+1:g.idx+1)+'. '+(g.name||'Not in a phase')]:[]),...g.acts.map(({a},k)=>(named?'    ':'')+wbsCode(p,g,k)+' '+a.name+(isDone(a)?' (done)':''))])].join('\n');
+  return [p.name+' - Gantt chart, '+fmtShort(S0.t0)+' to '+fmtShort(S0.t0+S0.W*7*DAY-DAY),['No.','WBS','Task','Phase','Start','End','Weeks','Depends on','Status'].join('\t'),
+    ...groups.flatMap(g=>g.acts.map(({a,i},k)=>{const r=S0.by.get(a.id);return [i+1,wbsCode(p,g,k),a.name,g.name||'',fmtShort(weekDate(S0,r.start)),fmtShort(weekDate(S0,r.start+r.weeks)-DAY),r.weeks,predsOf(a,m).map(x=>depLabel(x,p)).join(', '),stLabel(a.status)].join('\t')}))].join('\n');
+}
+function projView(p,kind){
+  const S0=schedOf(p),mine=busy&&busy.topicId==='phases',work=mine?`<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`:'';
+  if(kind==='brief')return `<section class="card pviews"><button class="fold" data-act="brief-fold" aria-expanded="${V.briefShut!==true}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg><span class="lbl">Project brief</span></button>${V.briefShut===true?'':`<p style="margin:0">${p.summary?esc(p.summary):p.what?esc(p.what):'<span class="muted">No brief yet. Draft the plan with AI, or describe the project when you create it.</span>'}</p><div class="facts" style="margin-top:4px"><span><b>Timeline</b>${S0.W} week${S0.W===1?'':'s'}</span><span><b>Starts</b>${fmtShort(S0.t0)}</span><span><b>Ends about</b>${fmtShort(S0.t0+S0.W*7*DAY-DAY)}</span><span><b>Tasks</b>${p.acts.length}</span><span><b>Done</b>${pct(p)}%</span></div>`}</section>`;
+  if(!p.acts.length)return `<section class="card"><p class="muted" style="margin:0">No tasks yet. Add tasks under Plan and Tasks, or draft the plan with AI, and this view fills in.</p></section>`;
+  return `<section class="card pviews">${work}${kind==='gsimple'?`<div class="row" style="justify-content:space-between"><span class="lbl">Timeline by week</span>${copyBtn('gantt')}</div>${simpleGantt(p,S0)}`:kind==='gadv'?advGantt(p,S0):wbsHtml(p)}</section>`;
 }
 
 /* ---------- My Day briefing ----------
@@ -2401,6 +2430,7 @@ function chatMd(t){
 
 /* ---------- UI ---------- */
 const ICON={
+  copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
   bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7 2.5 7h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
   assist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.9L19 9.7l-5.2 1.8L12 16.5l-1.8-5L5 9.7l5.2-1.8z"/><path d="M18.5 15.5l.8 2.1 2.2.8-2.2.8-.8 2.1-.8-2.1-2.2-.8 2.2-.8z"/></svg>',
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>',
@@ -2472,7 +2502,7 @@ function homeHead(){
   return `<div class="page wide hhead noprint">
   ${!hosted()?'<div class="banner">Preview inside Claude. Research here uses what Claude already knows, without live web search, and nothing is kept for long. The installed version searches the web and keeps your folders.</div>':''}
   <h1 class="hello">${(h=>h<12?'Good morning':h<17?'Good afternoon':'Good evening')(new Date().getHours())}${first?', <em>'+esc(first)+'</em>':''}</h1>
-  <div class="htabs" role="group" aria-label="Home sections">${[['day','My Day',''],['folders','Folders',S.topics.length],['tasks','Tasks Board',open],['research','Research','']].map(([k,l,n])=>`<button data-act="hview" data-v="${k}" aria-pressed="${hv===k}">${l}${n===''?'':`<b>${n}</b>`}</button>`).join('')}</div></div>`;
+  <div class="htabs" role="group" aria-label="Home sections">${[['day','My Day',''],['folders','Folders',S.topics.length],['tasks','Tasks Board',open],['research','Research','']].map(([k,l,n])=>`<button data-act="hview" data-v="${k}" aria-pressed="${hv===k}">${l}${n===''?'':`<b>${n}</b>`}</button>`).join('')}<span class="htog">${['topic','plan','guide'].includes(V.view)||V.doc?`<button class="btn ghost small" data-act="ws-hide" aria-pressed="${!!S.wsHidden}" title="${S.wsHidden?'Show the Folders list beside this page':'Hide the Folders list so this page uses the full width'}">${S.wsHidden?'&raquo; Show Folders list':'&laquo; Hide Folders list'}</button>`:''}<button class="btn ghost small only-wide" data-act="${S.railHidden?'rail-show':'rail-hide'}" aria-pressed="${!!S.railHidden}" title="${S.railHidden?'Show the left sidebar':'Hide the left sidebar'}">${S.railHidden?'&raquo; Show sidebar':'&laquo; Hide sidebar'}</button></span></div></div>`;
 }
 function viewHome(){
   const depth=V.depth||S.profile.depth,first=(S.profile.name||'').split(' ')[0];
@@ -2576,10 +2606,13 @@ function viewGuide(){
 }
 function viewPlan(){
   const p=curPlan(),html=viewPlanCore();if(!p||p.builtin||!(p.acts.length||p.custom)||!html.includes('<!--tabs-->'))return html.replace('<!--tabs-->','');
-  const tab=['budget','risks','miles'].includes(V.ptab)?V.ptab:'plan',s=budSum(p),openR=(p.risks||[]).filter(r=>r.status!=='closed').length,ms=p.miles||[],[head,rest]=html.split('<!--tabs-->');
-  const tabs=`<div class="htabs" role="group" aria-label="Project sections">${[['plan','Plan and tasks',p.acts.length],['budget','Budget',s.n?s.used+'% used':''],['risks','Risks and issues',openR||''],['miles','Milestones',ms.length?ms.filter(m=>m.done).length+'/'+ms.length:'']].map(([k,l,c])=>`<button data-act="ptab" data-v="${k}" aria-pressed="${tab===k}">${l}${c===''?'':`<b>${c}</b>`}</button>`).join('')}</div>`;
-  const strip=`<button class="bstrip" data-act="ptab" data-v="budget">${s.n?`<span><span class="lbl">Budget</span><b>${money(s.planned)}</b></span><span><span class="lbl">Spent</span><b>${money(s.actual)}</b></span><span><span class="lbl">${s.left<0?'Over budget':'Remaining'}</span><b style="${s.left<0?'color:var(--bad)':''}">${money(Math.abs(s.left))}</b></span><span class="grow"><span class="bar" style="height:8px"><i style="width:${Math.min(100,s.used)}%;${s.used>100?'background:var(--bad)':''}"></i></span><span class="small muted">${s.used}% used · open the budget</span></span>`:`<span class="grow"><span class="lbl">Budget</span><span class="b small muted">No budget yet. Add lines, or import an Excel sheet, PDF or photo.</span></span><span class="btn primary" style="pointer-events:none">Add a budget</span>`}</button>`;
-  return tab==='plan'?(['adv','wbs'].includes(V.gtab)?head.replace('<div class="page">','<div class="page wide">'):head)+tabs+strip+rest:head.replace('<div class="page">','<div class="page wide">')+tabs+controlsHtml(p,tab)+'</div>';
+  const T=['brief','plan','budget','risks','wbs','gsimple','gadv'],tab=T.includes(V.ptab)?V.ptab:V.ptab==='miles'?'risks':'plan';
+  const s=budSum(p),openR=(p.risks||[]).filter(r=>r.status!=='closed').length,ms=p.miles||[],[head,rest]=html.split('<!--tabs-->'),H=head.replace('<div class="page">','<div class="page wide">');
+  const tabs=`<div class="htabs ptabs" role="group" aria-label="Project sections">${[['brief','Project Brief',''],['plan','Plan and Tasks',p.acts.length],['budget','Budget',s.n?s.used+'%':''],['risks','Risks &amp; Milestones',(openR||ms.length)?openR+' · '+ms.filter(m=>m.done).length+'/'+ms.length:''],['wbs','WBS',''],['gsimple','Gantt Chart - Simple',''],['gadv','Gantt Chart - Advanced','']].map(([k,l,c])=>`<button data-act="ptab" data-v="${k}" aria-pressed="${tab===k}">${l}${c===''?'':`<b>${c}</b>`}</button>`).join('')}</div>`;
+  const ring=u=>{const C=2*Math.PI*18,f=Math.min(100,Math.max(0,u));return `<svg viewBox="0 0 48 48" class="ring" role="img" aria-label="${u}% of the budget used"><circle cx="24" cy="24" r="18" fill="none" stroke-width="5" class="tr"/><circle cx="24" cy="24" r="18" fill="none" stroke-width="5" class="${u>100?'ov':'fg'}" stroke-dasharray="${C*f/100} ${C}" transform="rotate(-90 24 24)" stroke-linecap="round"/><text x="24" y="28" text-anchor="middle">${u}%</text></svg>`};
+  const strip=`<button class="bstrip" data-act="ptab" data-v="budget" title="Open the budget">${s.n?`${ring(s.used)}<span><span class="lbl">Budget</span><b>${money(s.planned)}</b></span><span><span class="lbl">Spent</span><b>${money(s.actual)}</b></span><span><span class="lbl">${s.left<0?'Over budget':'Remaining'}</span><b style="${s.left<0?'color:var(--bad)':''}">${money(Math.abs(s.left))}</b></span><span class="go small">Open the budget &rsaquo;</span>`:`<span class="grow"><span class="lbl">Budget</span><span class="b small muted">No budget yet. Add lines, or import an Excel sheet, PDF or photo.</span></span><span class="btn primary" style="pointer-events:none">Add a budget</span>`}</button>`;
+  const body=tab==='plan'?strip+rest:(tab==='brief'?strip+projView(p,'brief'):tab==='budget'?controlsHtml(p,'budget'):tab==='risks'?`<h2 class="sech">Risks and issues</h2>${controlsHtml(p,'risks')}<h2 class="sech">Milestones</h2>${controlsHtml(p,'miles')}`:projView(p,tab))+'</div>';
+  return H+tabs+body;
 }
 function viewPlanCore(){
   const p=curPlan();if(!p){V.view='actions';return viewActions()}
@@ -2591,9 +2624,7 @@ function viewPlanCore(){
   ${mine?'<div class="card" id="stream"></div>':''}
   ${p.acts.length||p.custom?`
     <div class="row"><div class="bar"><i style="width:${pct(p)}%"></i></div><span class="pct">${pct(p)}%</span><span class="small muted">${n} of ${p.acts.length} done</span></div>
-    <div class="row">${p.custom?'':p.active?'<button class="btn" data-act="plan-remove">Remove from My Action List</button>':'<button class="btn primary" data-act="plan-add">Add to My Action List</button>'}<button class="btn" data-act="task-new" data-v="p:${p.id}">+ Add task</button>${onBoard(p)?'<button class="btn" data-act="plan-board">Open on board</button>':''}${p.custom&&!p.builtin&&!p.acts.length?`<button class="btn" data-act="plan-draft" ${busy?'disabled':''}>Draft the plan with AI</button>`:''}${p.builtin?'':`<button class="btn" data-act="plan-research" ${busy?'disabled':''}>Research this in depth</button>`}</div>
-    ${planViews(p)}
-    <section class="card"><span class="lbl">${p.builtin?'Tasks':'Activity plan'}</span><div style="margin-top:6px">${p.acts.length?p.acts.map((a,i)=>`<div class="act ${isDone(a)?'done':''}"><button class="box" role="checkbox" aria-checked="${isDone(a)}" aria-label="Mark complete" data-act="toggle-act" data-v="${i}">${isDone(a)?'&#10003;':''}</button><button class="linkish" data-act="task-open" data-v="${p.id}:${i}"><span class="t b" style="font-weight:600">${i+1}. ${esc(a.name)}</span>${a.detail?`<span class="b small">${esc(a.detail)}</span>`:''}<span class="b small muted">${[a.start?'Week '+a.start+(a.weeks>1?' to '+(a.start+a.weeks-1):''):'',a.cost?esc(a.cost):'',a.status==='doing'||a.status==='blocked'?stLabel(a.status):''].filter(Boolean).join(' · ')}</span></button>${a.due?dueLabel(a.due,isDone(a)):''}</div>`).join(''):'<p class="small muted">No tasks yet. Add one, or let OrganizerTX draft the plan.</p>'}</div></section>
+    <section class="card"><div class="row" style="justify-content:space-between"><span class="lbl">${p.builtin?'Tasks':'Activity plan'}</span><div class="row">${p.custom?'':p.active?'<button class="btn" data-act="plan-remove">Remove from My Action List</button>':'<button class="btn primary" data-act="plan-add">Add to My Action List</button>'}<button class="btn" data-act="task-new" data-v="p:${p.id}">+ Add task</button>${onBoard(p)?'<button class="btn" data-act="plan-board">Open on board</button>':''}${p.custom&&!p.builtin&&!p.acts.length?`<button class="btn" data-act="plan-draft" ${busy?'disabled':''}>Draft the plan with AI</button>`:''}${p.builtin?'':`<button class="btn" data-act="plan-research" ${busy?'disabled':''}>Research this in depth</button>`}</div></div><div style="margin-top:6px">${p.acts.length?p.acts.map((a,i)=>`<div class="act ${isDone(a)?'done':''}"><button class="box" role="checkbox" aria-checked="${isDone(a)}" aria-label="Mark complete" data-act="toggle-act" data-v="${i}">${isDone(a)?'&#10003;':''}</button><button class="linkish" data-act="task-open" data-v="${p.id}:${i}"><span class="t b" style="font-weight:600">${i+1}. ${esc(a.name)}</span>${a.detail?`<span class="b small">${esc(a.detail)}</span>`:''}<span class="b small muted">${[a.start?'Week '+a.start+(a.weeks>1?' to '+(a.start+a.weeks-1):''):'',a.cost?esc(a.cost):'',a.status==='doing'||a.status==='blocked'?stLabel(a.status):''].filter(Boolean).join(' · ')}</span></button>${a.due?dueLabel(a.due,isDone(a)):''}</div>`).join(''):'<p class="small muted">No tasks yet. Add one, or let OrganizerTX draft the plan.</p>'}</div></section>
     ${fieldLogHtml(p)}
     ${p.builtin?'':'<div class="row"><button class="btn danger" data-act="plan-delete">Delete this project</button></div>'}`:''}</div>`;
 }
@@ -3210,6 +3241,9 @@ function projectModal(){
     <div class="field"><label for="pname">Project name</label><input type="text" id="pname" placeholder="For example: Borehole for the farm"></div>
     <div class="field"><label for="pwhat">What is it about? (optional)</label><textarea id="pwhat" rows="2"></textarea></div>
     <label class="row small" for="pdraft" style="gap:8px"><input type="checkbox" id="pdraft" checked> Let OrganizerTX draft the activity plan and timeline</label>
+    <label class="row small" for="pgenb" style="gap:8px"><input type="checkbox" id="pgenb" checked> Let OrganizerTx draft a budget and Milestones</label>
+    <label class="row small" for="pgenx" style="gap:8px"><input type="checkbox" id="pgenx" checked> Let OrganizerTx generate Gantt charts, WBS, Risks and Issues list</label>
+    <span class="small muted" style="margin-top:-6px">Ticked items are drafted from your description when you press Create project, and filed under the project's tabs for you to check and edit.</span>
     <div class="field" style="border-top:1px solid var(--line);padding-top:12px"><span class="lbl">Budget (optional, you can add or change it later)</span>
       <div class="row" style="align-items:flex-start"><div class="field" style="flex:1;min-width:150px"><label for="pbud">Total budget${curSym()?' ('+curSym()+')':''}</label><input type="text" inputmode="decimal" id="pbud" placeholder="For example: 640,000"></div>
       <div class="field" style="flex:1.4;min-width:190px"><label for="pbudfile">Or import a budget file or photo</label><input type="file" id="pbudfile" accept=".xlsx,.xls,.csv,.pdf,image/*" style="padding:8px"></div></div>
@@ -3221,7 +3255,8 @@ function projectModal(){
       const p={id:'a'+Date.now(),guide:null,custom:true,name,what:el.querySelector('#pwhat').value.trim(),active:true,started:Date.now(),created:Date.now(),weeks:0,summary:'',acts:[]};
       const tot=num(el.querySelector('#pbud').value),bf=el.querySelector('#pbudfile').files[0];
       if(tot>0&&!bf)p.budget={lines:[{cat:'Other',item:'Overall budget (break this down into lines)',planned:tot,actual:0}]};
-      const draft=el.querySelector('#pdraft').checked&&(!hosted()||cred())&&!busy;
+      const gb=el.querySelector('#pgenb').checked,gx=el.querySelector('#pgenx').checked;p.gen={budget:gb&&!bf,extras:gx,total:tot>0?tot:0};
+      const wants=el.querySelector('#pdraft').checked||gb||gx,draft=wants&&(!hosted()||cred())&&!busy;if(wants&&!draft&&hosted()&&!cred())toast('Add your '+credName()+' in Settings so OrganizerTX can draft these for you.');
       S.plans.push(p);V.view='plan';V.plan=p.id;V.ptab=(tot>0||bf)&&!draft?'budget':'plan';save();
       if(draft)buildPlan(p);else render();
       if(bf)setTimeout(()=>importBudget(bf,p.id),0);
@@ -3708,9 +3743,10 @@ const ACT={
   'ws-hide'(){S.wsHidden=!S.wsHidden},
   'link-cancel'(){V.linkFrom=null},
   async 'dep-opt'(){const p=curPlan();if(!p)return;if(p.acts.some(a=>(a.deps||[]).length||num(a.start)>0)&&!await confirmBox('The AI will replace the current links in "'+p.name+'" and re-time the tasks so each starts when the tasks before it finish. Task names, lengths and phases stay as they are.','Link and optimise'))return;aiDeps(p,true)},
-  gtab(v){V.gtab=v},gcols(){V.gcols=V.gcols===false},'brief-fold'(){V.briefShut=V.briefShut!==true},
+  gcols(){V.gcols=V.gcols===false},
+  'pv-copy'(v){const p=curPlan();if(p)(navigator.clipboard?navigator.clipboard.writeText(planText(p,v)):Promise.reject()).then(()=>toast(v==='wbs'?'WBS copied as an outline.':'Gantt chart copied as a table. Paste it into Excel or Word.')).catch(()=>toast('Could not copy on this device.'))},'brief-fold'(){V.briefShut=V.briefShut!==true},
   'ph-ai'(){const p=curPlan();if(p)suggestPhases(p)},
-  'ph-add'(){const p=curPlan();if(!p)return;p.phases=(p.phases||[]).filter(Boolean);let n='New phase',k=2;while(p.phases.includes(n))n='New phase '+k++;if(!p.phases.length&&p.acts.length){p.phases.push('Phase 1');p.acts.forEach(a=>{a.phase='Phase 1'})}p.phases.push(n);V.gtab='wbs';setTimeout(()=>{const e=[...document.querySelectorAll('.wph .ed')].pop();if(e){e.focus();getSelection().selectAllChildren(e)}},60)},
+  'ph-add'(){const p=curPlan();if(!p)return;p.phases=(p.phases||[]).filter(Boolean);let n='New phase',k=2;while(p.phases.includes(n))n='New phase '+k++;if(!p.phases.length&&p.acts.length){p.phases.push('Phase 1');p.acts.forEach(a=>{a.phase='Phase 1'})}p.phases.push(n);V.ptab='wbs';setTimeout(()=>{const e=[...document.querySelectorAll('.wph .ed')].pop();if(e){e.focus();getSelection().selectAllChildren(e)}},60)},
   async 'ph-del'(v){const p=curPlan(),n=p&&(p.phases||[])[+v];if(n===undefined)return;if(p.acts.some(a=>a.phase===n)&&!await confirmBox('Remove the phase "'+n+'"? Its tasks are kept and move to "Not in a phase".','Remove phase'))return;p.acts.forEach(a=>{if(a.phase===n)a.phase=''});p.phases.splice(+v,1);orderActs(p)},
   'ph-task'(v){const p=curPlan();if(!p)return;const ph=+v>=0?(p.phases||[])[+v]:'';p.acts.push({id:uid(),name:'New task',status:'todo',phase:ph||'',deps:[]});orderActs(p);setTimeout(()=>{const col=document.querySelector('.wcol[data-ph="'+v+'"]'),e=col&&[...col.querySelectorAll('.wt .ed')].pop();if(e){e.focus();getSelection().selectAllChildren(e)}},60)},
   'dep-order'(v){const p=S.plans.find(x=>x.id===v);if(p){linkInOrder(p);toast('Each task now follows the one before it. Open a task to change what it depends on.')}},
@@ -3818,7 +3854,7 @@ document.addEventListener('click',async e=>{
   const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
   const fn=ACT[el.dataset.act];if(!fn)return;
   await fn(el.dataset.v);save();
-  if(!['stop','print','dl-doc','copy-doc','save-chat','backup','wk-scroll','sug-scroll','brief-copy','res-csv','paper-word','paper-copy','fa-copy','meet-dictate','weekly-email','share-kb','share-chat','share-msg','share-doc','deck-dl','cap','cap-menu','log-open'].includes(el.dataset.act))render();
+  if(!['stop','print','dl-doc','copy-doc','save-chat','backup','wk-scroll','sug-scroll','brief-copy','res-csv','pv-copy','paper-word','paper-copy','fa-copy','meet-dictate','weekly-email','share-kb','share-chat','share-msg','share-doc','deck-dl','cap','cap-menu','log-open'].includes(el.dataset.act))render();
   if(el.dataset.act==='idea'){const a=$('#ask');if(a)a.focus()}
 });
 document.addEventListener('input',e=>{
@@ -3853,6 +3889,7 @@ document.addEventListener('change',e=>{
       {const S1=schedOf(P);P.weeks=Math.max(...S1.rows.map(r=>r.start+r.weeks-1),1)}
       save();const key=e.target.dataset.g;setTimeout(()=>{const act=document.activeElement,k2=act&&act.dataset&&act.dataset.g;render();if(k2&&k2!==key){const n=document.querySelector(`[data-g="${k2}"]`);if(n)n.focus()}},0)}}
   if(e.target.dataset.gp!==undefined&&e.target.dataset.gp!==''){const P=curPlan(),i=+e.target.dataset.gp,old=P&&(P.phases||[])[i],v=clip(e.target.value.trim(),40);if(old!==undefined&&v&&v!==old&&!P.phases.includes(v)){P.acts.forEach(a=>{if(a.phase===old)a.phase=v});P.phases[i]=v;save()}setTimeout(render,0)}
+  if(e.target.dataset.change==='gzoom'){V.gzoom=+e.target.value;render();const z=document.querySelector('#gzoom');if(z)z.focus()}
   if(e.target.dataset.change==='pstart'||e.target.dataset.change==='pend'){const P=curPlan(),v=e.target.value;if(P&&isoOk(v)){const S0=schedOf(P),cur=e.target.dataset.change==='pstart'?dash(S0.t0):dash(S0.t0+S0.W*7*DAY-DAY),days=Math.round((new Date(v+'T12:00')-new Date(cur+'T12:00'))/DAY);if(!P.started)P.started=S0.t0;shiftProject(P,days);save();if(days)toast('Project moved '+Math.abs(days)+' day'+(Math.abs(days)===1?'':'s')+(days>0?' later.':' earlier.'))}render()}
   if(e.target.dataset.change==='vatin'){budOf(curPlan()).vatIn=e.target.checked;save();render()}
   if(e.target.dataset.change==='towner'){V.towner=e.target.value;render()}

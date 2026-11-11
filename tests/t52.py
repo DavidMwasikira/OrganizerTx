@@ -15,12 +15,12 @@ async def main():
         await pg.fill('#name','David'); await pg.fill('#country','Kenya'); await pg.fill('#key','k'); await pg.click('text=Start'); await pg.wait_for_timeout(400)
         await pg.evaluate("""S.skin='ultraviolet';applyTheme();const acts=[['Define needs',1,2],['Register business',1,2],['Secure land',2,3],['Appoint architect',4,5],['NEMA approval',8,4],['Build',12,6]].map(([n,s,w])=>({id:uid(),name:n,start:s,weeks:w,status:'todo',deps:[],due:dash(Date.now()+30*DAY)}));
           S.plans.push({id:'pb',name:'Building new site office',what:'x',custom:true,active:true,started:Date.now()-10*DAY,weeks:17,summary:'s',log:[],miles:[{name:'Permit',date:dash(Date.now()+50*DAY),done:false}],acts});
-          S.brief={day:dash(Date.now()),at:Date.now(),summary:'x',pri:[],ai:false};S.weekly={kind:'ai',date:Date.now(),items:[{name:'a',what:'b',why:'c'}]};V.view='plan';V.plan='pb';V.gtab='adv';save();render()""")
+          S.brief={day:dash(Date.now()),at:Date.now(),summary:'x',pri:[],ai:false};S.weekly={kind:'ai',date:Date.now(),items:[{name:'a',what:'b',why:'c'}]};V.view='plan';V.plan='pb';V.ptab='gadv';save();render()""")
         await pg.wait_for_timeout(300)
         # 1 hide list
         w0=await pg.evaluate("Math.round(document.querySelector('.wscol').getBoundingClientRect().width)"); await pg.click('[data-act=ws-hide]'); await pg.wait_for_timeout(200)
         print('hide list: project width',w0,'->',await pg.evaluate("Math.round(document.querySelector('.wscol').getBoundingClientRect().width)"),'| list visible',await pg.locator('.wsside').is_visible(),'| show button',await pg.locator('.wstog.show').count())
-        await pg.screenshot(path='lk-wide.png'); await pg.reload(); await pg.wait_for_timeout(1500); await pg.evaluate("V.view='plan';V.plan='pb';V.gtab='adv';render()"); await pg.wait_for_timeout(200); print('stays hidden after reload:',await pg.locator('.wsside').is_visible()==False)
+        await pg.screenshot(path='lk-wide.png'); await pg.reload(); await pg.wait_for_timeout(1500); await pg.evaluate("V.view='plan';V.plan='pb';V.ptab='gadv';render()"); await pg.wait_for_timeout(200); print('stays hidden after reload:',await pg.locator('.wsside').is_visible()==False)
         # 2 today line
         print('today label:',await pg.locator('.agnow b').inner_text(),'| x px',await pg.evaluate("Math.round(parseFloat(document.querySelector('.agnow').style.left))"),'(10 days = 43 px expected)')
         # 3 project dates

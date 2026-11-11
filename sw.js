@@ -1,5 +1,5 @@
 // OrganizerTX service worker: keeps the app shell available offline and makes the app installable.
-const CACHE = 'organizertx-v0.46';
+const CACHE = 'organizertx-v0.47';
 const SHELL = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {

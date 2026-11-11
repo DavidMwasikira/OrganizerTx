@@ -21,7 +21,7 @@ async def main():
         await pg.screenshot(path='sp-budget.png',full_page=False)
         await pg.uncheck('#vatin'); await pg.wait_for_timeout(200); print('budget excludes VAT -> spent tile',(await pg.locator('.btile >> nth=1').inner_text()).replace('\n',' ')); await pg.check('#vatin')
         await pg.click('[data-act=spend-open] >> nth=0'); await pg.fill('#samt','2000000'); await pg.click('[data-x=save]'); await pg.wait_for_timeout(200); print('edited entry -> net total',(await pg.locator('table.dt >> nth=0 >> tfoot td >> nth=1').inner_text()))
-        await pg.click('[data-act=ptab][data-v=miles]'); await pg.wait_for_timeout(200); print('milestone rows:',[ (await x.inner_text()).replace('\n',' ')[:60] for x in await pg.locator('.mact').all()])
+        await pg.click('[data-act=ptab][data-v=risks]'); await pg.wait_for_timeout(200); print('milestone rows:',[ (await x.inner_text()).replace('\n',' ')[:60] for x in await pg.locator('.mact').all()])
         await pg.click('[data-act=spend-new][data-v^="mile:"] >> nth=1'); print('+Spend presets milestone:',await pg.locator('#smile option:checked').inner_text()); await pg.fill('#sdesc','Roof trusses'); await pg.fill('#samt','300000'); await pg.click('[data-x=save]'); await pg.wait_for_timeout(200)
         print('after: milestone 2 spend',(await pg.locator('.mact >> nth=1').inner_text()).replace('\n',' ')[:70]); await pg.screenshot(path='sp-miles.png')
         await pg.reload(); await pg.wait_for_timeout(1500); print('after reload: entries',await pg.evaluate("S.plans.find(p=>p.id==='pb').spend.length"),'| no double migration',await pg.evaluate("(budOf(S.plans.find(p=>p.id==='pb')),S.plans.find(p=>p.id==='pb').spend.length)"))

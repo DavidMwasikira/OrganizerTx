@@ -1,9 +1,17 @@
-ORGANIZERTX v0.46
+ORGANIZERTX v0.47
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.47 Project page: one row of tabs (Project Brief, Plan and Tasks, Budget,
+        Risks & Milestones, WBS, Gantt Chart - Simple, Gantt Chart -
+        Advanced). Budget summary shows % used in a ring with the amounts
+        spaced out. Timeline scale slider from weeks to months to quarters.
+        Copy buttons on both Gantt charts and the WBS. "Hide/Show sidebar"
+        and "Hide/Show Folders list" buttons in the page heading. New
+        project form: tick boxes to have the budget, milestones, Gantt
+        charts, WBS and risks drafted when the project is created.
   v0.46 Folders list can be hidden so a project or chat uses the full width.
         Advanced Gantt: Project start and end dates that move the whole plan;
         a labelled Today line; link tasks by dragging from a bar's end dot to
