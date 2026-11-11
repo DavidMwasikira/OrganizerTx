@@ -334,6 +334,9 @@ nav .util svg{width:18px;height:18px}
 .wsside .g b{margin-left:auto;font-family:var(--mono);font-weight:400}
 .wsside .it{display:block;text-align:left;width:100%;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--band);padding:11px 14px;border-radius:4px 10px 10px 4px;font-size:.95rem;line-height:1.3}
 .wsside .it:hover{border-color:var(--band)}
+.wsside .itw{position:relative}.wsside .itw.hasdel .it{padding-right:46px}
+.wsside .itdel{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;display:grid;place-items:center;border:0;border-radius:8px;background:none;color:var(--muted);padding:0}
+.wsside .itdel svg{width:17px;height:17px}.wsside .itdel:hover,.wsside .itdel:focus-visible{color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
 .wsside .it[aria-current="true"]{background:var(--accent-soft);font-weight:600;border-color:var(--band)}
 .wsside .it .n{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .wsside .it .m{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.68rem;color:var(--muted);margin-top:2px}
@@ -895,7 +898,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.52';
+const VERSION='v0.53';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2588,6 +2591,7 @@ function chatMd(t){
 
 /* ---------- UI ---------- */
 const ICON={
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
   copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
   bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7 2.5 7h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
   assist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.9L19 9.7l-5.2 1.8L12 16.5l-1.8-5L5 9.7l5.2-1.8z"/><path d="M18.5 15.5l.8 2.1 2.2.8-2.2.8-.8 2.1-.8-2.1-2.2-.8 2.2-.8z"/></svg>',
@@ -2967,7 +2971,7 @@ const anCsv=(cols,rows)=>[cols,...rows].map(r=>r.map(v=>{const s=anEmpty(v)?'':S
 const AN_ACT={
   'an-step'(v){V.anStep=+v;V.an=V.an||{};V.an.open=false},
   'an-retry'(v){const f=AFILES.get(v);if(f)anImport([f],v);else toast('The file is no longer in memory. Use Load Data to choose it again.')},
-  'an-del'(v){const A=anS(),f=A.files.find(x=>x.id===v);if(!f)return;confirmBox('Remove '+f.name+' and the tables read from it?',()=>{const ids=A.tables.filter(t=>t.fileId===v).map(t=>t.id),dead=id=>ids.includes(id);A.tables=A.tables.filter(t=>!dead(t.id)&&!(t.recipe&&(dead(t.recipe.a)||dead(t.recipe.b))));A.views=A.views.filter(x=>A.tables.some(t=>t.id===x.tid));A.files=A.files.filter(x=>x.id!==v);AFILES.delete(v);anLog('Removed '+f.name);save();render()})},
+  async 'an-del'(v){const A=anS(),f=A.files.find(x=>x.id===v);if(!f||!await confirmBox('Remove '+f.name+' and the tables read from it?','Remove'))return;const ids=A.tables.filter(t=>t.fileId===v).map(t=>t.id),dead=id=>ids.includes(id);A.tables=A.tables.filter(t=>!dead(t.id)&&!(t.recipe&&(dead(t.recipe.a)||dead(t.recipe.b))));A.views=A.views.filter(x=>A.tables.some(t=>t.id===x.tid));A.files=A.files.filter(x=>x.id!==v);AFILES.delete(v);anLog('Removed '+f.name)},
   'an-flag-ok'(v){const [tid,i]=v.split('|'),t=anS().tables.find(x=>x.id===tid);if(t){t.flags.splice(+i,1);t.ver=(t.ver||1)+1;anLog('Confirmed a value in '+t.name)}},
   'an-accept'(v){const t=anT();if(!t)return;const [i,ord]=String(v).split('|'),local=anSuggest(t).filter(s=>!(t.skip||[]).includes(s.type+'|'+(s.col||''))),all=[...local,...(ANSUG[t.id]||[])],s=all[+i];if(!s)return;const st={type:s.type,on:true,at:Date.now()};['col','to','map','cols'].forEach(k=>{if(s[k]!==undefined)st[k]=s[k]});if(s.type==='date')st.order=ord||s.order||'DMY';(t.steps=t.steps||[]).push(st);if(+i>=local.length)ANSUG[t.id].splice(+i-local.length,1);anLog('Accepted in '+t.name+': '+AN_STEP[st.type](st))},
   'an-skip'(v){const t=anT();if(!t)return;const local=anSuggest(t).filter(s=>!(t.skip||[]).includes(s.type+'|'+(s.col||'')));if(+v<local.length)(t.skip=t.skip||[]).push(local[+v].type+'|'+(local[+v].col||''));else ANSUG[t.id].splice(+v-local.length,1)},
@@ -3611,12 +3615,13 @@ function viewDoc(){
   </div>`;
 }
 /* the list of chats and projects shown beside any chat, project or guide */
+const defPlan=()=>{const ok=p=>!p.builtin&&(onBoard(p)||p.acts.length)&&(p.acts.length||p.custom),L=S.plans.filter(ok);return L.find(p=>p.id===S.lastPlan)||L[L.length-1]||null};
 function wsItems(){
   const proj=S.plans.filter(p=>p.builtin?p.acts.length:(onBoard(p)||p.acts.length)&&(p.acts.length||p.custom));
   return [
-    {label:'Following',band:'#c98500',items:S.topics.filter(t=>t.interval).map(t=>({act:'open-topic',v:t.id,on:V.view==='topic'&&V.topic===t.id,name:t.title,meta:t.code+' · '+t.docs.length+' doc'+(t.docs.length===1?'':'s')+' · '+ivLabel(t.interval).toLowerCase()+(t.docs.length?' · '+fmtShort(t.docs[t.docs.length-1].date):''),dot:t.unread}))},
-    {label:'Research chats',band:'var(--s-doing)',items:S.topics.filter(t=>!t.interval).map(t=>({act:'open-topic',v:t.id,on:V.view==='topic'&&V.topic===t.id,name:t.title,meta:t.code+' · '+t.docs.length+' doc'+(t.docs.length===1?'':'s')+(t.docs.length?' · updated '+fmtShort(t.docs[t.docs.length-1].date):'')+(t.example?' · example':''),dot:t.unread}))},
-    {label:'Projects',band:'var(--s-done)',items:proj.map(p=>({act:'open-plan',v:p.id,on:V.view==='plan'&&V.plan===p.id,name:p.name,meta:p.acts.filter(isDone).length+' of '+p.acts.length+' done · '+pct(p)+'%',bar:pct(p)}))},
+    {label:'Following',band:'#c98500',items:S.topics.filter(t=>t.interval).map(t=>({del:'topic|'+t.id,act:'open-topic',v:t.id,on:V.view==='topic'&&V.topic===t.id,name:t.title,meta:t.code+' · '+t.docs.length+' doc'+(t.docs.length===1?'':'s')+' · '+ivLabel(t.interval).toLowerCase()+(t.docs.length?' · '+fmtShort(t.docs[t.docs.length-1].date):''),dot:t.unread}))},
+    {label:'Research chats',band:'var(--s-doing)',items:S.topics.filter(t=>!t.interval).map(t=>({del:'topic|'+t.id,act:'open-topic',v:t.id,on:V.view==='topic'&&V.topic===t.id,name:t.title,meta:t.code+' · '+t.docs.length+' doc'+(t.docs.length===1?'':'s')+(t.docs.length?' · updated '+fmtShort(t.docs[t.docs.length-1].date):'')+(t.example?' · example':''),dot:t.unread}))},
+    {label:'Projects',band:'var(--s-done)',items:proj.map(p=>({del:p.builtin?'':'plan|'+p.id,act:'open-plan',v:p.id,on:V.view==='plan'&&V.plan===p.id,name:p.name,meta:p.acts.filter(isDone).length+' of '+p.acts.length+' done · '+pct(p)+'%',bar:pct(p)}))},
     {label:'Guides',band:'#9085e9',items:Object.entries(GUIDES).map(([k,G])=>({act:'open-guide',v:k,on:V.view==='guide'&&V.guide===k,name:G.title,meta:S.guides[k]?S.guides[k].items.length+' ranked':'not built yet'}))}
   ].filter(g=>g.items.length);
 }
@@ -3625,7 +3630,7 @@ function wsWrap(body){
   const gs=wsItems(),none=V.view==='topics'||V.view==='home',cur=gs.find(g=>g.items.some(x=>x.on)),sel=gs.find(g=>g.label===V.wsg)||cur||gs[0];
   const side=`<aside class="wsside" aria-label="Your chats and projects">${none&&HIST.length?'<div><button class="btn ghost" data-act="back" style="padding-left:0">&larr; Back</button></div>':''}<div class="row" style="justify-content:space-between"><h1 style="font-size:1.7rem">Folders</h1><span class="row" style="gap:4px"><button class="btn ghost small" data-act="nav" data-v="settings">${DISK.root&&DISK.ok?'Saved to '+esc(DISK.root.name)+'/projects/':DISK.root?'Computer folder not connected':canDisk()?'Save as folders on this computer':''}</button>${none?'':`<button class="btn wstog" data-act="ws-hide" aria-label="Hide the Folders list" title="Hide this list so the page uses the full width">&laquo;</button>`}</span></div>
     <div class="htabs wstabs" role="group" aria-label="Show">${gs.map(g=>`<button data-act="wsg" data-v="${g.label}" aria-pressed="${g===sel}" style="--band:${g.band}"><i></i>${g.label}<b>${g.items.length}</b></button>`).join('')}</div>
-    ${(sel?[sel]:[]).map(g=>`${g.items.map(x=>`<button class="it" style="--band:${g.band}" data-act="${x.act}" data-v="${esc(x.v)}" aria-current="${!!x.on}"><span class="n">${x.dot?'<span class="dot" title="Unread update"></span> ':''}${esc(x.name)}</span><span class="m">${esc(x.meta)}${x.bar!==undefined?`<span class="bar"><i style="width:${x.bar}%"></i></span>`:''}</span></button>`).join('')}`).join('')}</aside>`;
+    ${(sel?[sel]:[]).map(g=>`${g.items.map(x=>`<div class="itw ${x.del?'hasdel':''}"><button class="it" style="--band:${g.band}" data-act="${x.act}" data-v="${esc(x.v)}" aria-current="${!!x.on}"><span class="n">${x.dot?'<span class="dot" title="Unread update"></span> ':''}${esc(x.name)}</span><span class="m">${esc(x.meta)}${x.bar!==undefined?`<span class="bar"><i style="width:${x.bar}%"></i></span>`:''}</span></button>${x.del?`<button class="itdel" data-act="ws-del" data-v="${esc(x.del)}" aria-label="Delete ${esc(x.name)}" title="Delete this ${x.del[0]==='p'?'project and everything in it':'folder and its documents'}">${ICON.trash}</button>`:''}</div>`).join('')}`).join('')}</aside>`;
   const pick=none?'':`<select class="wspick" id="wspick" data-change="wsgo" aria-label="Switch chat or project">${gs.map(g=>`<optgroup label="${g.label}">${g.items.map(x=>`<option value="${x.act}|${esc(x.v)}" ${x.on?'selected':''}>${esc(x.name)}</option>`).join('')}</optgroup>`).join('')}</select>`;
   const shut=!none&&S.wsHidden;
   return `<div class="ws ${none?'none':''} ${shut?'nolist':''}">${side}<div class="wscol">${shut&&V.view!=='plan'?`<button class="btn wstog show" data-act="ws-hide" aria-label="Show the Folders list" title="Show the Folders list">&raquo; <span>Folders</span></button>`:''}${pick}${body}</div></div>`;
@@ -3641,6 +3646,8 @@ function render(){
   if(lastNav&&JSON.stringify(ns)!==JSON.stringify(lastNav)&&!goingBack){HIST.push(lastNav);if(HIST.length>40)HIST.shift();if(hosted()){try{history.pushState({otx:1},'');PUSHED++}catch(e){}}}
   lastNav=ns;goingBack=false;
   const tabs=[['home','Home'],['assist','Assistant'],['desk','Desktop'],['tasks','Tasks'],['actions','Dashboard'],['brain','Brain']];
+  if(V.view==='home'&&V.hview==='folders'&&!V.doc&&innerWidth>860){const dp=defPlan();if(dp){V.view='plan';V.plan=dp.id}}
+  if(V.view==='plan'&&!V.doc){const cp0=curPlan();if(cp0&&!cp0.builtin)S.lastPlan=cp0.id}
   asstState();sweepRecurring();
   const body=V.doc?viewDoc():{help:viewHelp,field:viewField,desk:viewDesk,rules:viewRules,home:viewHome,tasks:viewTasks,topics:viewTopics,topic:viewTopic,guide:viewGuide,plan:viewPlan,actions:viewActions,brain:viewBrain,settings:viewSettings,assist:viewAssist,resources:viewResources}[V.view]();
   let bodyHtml=body;
@@ -4355,7 +4362,11 @@ const ACT={
   'plan-add'(){const p=curPlan();p.active=true;p.started=Date.now();S.brain.entries.push({date:Date.now(),topic:'Action list',text:`- [Action list] Started working on "${p.name}" on ${fmtDate(Date.now())}.`});toast('Added to My Action List.')},
   'plan-remove'(){const p=curPlan();p.active=false;toast('Removed from My Action List. The plan is kept in the guide.')},
   'plan-research'(){const p=curPlan();startResearch(p.name+': '+p.what,S.profile.depth)},
-  async 'plan-delete'(){const p=curPlan();if(await confirmBox(`Delete "${p.name}" with its tasks and progress?`,'Delete')){(p.log||[]).forEach(e=>blobDel(e.id));S.plans=S.plans.filter(x=>x!==p);S.pins=S.pins.filter(k=>k!=='plan:'+p.id);if(p.guide){V.view='guide';V.guide=p.guide}else V.view='actions';save();render()}},
+  async 'ws-del'(v){const [k,id]=v.split('|');
+    if(k==='topic'){const t=S.topics.find(x=>x.id===id);if(!t||!await confirmBox(`Delete the folder "${t.title}" (${t.code}) and its ${t.docs.length} document${t.docs.length===1?'':'s'}? This cannot be undone.`,'Delete'))return;S.topics=S.topics.filter(x=>x!==t);if(V.topic===id&&(V.view==='topic'||V.doc)){V.doc=null;V.view='home';V.hview='folders'}toast('Folder deleted.')}
+    else{const p=S.plans.find(x=>x.id===id);if(!p||p.builtin||!await confirmBox(`Delete the project "${p.name}" with its ${p.acts.length} task${p.acts.length===1?'':'s'}, budget, risks, milestones and site log? This cannot be undone.`,'Delete'))return;(p.log||[]).forEach(e=>blobDel(e.id));S.plans=S.plans.filter(x=>x!==p);S.pins=S.pins.filter(q=>q!=='plan:'+p.id);if(S.lastPlan===id)S.lastPlan='';if(V.plan===id&&V.view==='plan'){V.view='home';V.hview='folders'}toast('Project deleted.')}
+    save();render()},
+  async 'plan-delete'(){const p=curPlan();if(await confirmBox(`Delete "${p.name}" with its tasks and progress?`,'Delete')){(p.log||[]).forEach(e=>blobDel(e.id));S.plans=S.plans.filter(x=>x!==p);S.pins=S.pins.filter(k=>k!=='plan:'+p.id);if(p.guide){V.view='guide';V.guide=p.guide}else{V.view='home';V.hview='folders'}save();render()}},
   tidy(){tidyBrain()},
   'save-brain'(){S.brain.organized=$('#braintext').value.trim();toast('Brain saved.')},
   async notify(){

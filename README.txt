@@ -1,9 +1,12 @@
-ORGANIZERTX v0.52
+ORGANIZERTX v0.53
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.53 The Folders tab opens your last project beside the list instead of
+        the research start page (research stays under the Research tab).
+        Each folder and project in the list has a delete icon.
   v0.52 New Analytics tab on Home, in six steps: Import (Load Data from
         Excel, CSV, PDF, Word, scans), Extract (tables, where each came
         from, review queue), Clean and combine (reviewable fixes saved as
