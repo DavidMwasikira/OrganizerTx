@@ -1,9 +1,13 @@
-ORGANIZERTX v0.49
+ORGANIZERTX v0.50
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.50 Resolve now returns a concrete proposal with figures (for example
+        floor area in m2 and cost in Kshs) that you can edit and accept,
+        states its assumptions instead of asking, and can raise the
+        project budget when you accept.
   v0.49 Risks and issues: "Resolve Issues" asks the AI for a resolution to
         every open item, and each row has its own "Resolve" button. Each
         suggestion is shown for you to Accept and save, or Discard.
