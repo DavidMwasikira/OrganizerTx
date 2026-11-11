@@ -22,7 +22,7 @@ async def main():
         await pg.click('[data-act=hview][data-v=analytics]'); await pg.wait_for_timeout(300)
         print('steps:',[x.replace('\n',' ') for x in await pg.locator('.ansteps button').all_inner_texts()])
         await pg.set_input_files('input[data-change=an-files]',['invoices.xlsx','tiny.pdf','bad.zzz']); await pg.wait_for_timeout(3500)
-        print('tiles:',[x.replace('\n',' | ') for x in await pg.locator('.antiles > *').all_inner_texts()])
+        print('tiles:',[x.replace('\n',' | ') for x in await pg.locator('.anstats > *').all_inner_texts()])
         print('files:',[x.replace('\n',' ').replace('\t',' | ') for x in await pg.locator('.antl tbody tr').all_inner_texts()])
         await pg.screenshot(path='an1.png')
         await pg.click('.ansteps [data-v="2"]'); await pg.wait_for_timeout(300)

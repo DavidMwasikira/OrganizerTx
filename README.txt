@@ -1,9 +1,10 @@
-ORGANIZERTX v0.53
+ORGANIZERTX v0.54
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.54 Analytics: the Load Data area is one slim strip with small counters.
   v0.53 The Folders tab opens your last project beside the list instead of
         the research start page (research stays under the Research tab).
         Each folder and project in the list has a delete icon.
