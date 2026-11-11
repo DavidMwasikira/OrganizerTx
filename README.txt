@@ -1,9 +1,17 @@
-ORGANIZERTX v0.44
+ORGANIZERTX v0.45
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.45 Project views. The timeline area of a project now has four tabs:
+        Project Brief (foldable), Simple (the week timeline), Advanced (a
+        Gantt chart with an editable table, dependency arrows, critical path
+        and a button to hide the WBS, start, weeks, cost and hours columns)
+        and WBS (an editable work breakdown structure: type to rename, drag
+        tasks between phases, add phases, or let the AI group tasks into
+        phases). All views share one schedule, so an edit shows everywhere.
+        AI-drafted plans now come with phases.
   v0.44 Task sequence. Tasks are numbered within their project and keep the
         number when dragged between lanes. A task can depend on other tasks,
         including tasks in another project, and cannot be completed until

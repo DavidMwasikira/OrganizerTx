@@ -708,6 +708,55 @@ table.rt td{vertical-align:top;padding-top:10px;padding-bottom:10px}table.rt but
 .cpath button.done{border-color:var(--s-done);background:color-mix(in srgb,var(--s-done) 16%,var(--surface));text-decoration:line-through}
 .tdeps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.tdeps .pill button{border:0;background:none;font-size:1rem;line-height:1;padding:0 0 0 4px;color:inherit;cursor:pointer}
 .plink{padding:7px 0;border-top:1px solid var(--line);line-height:1.6}.plink:first-of-type{border-top:0}
+.pviews{display:flex;flex-direction:column;gap:12px;min-width:0}
+.ag{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);min-width:0}
+.agl{flex:0 0 auto;max-width:64%;overflow-x:auto;border-right:2px solid var(--line)}.agr{flex:1;min-width:0;overflow-x:auto}
+.agrow{display:grid;grid-template-columns:34px minmax(210px,1fr) 52px 132px 54px 150px 76px;align-items:center;height:34px;box-sizing:border-box;border-bottom:1px solid var(--line);font-size:.84rem;white-space:nowrap;border-left:4px solid var(--c,transparent)}
+.ag.nocols .agrow{grid-template-columns:34px minmax(180px,1fr)}.ag.nocols .agrow .x{display:none}.ag.nocols .agl{max-width:46%}
+.agrow>span{padding:0 6px;overflow:hidden;text-overflow:ellipsis;min-width:0}.agrow .no{color:var(--muted);font-family:var(--mono);font-size:.74rem;text-align:right}
+.agrow.hd{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--sunk);border-left-color:transparent}
+.agrow.ph{background:color-mix(in srgb,var(--c) 9%,var(--surface));font-weight:700}.agrow.ms{background:var(--sunk);border-left-color:transparent}
+.agrow input{width:100%;height:26px;min-height:0;padding:0 6px;border:1px solid transparent;border-radius:6px;background:transparent;font:inherit;color:var(--ink)}
+.agrow input:hover{border-color:var(--line)}.agrow input:focus{border-color:var(--accent);background:var(--surface);outline:0;box-shadow:0 0 0 2px var(--glow)}
+.agrow .nm.in{padding-left:20px}.agrow.done input[data-g$="name"]{text-decoration:line-through;color:var(--muted)}.agrow.ph input{font-weight:700}
+.agtl{position:relative}.aghd{position:relative;height:34px;box-sizing:border-box;border-bottom:1px solid var(--line);background:var(--sunk)}
+.aghd span{position:absolute;top:0;height:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding-left:4px;white-space:nowrap;overflow:visible}
+.aghd span.t{border-left:1px solid var(--line)}.aghd b{font:600 .7rem var(--mono);color:var(--ink)}.aghd small{font-size:.62rem;color:var(--muted)}
+.agbody{position:relative;background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px)}
+.agline{position:relative;height:34px;box-sizing:border-box;border-bottom:1px solid var(--line)}
+.agline .bar{position:absolute;top:8px;height:18px;border-radius:5px;border:1.5px solid var(--c);background:color-mix(in srgb,var(--c) 22%,var(--surface));padding:0;z-index:2;cursor:pointer}
+.agline .bar.doing{background:linear-gradient(90deg,var(--c) 50%,color-mix(in srgb,var(--c) 22%,var(--surface)) 50%)}.agline .bar.done{background:var(--c)}
+.agline .bar.crit{box-shadow:0 0 0 2px var(--bad)}.agline .bar:hover,.agline .bar:focus-visible{filter:brightness(1.08);outline:2px solid var(--ink);outline-offset:1px}
+.agline .sum{position:absolute;top:12px;height:8px;background:color-mix(in srgb,var(--c) 35%,var(--surface));border-radius:2px;z-index:1;display:block}
+.agline .sum::before,.agline .sum::after{content:"";position:absolute;top:0;width:3px;height:14px;background:var(--c)}.agline .sum::before{left:0}.agline .sum::after{right:0}
+.agline .sum b{display:block;height:100%;background:var(--c);border-radius:2px}
+.agline .dia{position:absolute;top:10px;width:13px;height:13px;margin-left:-7px;transform:rotate(45deg);border:2px solid var(--k5);background:var(--surface);z-index:2}.agline .dia.done{background:var(--k5)}
+.aglinks{position:absolute;left:0;top:0;pointer-events:none;z-index:1;overflow:visible}
+.aglinks path{fill:none;stroke:var(--muted);stroke-width:1.3}.aglinks path.c{stroke:var(--bad)}.aglinks marker path{fill:var(--muted);stroke:none}.aglinks marker path.c{fill:var(--bad)}
+.agnow{position:absolute;top:0;bottom:0;width:2px;background:var(--signal);z-index:3}
+.wbswrap{overflow-x:auto;padding:6px 2px 12px}
+.wbs{display:flex;flex-direction:column;align-items:center;min-width:max-content}
+.wroot{background:var(--ink);color:var(--bg);border-radius:10px;padding:10px 22px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;margin-bottom:22px;text-align:center}
+.wroot b{font:700 1.05rem var(--display)}.wroot::after{content:"";position:absolute;left:50%;top:100%;height:22px;border-left:2px solid var(--muted)}
+.wcols{display:flex;align-items:flex-start}
+.wcol{position:relative;padding:22px 12px 0;width:268px;box-sizing:border-box;border-radius:10px}
+.wcol::before{content:"";position:absolute;top:0;left:0;right:0;border-top:2px solid var(--muted)}
+.wcol:first-child::before{left:50%}.wcol:last-child::before{right:50%}.wcols.one .wcol::before{display:none}
+.wcol::after{content:"";position:absolute;top:0;left:50%;height:22px;border-left:2px solid var(--muted)}
+.wcol.over{background:var(--lanehi)}
+.wph{border:2px solid var(--c);background:color-mix(in srgb,var(--c) 14%,var(--surface));border-radius:10px;padding:8px 10px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 6px;align-items:start}.wph .code,.wt .code{padding-top:5px}
+.wph .small{grid-column:1/-1;color:var(--muted)}.wph b{grid-column:1/-1}.wph .code,.wt .code{font:700 .8rem var(--mono);color:var(--ink)}
+.wph .ed,.wt .ed{display:block;padding:3px 6px;border:1px solid transparent;border-radius:6px;font-weight:600;min-width:0;color:var(--ink);overflow-wrap:anywhere;line-height:1.3;cursor:text}
+.wph .ed:hover,.wt .ed:hover{border-color:var(--line)}.wph .ed:focus,.wt .ed:focus{border-color:var(--accent);background:var(--surface);outline:0;box-shadow:0 0 0 2px var(--glow)}
+.wph .x,.wt .o{border:0;background:none;width:24px;height:24px;border-radius:6px;color:var(--muted);font-size:1.1rem;line-height:1;cursor:pointer}.wph .x:hover,.wt .o:hover{background:var(--sunk);color:var(--ink)}
+.wts{margin:0 0 0 18px;padding:12px 0 0 18px;display:flex;flex-direction:column;gap:10px}
+.wt{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px;align-items:start;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:4px 8px 8px 4px;background:var(--surface);padding:5px 6px 5px 8px;cursor:grab}
+.wt::before{content:"";position:absolute;left:-18px;top:18px;width:18px;border-top:2px solid var(--muted)}
+.wt::after{content:"";position:absolute;left:-18px;top:-12px;height:32px;border-left:2px solid var(--muted)}.wt:not(:last-of-type)::after{height:auto;bottom:-1px}
+.wt .ed{font-weight:500}.wt.done .ed{text-decoration:line-through;color:var(--muted)}.wt.over{box-shadow:0 -3px 0 var(--accent)}
+.wadd{position:relative;align-self:flex-start;border:1px dashed var(--line);background:none;border-radius:8px;padding:5px 10px;color:var(--muted);font-size:.84rem}.wadd:hover{color:var(--accent);border-color:var(--accent)}
+@media (max-width:760px){.ag{flex-direction:column}.agl{max-width:none!important;border-right:0;border-bottom:2px solid var(--line)}.wcol{width:236px}}
+@media print{.agl,.agr,.wbswrap{overflow:visible}}
 .rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}.rgrid>*{min-width:0}
 .rsug{display:flex;flex-direction:column;gap:10px}
 .ttl2{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;font-size:1rem}
@@ -754,7 +803,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.44';
+const VERSION='v0.45';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1475,16 +1524,16 @@ ${p.name}${p.what?': '+p.what:''}
 ${p.guide?G.a+': '+(p.a||'not stated')+'. ':''}The user is starting from zero in ${place()}.
 ${searchLine()}
 Reply with only a JSON object, with no text before or after it:
-{"summary": "two sentences on the approach and what done looks like", "activities": [{"name": "at most 6 words", "detail": "one sentence saying exactly what to do and what it produces", "start": <week number it starts, counting from 1>, "weeks": <how many weeks it takes>, "cost": "estimated cost${moneyFmt()}, or empty", "after": [<numbers of the activities, counting from 1, that must be finished before this one can be finished; empty if none>]}]}
+{"summary": "two sentences on the approach and what done looks like", "activities": [{"name": "at most 6 words", "detail": "one sentence saying exactly what to do and what it produces", "start": <week number it starts, counting from 1>, "weeks": <how many weeks it takes>, "cost": "estimated cost${moneyFmt()}, or empty", "after": [<numbers of the activities, counting from 1, that must be finished before this one can be finished; empty if none>], "phase": "the stage it belongs to: one of 3 to 5 short stage names you choose for this plan, such as Preparation, Approvals, Construction, Handover"}]}
 Give 8 to 12 activities in working order. Let activities overlap where that is realistic. The whole plan must fit in ${G.maxWeeks} weeks.`}]});
     const o=grab(r.text,'{','}')||{},acts=(Array.isArray(o.activities)&&o.activities.length?o.activities:grabList(r.text)).map(a=>{
       const st=Math.min(Math.max(parseInt(a&&a.start,10)||1,1),G.maxWeeks),w=Math.min(Math.max(parseInt(a&&a.weeks,10)||1,1),G.maxWeeks-st+1);
-      return {id:uid(),name:str(a&&a.name),detail:str(a&&a.detail),cost:str(a&&a.cost),start:st,weeks:w,status:'todo',_after:Array.isArray(a&&a.after)?a.after:[]};
+      return {id:uid(),name:str(a&&a.name),detail:str(a&&a.detail),cost:str(a&&a.cost),start:st,weeks:w,status:'todo',phase:clip(str(a&&a.phase),40),_after:Array.isArray(a&&a.after)?a.after:[]};
     }).filter(a=>a.name).slice(0,14);
     acts.forEach((a,i)=>{a.deps=[];a._after.forEach(k=>{const pre=acts[(+k)-1];if(pre&&pre!==a&&(+k)-1<i&&!a.deps.includes(pre.id))a.deps.push(pre.id)});delete a._after});
     if(!acts.some(a=>a.deps.length))acts.forEach((a,i)=>{if(i)a.deps=[acts[i-1].id]});
     if(!acts.length)throw new Error('The plan came back in a form that could not be read. Try again.'+snippet(r.text));
-    p.acts=acts;p.summary=str(o.summary);p.weeks=Math.max(...acts.map(a=>a.start+a.weeks-1));p.sources=r.sources;
+    p.acts=acts;p.phases=[...new Set(acts.map(a=>a.phase).filter(Boolean))];if(p.phases.length<2){p.phases=[];acts.forEach(a=>{a.phase=''})}else orderActs(p);p.summary=str(o.summary);p.weeks=Math.max(...acts.map(a=>a.start+a.weeks-1));p.sources=r.sources;
   }).then(()=>{
     if(!p.acts.length&&p.guide){S.plans=S.plans.filter(x=>x!==p);if(V.view==='plan'&&V.plan===p.id){V.view='guide';V.guide=p.guide}save();render()}
   });
@@ -2075,6 +2124,86 @@ function projectLinks(m){
   m=m||taskIndex();const out=[];m.forEach(x=>predsOf(x.a,m).forEach(pr=>{if(pr.p!==x.p)out.push({from:pr,to:x})}));return out;
 }
 
+/* ================= v0.45: project views (brief, simple timeline, advanced Gantt, WBS) =================
+   One schedule and one phase list feed every view, so an edit in any of them shows everywhere at once. */
+const PHC=['var(--k1)','var(--k2)','var(--k3)','var(--k4)','var(--k5)','var(--k6)'];
+/* phases in order; tasks with no (or an unknown) phase fall into a last, unnamed group */
+function phasesOf(p){
+  const names=(p.phases||[]).filter(Boolean),out=names.map((n,i)=>({name:n,idx:i,acts:[]})),loose={name:'',idx:-1,acts:[]};
+  p.acts.forEach((a,i)=>{const g=out.find(x=>x.name===a.phase)||loose;g.acts.push({a,i})});
+  if(loose.acts.length||!out.length)out.push(loose);return out;
+}
+/* keep the task list in WBS order (phase by phase), which is also the numbering order */
+function orderActs(p){const names=(p.phases||[]);const rank=a=>{const k=names.indexOf(a.phase);return k<0?names.length:k};p.acts=p.acts.map((a,i)=>({a,i})).sort((x,y)=>rank(x.a)-rank(y.a)||x.i-y.i).map(x=>x.a)}
+const wbsCode=(p,g,k)=>(p.phases||[]).filter(Boolean).length?(g.idx<0?(p.phases.length+1):g.idx+1)+'.'+(k+1):String(k+1);
+/* start week and length of every task: what was typed wins; otherwise a task starts when the tasks it depends on end */
+function schedOf(p){
+  const m=taskIndex(),memo=new Map(),wk=a=>Math.max(1,Math.round(num(a.weeks)||Math.ceil(num(a.days)/7)||1));
+  const st=(a,depth)=>{if(memo.has(a.id))return memo.get(a.id);let v=num(a.start)>0?Math.round(num(a.start)):1;
+    if(!(num(a.start)>0)&&depth<60)predsOf(a,m).filter(x=>x.p===p).forEach(x=>{v=Math.max(v,st(x.a,depth+1)+wk(x.a))});memo.set(a.id,v);return v};
+  const rows=p.acts.map(a=>({a,start:st(a,0),weeks:wk(a)})),W=Math.max(1,p.weeks||1,...rows.map(r=>r.start+r.weeks-1));
+  return {rows,W,by:new Map(rows.map(r=>[r.a.id,r])),t0:p.started||Date.now()};
+}
+const weekDate=(S0,w)=>S0.t0+(w-1)*7*DAY;
+function suggestPhases(p){
+  if(needKey())return;
+  job('phases','Grouping the tasks into phases',async signal=>{
+    const r=await callAI({system:systemPrompt(),depth:'helper',maxTokens:3000,signal,messages:[{role:'user',content:
+`Group the tasks of the project "${p.name}" into 3 to 6 phases for a work breakdown structure. Phase names are 1 to 3 words (for example Preparation, Approvals, Procurement, Construction, Handover). Every task goes in exactly one phase; keep the phases in working order.
+TASKS:
+${p.acts.map((a,i)=>(i+1)+'. '+a.name).join('\n')}
+Reply with only a JSON object: {"phases":["name", "..."],"tasks":[{"n":1,"phase":"name"}]}`}]});
+    const o=grab(r.text,'{','}');if(!o||!Array.isArray(o.phases)||!Array.isArray(o.tasks))throw new Error('The phases came back in a form that could not be read. Try again.');
+    const names=[...new Set(o.phases.map(x=>clip(String(x||'').trim(),40)).filter(Boolean))].slice(0,8);if(!names.length)throw new Error('No phases were suggested. Add them by hand.');
+    const acts=p.acts.slice();o.tasks.forEach(t=>{const a=acts[(+t.n)-1],ph=clip(String(t.phase||'').trim(),40);if(a&&names.includes(ph))a.phase=ph});
+    p.phases=names;orderActs(p);
+  });
+}
+function simpleGantt(p,S0){
+  const W=S0.W,step=W<=8?1:W<=16?2:4,ticks=[];for(let w=1;w<=W;w+=step)ticks.push(`<span style="left:${100*(w-1)/W}%">W${w}</span>`);
+  const now=p.active||p.custom?(Date.now()-S0.t0)/(7*DAY)/W*100:-1,mark=now>=0&&now<=100?`<u style="left:${now}%" title="Today"></u>`:'';
+  return `<div class="gantt" style="--wk:${100/W}%" role="img" aria-label="Timeline of ${W} weeks"><span></span><div class="sc">${ticks.join('')}</div>${S0.rows.map((r,i)=>`<span class="gn">${i+1}. ${esc(r.a.name)}</span><div class="tr"><i class="${isDone(r.a)?'done':''}" style="left:${100*(r.start-1)/W}%;width:${100*r.weeks/W}%" title="${esc(r.a.name)}: week ${r.start}${r.weeks>1?' to '+(r.start+r.weeks-1):''}"></i>${mark}</div>`).join('')}</div>
+  <p class="small muted" style="margin:10px 0 0">W1 is the first week. Filled bars are finished tasks; the orange line is today.</p>`;
+}
+function advGantt(p,S0){
+  const RH=34,WK=30,W=S0.W,groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,cols=V.gcols!==false,m=taskIndex(),crit=(criticalPaths(m).get(p.id)||{ids:new Set()}).ids;
+  const left=[],right=[],pos=new Map();let r=0;
+  const miles=(p.miles||[]).filter(x=>isoOk(x.date));
+  if(miles.length){left.push(`<div class="agrow ms"><span></span><span class="nm"><b>Milestones</b></span><span class="x"></span><span class="x"></span><span class="x"></span><span class="x"></span><span class="x"></span></div>`);
+    right.push(`<div class="agline">${miles.map(x=>{const w=(new Date(x.date+'T12:00').getTime()-S0.t0)/(7*DAY);return w>=-0.5&&w<=W+0.5?`<i class="dia ${x.done?'done':''}" style="left:${Math.max(0,w*WK)}px" title="Milestone: ${esc(x.name)}, ${fmtShort(x.date)}"></i>`:''}).join('')}</div>`);r++}
+  groups.forEach(g=>{const c=PHC[(g.idx<0?groups.length-1:g.idx)%PHC.length],rows=g.acts.map(({a})=>S0.by.get(a.id));
+    if(named){const s=rows.length?Math.min(...rows.map(x=>x.start)):1,e=rows.length?Math.max(...rows.map(x=>x.start+x.weeks)):2,dn=g.acts.filter(({a})=>isDone(a)).length,hrs=g.acts.reduce((t,{a})=>t+num(a.hours),0);
+      left.push(`<div class="agrow ph" style="--c:${c}"><span class="no"></span><span class="nm">${g.idx<0?'<b>Not in a phase</b>':`<input type="text" data-gp="${g.idx}" value="${esc(g.name)}" aria-label="Phase name">`}</span><span class="x">${g.idx<0?p.phases.length+1:g.idx+1}</span><span class="x">${rows.length?fmtShort(weekDate(S0,s)):'-'}</span><span class="x">${rows.length?e-s:'-'}</span><span class="x small">${g.acts.length} task${g.acts.length===1?'':'s'}</span><span class="x">${hrs?hrs+' h':'-'}</span></div>`);
+      right.push(`<div class="agline">${rows.length?`<i class="sum" style="--c:${c};left:${(s-1)*WK}px;width:${(e-s)*WK}px" title="${esc(g.name||'Not in a phase')}: ${dn} of ${g.acts.length} done"><b style="width:${g.acts.length?100*dn/g.acts.length:0}%"></b></i>`:''}</div>`);r++}
+    g.acts.forEach(({a,i},k)=>{const x=S0.by.get(a.id);pos.set(a.id,{r,x1:(x.start-1)*WK,x2:(x.start-1+x.weeks)*WK});
+      left.push(`<div class="agrow ${isDone(a)?'done':''}" style="--c:${c}"><span class="no">${i+1}</span><span class="nm ${named?'in':''}"><input type="text" data-g="${i}|name" value="${esc(a.name)}" title="${esc(a.name)}" aria-label="Task name"></span><span class="x">${wbsCode(p,g,k)}</span><span class="x"><input type="date" data-g="${i}|start" value="${dash(weekDate(S0,x.start))}" aria-label="Planned start"></span><span class="x"><input type="text" inputmode="numeric" data-g="${i}|weeks" value="${x.weeks}" aria-label="Weeks"></span><span class="x"><input type="text" data-g="${i}|cost" value="${esc(a.cost||(a.budget?a.budget.cur+' '+num(a.budget.amt).toLocaleString('en-GB'):''))}" placeholder="-" aria-label="Planned cost"></span><span class="x"><input type="text" inputmode="decimal" data-g="${i}|hours" value="${num(a.hours)||''}" placeholder="-" aria-label="Work hours"></span></div>`);
+      right.push(`<div class="agline"><button class="bar ${isDone(a)?'done':a.status==='doing'?'doing':''} ${crit.has(a.id)&&!isDone(a)?'crit':''}" style="--c:${c};left:${(x.start-1)*WK}px;width:${x.weeks*WK}px" data-act="task-open" data-v="${p.id}:${i}" title="${i+1}. ${esc(a.name)}: ${fmtShort(weekDate(S0,x.start))}, ${x.weeks} week${x.weeks===1?'':'s'}${crit.has(a.id)?' · on the critical path':''}" aria-label="${esc(a.name)}"></button></div>`);r++})});
+  const links=[];p.acts.forEach(a=>predsOf(a,m).filter(x=>x.p===p).forEach(pr=>{const A=pos.get(pr.a.id),B=pos.get(a.id);if(!A||!B)return;const y1=A.r*RH+RH/2,y2=B.r*RH+RH/2,x1=A.x2,x2=B.x1,cl=crit.has(a.id)&&crit.has(pr.a.id)?'c':'';
+    const d=x2>=x1+12?`M${x1} ${y1}h6V${y2}H${x2-1}`:`M${x1} ${y1}h6V${y2-(y2>y1?RH/2:-RH/2)+0.5}H${x2-8}V${y2}H${x2-1}`;links.push(`<path d="${d}" class="${cl}" marker-end="url(#ah${cl})"/>`)}));
+  const step=W<=12?1:W<=26?2:4,head=[];for(let w=1;w<=W;w++)head.push(`<span style="left:${(w-1)*WK}px;width:${WK}px" class="${(w-1)%step?'':'t'}">${(w-1)%step?'':`<b>W${w}</b><small>${fmtShort(weekDate(S0,w))}</small>`}</span>`);
+  const now=(Date.now()-S0.t0)/(7*DAY)*WK;
+  return `<div class="row" style="justify-content:space-between"><span class="small muted">Type in any cell to change it. Click a bar to open the task. Arrows show what must finish first; red marks the critical path.</span><span class="row">${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small" data-act="gcols" aria-pressed="${!cols}">${cols?'Hide the detail columns':'Show the detail columns'}</button></span></div>
+  <div class="ag ${cols?'':'nocols'}"><div class="agl"><div class="agrow hd"><span>#</span><span>Task name</span><span class="x">WBS</span><span class="x">Planned start</span><span class="x">Weeks</span><span class="x">Planned cost</span><span class="x">Work hours</span></div>${left.join('')}</div>
+    <div class="agr" tabindex="0" aria-label="Gantt chart, scroll sideways"><div class="agtl" style="width:${W*WK}px"><div class="aghd">${head.join('')}</div><div class="agbody" style="background-size:${WK}px 100%">${right.join('')}<svg class="aglinks" width="${W*WK}" height="${r*RH}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z"/></marker><marker id="ahc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" class="c"/></marker></defs>${links.join('')}</svg>${now>=0&&now<=W*WK?`<u class="agnow" style="left:${now}px" title="Today"></u>`:''}</div></div></div></div>`;
+}
+function wbsHtml(p){
+  const groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,s=budSum(p),hrs=p.acts.reduce((t,a)=>t+num(a.hours),0);
+  return `<div class="row" style="justify-content:space-between"><span class="small muted">Type in a box to rename it. Drag a task onto another task or phase to move it. Changes show at once on the board and both timelines.</span><span class="row">${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small primary" data-act="ph-add">+ Add phase</button></span></div>
+  <div class="wbswrap" tabindex="0" aria-label="Work breakdown structure, scroll sideways"><div class="wbs">
+    <div class="wroot"><b>${esc(p.name)}</b><span class="small">${pct(p)}% done · ${p.acts.length} task${p.acts.length===1?'':'s'}${hrs?' · '+hrs+' h':''}${s.n?' · '+money(s.planned):''}</span></div>
+    <div class="wcols ${groups.length===1?'one':''}">${groups.map((g,gi)=>{const c=PHC[(g.idx<0?groups.length-1:g.idx)%PHC.length],dn=g.acts.filter(({a})=>isDone(a)).length;
+      return `<div class="wcol" data-ph="${g.idx}" style="--c:${c}"><div class="wph">${g.idx<0?`<b>${named?(p.phases.length+1)+'. Not in a phase':'Tasks'}</b>`:`<span class="code">${g.idx+1}.</span><span class="ed" contenteditable="plaintext-only" spellcheck="false" role="textbox" aria-label="Phase name" data-gpe="${g.idx}">${esc(g.name)}</span><button class="x" data-act="ph-del" data-v="${g.idx}" aria-label="Remove this phase" title="Remove this phase (its tasks are kept)">&times;</button>`}<span class="small">${g.acts.length?Math.round(100*dn/g.acts.length):0}% · ${g.acts.length} task${g.acts.length===1?'':'s'}</span></div>
+        <div class="wts">${g.acts.map(({a,i},k)=>`<div class="wt ${isDone(a)?'done':''}" draggable="true" data-wi="${i}" title="Drag to move"><span class="code">${wbsCode(p,g,k)}</span><span class="ed" contenteditable="plaintext-only" spellcheck="false" role="textbox" aria-label="Task name" data-ge="${i}">${esc(a.name)}</span><button class="o" data-act="task-open" data-v="${p.id}:${i}" aria-label="Open this task" title="Open this task">&rsaquo;</button></div>`).join('')}<button class="wadd" data-act="ph-task" data-v="${g.idx}">+ Add task</button></div></div>`}).join('')}</div></div></div>`;
+}
+function planViews(p){
+  if(!p.acts.length)return p.summary?`<p style="margin:0">${esc(p.summary)}</p>`:'';
+  const tab=['brief','adv','wbs'].includes(V.gtab)?V.gtab:'simple',S0=schedOf(p),mine=busy&&busy.topicId==='phases';
+  return `<section class="card pviews"><div class="htabs" role="group" aria-label="Project views">${[['brief','Project Brief'],['simple','Simple'],['adv','Advanced'],['wbs','WBS']].map(([k,l])=>`<button data-act="gtab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>
+    ${mine?`<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`:''}
+    ${tab==='brief'?`<div><button class="fold" data-act="brief-fold" aria-expanded="${V.briefShut!==true}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg><span class="lbl">Project brief</span></button>${V.briefShut===true?'':`<p style="margin:8px 0 0">${p.summary?esc(p.summary):'<span class="muted">No brief yet. Draft the plan with AI, or describe the project when you create it.</span>'}</p><div class="facts" style="margin-top:10px"><span><b>Timeline</b>${S0.W} week${S0.W===1?'':'s'}</span><span><b>Starts</b>${fmtShort(S0.t0)}</span><span><b>Ends about</b>${fmtShort(weekDate(S0,S0.W+1))}</span><span><b>Tasks</b>${p.acts.length}</span></div>`}</div>`
+      :tab==='simple'?simpleGantt(p,S0):tab==='adv'?advGantt(p,S0):wbsHtml(p)}</section>`;
+}
+
 /* ---------- My Day briefing ----------
    The facts (due, overdue, blocked, what changed) are worked out on this device, so they are always exact and
    always current. The AI is given only those facts and asked to word a short summary and rank three priorities;
@@ -2417,7 +2546,7 @@ function viewPlan(){
   const tab=['budget','risks','miles'].includes(V.ptab)?V.ptab:'plan',s=budSum(p),openR=(p.risks||[]).filter(r=>r.status!=='closed').length,ms=p.miles||[],[head,rest]=html.split('<!--tabs-->');
   const tabs=`<div class="htabs" role="group" aria-label="Project sections">${[['plan','Plan and tasks',p.acts.length],['budget','Budget',s.n?s.used+'% used':''],['risks','Risks and issues',openR||''],['miles','Milestones',ms.length?ms.filter(m=>m.done).length+'/'+ms.length:'']].map(([k,l,c])=>`<button data-act="ptab" data-v="${k}" aria-pressed="${tab===k}">${l}${c===''?'':`<b>${c}</b>`}</button>`).join('')}</div>`;
   const strip=`<button class="bstrip" data-act="ptab" data-v="budget">${s.n?`<span><span class="lbl">Budget</span><b>${money(s.planned)}</b></span><span><span class="lbl">Spent</span><b>${money(s.actual)}</b></span><span><span class="lbl">${s.left<0?'Over budget':'Remaining'}</span><b style="${s.left<0?'color:var(--bad)':''}">${money(Math.abs(s.left))}</b></span><span class="grow"><span class="bar" style="height:8px"><i style="width:${Math.min(100,s.used)}%;${s.used>100?'background:var(--bad)':''}"></i></span><span class="small muted">${s.used}% used · open the budget</span></span>`:`<span class="grow"><span class="lbl">Budget</span><span class="b small muted">No budget yet. Add lines, or import an Excel sheet, PDF or photo.</span></span><span class="btn primary" style="pointer-events:none">Add a budget</span>`}</button>`;
-  return tab==='plan'?head+tabs+strip+rest:head.replace('<div class="page">','<div class="page wide">')+tabs+controlsHtml(p,tab)+'</div>';
+  return tab==='plan'?(['adv','wbs'].includes(V.gtab)?head.replace('<div class="page">','<div class="page wide">'):head)+tabs+strip+rest:head.replace('<div class="page">','<div class="page wide">')+tabs+controlsHtml(p,tab)+'</div>';
 }
 function viewPlanCore(){
   const p=curPlan();if(!p){V.view='actions';return viewActions()}
@@ -2430,8 +2559,7 @@ function viewPlanCore(){
   ${p.acts.length||p.custom?`
     <div class="row"><div class="bar"><i style="width:${pct(p)}%"></i></div><span class="pct">${pct(p)}%</span><span class="small muted">${n} of ${p.acts.length} done</span></div>
     <div class="row">${p.custom?'':p.active?'<button class="btn" data-act="plan-remove">Remove from My Action List</button>':'<button class="btn primary" data-act="plan-add">Add to My Action List</button>'}<button class="btn" data-act="task-new" data-v="p:${p.id}">+ Add task</button>${onBoard(p)?'<button class="btn" data-act="plan-board">Open on board</button>':''}${p.custom&&!p.builtin&&!p.acts.length?`<button class="btn" data-act="plan-draft" ${busy?'disabled':''}>Draft the plan with AI</button>`:''}${p.builtin?'':`<button class="btn" data-act="plan-research" ${busy?'disabled':''}>Research this in depth</button>`}</div>
-    ${p.summary?`<p style="margin:0">${esc(p.summary)}</p>`:''}
-    ${timed?`<section class="card"><span class="lbl">Timeline</span><div style="margin-top:12px">${ganttHtml(p)}</div><p class="small muted" style="margin:10px 0 0">W1 is the first week. Filled bars are finished activities${p.active?'; the orange line is today':''}.</p></section>`:''}
+    ${planViews(p)}
     <section class="card"><span class="lbl">${p.builtin?'Tasks':'Activity plan'}</span><div style="margin-top:6px">${p.acts.length?p.acts.map((a,i)=>`<div class="act ${isDone(a)?'done':''}"><button class="box" role="checkbox" aria-checked="${isDone(a)}" aria-label="Mark complete" data-act="toggle-act" data-v="${i}">${isDone(a)?'&#10003;':''}</button><button class="linkish" data-act="task-open" data-v="${p.id}:${i}"><span class="t b" style="font-weight:600">${i+1}. ${esc(a.name)}</span>${a.detail?`<span class="b small">${esc(a.detail)}</span>`:''}<span class="b small muted">${[a.start?'Week '+a.start+(a.weeks>1?' to '+(a.start+a.weeks-1):''):'',a.cost?esc(a.cost):'',a.status==='doing'||a.status==='blocked'?stLabel(a.status):''].filter(Boolean).join(' · ')}</span></button>${a.due?dueLabel(a.due,isDone(a)):''}</div>`).join(''):'<p class="small muted">No tasks yet. Add one, or let OrganizerTX draft the plan.</p>'}</div></section>
     ${fieldLogHtml(p)}
     ${p.builtin?'':'<div class="row"><button class="btn danger" data-act="plan-delete">Delete this project</button></div>'}`:''}</div>`;
@@ -2941,7 +3069,7 @@ function render(){
   if(HIST.length&&!V.doc&&['tasks','actions','brain','help','settings','rules','field','assist','resources'].includes(V.view)&&!(V.view==='assist'&&V.paper))bodyHtml=body.replace(/^(\s*<div class="page[^"]*"[^>]*>)/,'$1<div><button class="btn ghost" data-act="back" style="padding-left:0">&larr; Back</button></div>');
   if(!V.doc&&['topic','plan','guide','topics'].includes(V.view))bodyHtml=wsWrap(body);
   const cp=curPlan(),cur=V.doc||['topic','guide','plan','topics'].includes(V.view)?'home':V.view==='rules'||V.view==='resources'?'settings':V.view;
-  const where=[V.view,V.topic,V.guide,V.plan,V.tab,V.tmode,V.doc,V.btab,V.bsec,V.lib,V.slide,V.dcat,V.dmode,V.atab,V.paper,V.ptab,V.calM,V.hview,V.rtab].join('|'),old=$('main'),keep=old&&where===render.where?old.scrollTop:0;render.where=where;
+  const where=[V.view,V.topic,V.guide,V.plan,V.tab,V.tmode,V.doc,V.btab,V.bsec,V.lib,V.slide,V.dcat,V.dmode,V.atab,V.paper,V.ptab,V.calM,V.hview,V.rtab,V.gtab].join('|'),old=$('main'),keep=old&&where===render.where?old.scrollTop:0;render.where=where;
   const themeBtn=`<button data-act="theme" class="${'T'}" aria-label="Switch to ${isDark()?'light':'dark'} theme" title="Switch to ${isDark()?'light':'dark'} theme">${isDark()?ICON.sun:ICON.moon}</button>`;
   const rail=`<nav aria-label="Main"><button class="create" data-act="create"><i>+</i><span>Create</span></button>${tabs.map(([k,l])=>`<button data-act="nav" data-v="${k}" ${k==='assist'?'class="only-wide"':''} ${cur===k?'aria-current="page"':''}>${ICON[k]}<span>${l}</span>${k==='topics'&&unreadTotal()?'<span class="dot" title="Unread updates"></span>':''}</button>`).join('')}<button class="only-wide capnav" data-act="cap-pin" aria-expanded="${!!S.capPin}" aria-label="Data Capture: photo, voice note, web page note, text note">${ICON.camera}<span>Data Capture</span></button><span class="sp"></span><span class="only-wide mono" style="color:var(--rail-ink);text-align:center;font-size:.7rem;opacity:.8">${VERSION}</span><span class="util only-wide">${themeBtn}<button data-act="rail-hide" aria-label="Hide the sidebar" title="Hide the sidebar">${ICON.hide}</button></span><button class="only-wide" data-act="nav" data-v="help" ${cur==='help'?'aria-current="page"':''}>${ICON.help}<span>Help</span></button><button class="only-wide" data-act="nav" data-v="settings" ${cur==='settings'?'aria-current="page"':''}>${ICON.settings}<span>Settings</span></button></nav>`;
   const strip=`<div class="topstrip only-narrow"><span class="mono small">OrganizerTX ${VERSION}</span><span class="row" style="gap:6px"><button class="btn" data-act="theme" aria-label="Switch theme">${isDark()?ICON.sun:ICON.moon}</button><button class="btn" data-act="nav" data-v="assist" aria-label="Assistant" title="Assistant">${ICON.assist}</button><button class="btn" data-act="nav" data-v="help" aria-label="Help">${ICON.help}</button><button class="btn" data-act="nav" data-v="settings" aria-label="Settings">${ICON.settings}</button></span></div>`;
@@ -3423,6 +3551,7 @@ function shareChat(i){
 }
 /* ---------- help: built-in guides, plus an assistant that answers from them ---------- */
 const HELP=[
+ ['Project views: brief, timelines and WBS','Open a project. Under Plan and tasks there are four views. Project Brief shows the summary, which you can fold away. Simple is the week-by-week timeline. Advanced is a Gantt chart with a table: type in any cell to change a task name, planned start, weeks, cost or hours; arrows show dependencies and red marks the critical path; "Hide the detail columns" gives the chart more room. WBS is the work breakdown structure: type in a box to rename it, drag a task to another phase, add phases, or let the AI group the tasks into phases. Every view uses the same data, so a change in one shows in the others and on the task board at once.'],
  ['Task numbers, dependencies and the critical path','Every task carries its number in its project, and keeps it when you drag the card between lanes. Open a task and use "Depends on" to pick the tasks that must be done first; they can be in another project. A task cannot be completed while one it depends on is not done. On the Tasks board, choose a project to see its critical path: the chain of tasks that sets the finish date. "Link tasks in order" makes each task follow the one before; "Let AI work out the sequence" suggests the dependencies. The Dashboard lists where one project waits on another.'],
  ['Resources: people, equipment and other','Open Settings, then the Resources tab. Add people with their role, availability, hours and pay rate; equipment with capacity, status, cost and next service date; and any other resource such as materials or subcontractors. Staff names appear as owner suggestions on tasks, and each person\'s open tasks are counted. The tiles show who and what is available, the team cost per day, and anything needing attention. Download the register as a spreadsheet at any time.'],
  ['Owners, reminders and repeating tasks','Open any task to set an Owner, a Repeat (daily, weekdays, weekly or monthly) and a reminder date and time. Completing a repeating task creates the next one. Reminders show as a bar at the top while OrganizerTX is open, and as a device notification if notifications are turned on in Settings. On the Tasks page you can filter by owner.'],
@@ -3542,6 +3671,11 @@ const ACT={
   dcat(v){V.dcat=V.dcat===v?'all':v},
   dtab(v){V.dtab=v},
   wsg(v){V.wsg=v},
+  gtab(v){V.gtab=v},gcols(){V.gcols=V.gcols===false},'brief-fold'(){V.briefShut=V.briefShut!==true},
+  'ph-ai'(){const p=curPlan();if(p)suggestPhases(p)},
+  'ph-add'(){const p=curPlan();if(!p)return;p.phases=(p.phases||[]).filter(Boolean);let n='New phase',k=2;while(p.phases.includes(n))n='New phase '+k++;if(!p.phases.length&&p.acts.length){p.phases.push('Phase 1');p.acts.forEach(a=>{a.phase='Phase 1'})}p.phases.push(n);V.gtab='wbs';setTimeout(()=>{const e=[...document.querySelectorAll('.wph .ed')].pop();if(e){e.focus();getSelection().selectAllChildren(e)}},60)},
+  async 'ph-del'(v){const p=curPlan(),n=p&&(p.phases||[])[+v];if(n===undefined)return;if(p.acts.some(a=>a.phase===n)&&!await confirmBox('Remove the phase "'+n+'"? Its tasks are kept and move to "Not in a phase".','Remove phase'))return;p.acts.forEach(a=>{if(a.phase===n)a.phase=''});p.phases.splice(+v,1);orderActs(p)},
+  'ph-task'(v){const p=curPlan();if(!p)return;const ph=+v>=0?(p.phases||[])[+v]:'';p.acts.push({id:uid(),name:'New task',status:'todo',phase:ph||'',deps:[]});orderActs(p);setTimeout(()=>{const col=document.querySelector('.wcol[data-ph="'+v+'"]'),e=col&&[...col.querySelectorAll('.wt .ed')].pop();if(e){e.focus();getSelection().selectAllChildren(e)}},60)},
   'dep-order'(v){const p=S.plans.find(x=>x.id===v);if(p){linkInOrder(p);toast('Each task now follows the one before it. Open a task to change what it depends on.')}},
   'dep-ai'(v){const p=S.plans.find(x=>x.id===v);if(p)aiDeps(p)},
   async 'dep-clear'(v){const p=S.plans.find(x=>x.id===v);if(p&&await confirmBox('Remove every dependency in "'+p.name+'"? The task numbers stay.','Clear sequence'))p.acts.forEach(a=>{a.deps=[]})},
@@ -3674,6 +3808,14 @@ document.addEventListener('change',e=>{
   if(e.target.closest('.sett')&&e.target.id!=='restore'){readProfileInputs();save()}
   if(e.target.id==='fafile'){FA_FILES=[...e.target.files].slice(0,2);if(FA_FILES.length>1&&V.fa.task!=='compare'&&V.fa.task!=='ask')V.fa.task='compare';render()}
   if(e.target.dataset.change==='dtype'){V.dcat=e.target.value;V.dtab='files';render()}
+  if(e.target.dataset.g){const [i,k]=e.target.dataset.g.split('|'),P=curPlan(),a=P&&P.acts[+i],v=e.target.value.trim();if(a){
+      if(k==='name'){if(v)a.name=clip(v,120)}
+      else if(k==='start'){const S0=schedOf(P);if(isoOk(v))a.start=Math.max(1,Math.round((new Date(v+'T12:00').getTime()-S0.t0)/(7*DAY))+1);else delete a.start}
+      else if(k==='weeks'){a.weeks=Math.max(1,Math.min(520,Math.round(num(v)||1)))}
+      else if(k==='cost'){a.cost=v}else if(k==='hours'){a.hours=num(v)||''}
+      {const S1=schedOf(P);P.weeks=Math.max(...S1.rows.map(r=>r.start+r.weeks-1),1)}
+      save();const key=e.target.dataset.g;setTimeout(()=>{const act=document.activeElement,k2=act&&act.dataset&&act.dataset.g;render();if(k2&&k2!==key){const n=document.querySelector(`[data-g="${k2}"]`);if(n)n.focus()}},0)}}
+  if(e.target.dataset.gp!==undefined&&e.target.dataset.gp!==''){const P=curPlan(),i=+e.target.dataset.gp,old=P&&(P.phases||[])[i],v=clip(e.target.value.trim(),40);if(old!==undefined&&v&&v!==old&&!P.phases.includes(v)){P.acts.forEach(a=>{if(a.phase===old)a.phase=v});P.phases[i]=v;save()}setTimeout(render,0)}
   if(e.target.dataset.change==='vatin'){budOf(curPlan()).vatIn=e.target.checked;save();render()}
   if(e.target.dataset.change==='towner'){V.towner=e.target.value;render()}
   if(e.target.dataset.bud){const [i,k]=e.target.dataset.bud.split('|'),l=budOf(curPlan()).lines[+i];if(l){l[k]=k==='planned'||k==='actual'?num(e.target.value):e.target.value.trim();save();setTimeout(()=>{const a=document.activeElement,k2=a&&a.dataset&&a.dataset.bud;render();if(k2){const n=document.querySelector(`[data-bud="${k2}"]`);if(n){n.focus();if(n.select)n.select()}}},0)}}
@@ -3701,6 +3843,16 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('.kcard');if(c){e.dataTransfer.setData('text/plain',c.dataset.v);e.dataTransfer.effectAllowed='move'}});
 document.addEventListener('dragover',e=>{const l=e.target.closest&&e.target.closest('.lane');document.querySelectorAll('.lane.over').forEach(x=>{if(x!==l)x.classList.remove('over')});if(l){e.preventDefault();l.classList.add('over')}});
 document.addEventListener('drop',e=>{const l=e.target.closest&&e.target.closest('.lane');if(!l)return;e.preventDefault();const t=findTask(e.dataTransfer.getData('text/plain'));if(t&&!(l.dataset.lane==='done'&&!isDone(t.a)&&blockDone(t.a))){t.a.status=l.dataset.lane;t.a.closed=isDone(t.a)?Date.now():0;save()}render()});
+/* text typed straight into a WBS box is saved when the box loses focus or Enter is pressed */
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('ed')){e.preventDefault();e.target.blur()}});
+document.addEventListener('focusout',e=>{const t=e.target;if(!t.classList||!t.classList.contains('ed'))return;const P=curPlan(),v=clip((t.textContent||'').replace(/\s+/g,' ').trim(),120);if(!P)return;
+  if(t.dataset.ge!==undefined){const a=P.acts[+t.dataset.ge];if(a&&v&&v!==a.name){a.name=v;save();setTimeout(render,0)}else if(a)t.textContent=a.name}
+  else if(t.dataset.gpe!==undefined){const i=+t.dataset.gpe,old=(P.phases||[])[i],nv=clip(v,40);if(old!==undefined&&nv&&nv!==old&&!P.phases.includes(nv)){P.acts.forEach(a=>{if(a.phase===old)a.phase=nv});P.phases[i]=nv;save();setTimeout(render,0)}else if(old!==undefined)t.textContent=old}});
+document.addEventListener('dragstart',e=>{const w=e.target.closest&&e.target.closest('.wt');if(w){e.dataTransfer.setData('text/plain','wbs:'+w.dataset.wi);e.dataTransfer.effectAllowed='move'}});
+document.addEventListener('dragover',e=>{const c=e.target.closest&&e.target.closest('.wcol');if(c){e.preventDefault();document.querySelectorAll('.wcol.over,.wt.over').forEach(x=>x.classList.remove('over'));(e.target.closest('.wt')||c).classList.add('over')}});
+document.addEventListener('drop',e=>{const c=e.target.closest&&e.target.closest('.wcol');if(!c)return;const d=e.dataTransfer.getData('text/plain')||'';if(!d.startsWith('wbs:'))return;e.preventDefault();
+  const P=curPlan(),a=P&&P.acts[+d.slice(4)],tgt=e.target.closest('.wt'),before=tgt?P.acts[+tgt.dataset.wi]:null;if(!a||before===a){render();return}
+  a.phase=+c.dataset.ph>=0?(P.phases||[])[+c.dataset.ph]||'':'';P.acts.splice(P.acts.indexOf(a),1);if(before)P.acts.splice(P.acts.indexOf(before),0,a);else P.acts.push(a);orderActs(P);save();render()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
 
 /* ---------- start ---------- */
