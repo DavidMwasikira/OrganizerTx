@@ -18,8 +18,8 @@ async def main():
           S.brief={day:dash(Date.now()),at:Date.now(),summary:'x',pri:[],ai:false};S.weekly={kind:'ai',date:Date.now(),items:[{name:'a',what:'b',why:'c'}]};V.view='plan';V.plan='pb';V.ptab='gadv';save();render()""")
         await pg.wait_for_timeout(300)
         # 1 hide list
-        w0=await pg.evaluate("Math.round(document.querySelector('.wscol').getBoundingClientRect().width)"); await pg.click('[data-act=ws-hide]'); await pg.wait_for_timeout(200)
-        print('hide list: project width',w0,'->',await pg.evaluate("Math.round(document.querySelector('.wscol').getBoundingClientRect().width)"),'| list visible',await pg.locator('.wsside').is_visible(),'| show button',await pg.locator('.wstog.show').count())
+        w0=await pg.evaluate("Math.round(document.querySelector('.wscol').getBoundingClientRect().width)"); await pg.click('.ttog [data-act=ws-hide]'); await pg.wait_for_timeout(200)
+        print('hide list: project width',w0,'->',await pg.evaluate("Math.round(document.querySelector('.wscol').getBoundingClientRect().width)"),'| list visible',await pg.locator('.wsside').is_visible(),'| show button',await pg.locator('.ttog [data-act=ws-hide]').count())
         await pg.screenshot(path='lk-wide.png'); await pg.reload(); await pg.wait_for_timeout(1500); await pg.evaluate("V.view='plan';V.plan='pb';V.ptab='gadv';render()"); await pg.wait_for_timeout(200); print('stays hidden after reload:',await pg.locator('.wsside').is_visible()==False)
         # 2 today line
         print('today label:',await pg.locator('.agnow b').inner_text(),'| x px',await pg.evaluate("Math.round(parseFloat(document.querySelector('.agnow').style.left))"),'(10 days = 43 px expected)')
@@ -51,6 +51,6 @@ async def main():
         await pg.wait_for_timeout(1500)
         print('AI: deps',await pg.evaluate("(()=>{const m=taskIndex();return S.plans.find(p=>p.id==='pb').acts.map(a=>predsOf(a,m).map(x=>x.n))})()"),'| every task connected',await pg.evaluate("(()=>{const m=taskIndex();return S.plans.find(p=>p.id==='pb').acts.every(a=>predsOf(a,m).length||succsOf(a,m).length)})()"),'| starts',await pg.evaluate("schedOf(S.plans.find(p=>p.id==='pb')).rows.map(r=>r.start)"),'| lines',await pg.locator('.aglinks path[marker-end]').count())
         await pg.locator('.pviews').screenshot(path='lk-ai.png')
-        await pg.click('.wstog.show'); await pg.wait_for_timeout(200); print('show list again:',await pg.locator('.wsside').is_visible(),'| errors',errs)
+        await pg.click('.ttog [data-act=ws-hide]'); await pg.wait_for_timeout(200); print('show list again:',await pg.locator('.wsside').is_visible(),'| errors',errs)
         await b.close()
 asyncio.run(main())

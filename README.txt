@@ -1,9 +1,14 @@
-ORGANIZERTX v0.47
+ORGANIZERTX v0.48
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.48 Project heading tidied: no Dashboard link, the Folders and Sidebar
+        hide/show buttons sit before the project title, facts on the same
+        line. Gantt toolbar on one row with a Weeks / Months / Quarters /
+        Whole project toggle instead of the slider. Gantt bars are solid
+        blocks coloured by task status, with a legend and open arrows.
   v0.47 Project page: one row of tabs (Project Brief, Plan and Tasks, Budget,
         Risks & Milestones, WBS, Gantt Chart - Simple, Gantt Chart -
         Advanced). Budget summary shows % used in a ring with the amounts

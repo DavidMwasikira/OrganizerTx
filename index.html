@@ -145,8 +145,7 @@ textarea{resize:vertical;line-height:1.5}
 .gantt{display:grid;grid-template-columns:minmax(92px,34%) 1fr;gap:6px 10px;align-items:center;font-size:.84rem}
 .gantt .gn{line-height:1.25;overflow-wrap:anywhere}
 .gantt .tr{position:relative;height:20px;border-radius:4px;background:repeating-linear-gradient(90deg,var(--sunk) 0,var(--sunk) calc(var(--wk) - 1px),var(--line) calc(var(--wk) - 1px),var(--line) var(--wk))}
-.gantt .tr i{position:absolute;top:3px;bottom:3px;border-radius:3px;background:var(--accent-soft);border:1.5px solid var(--accent)}
-.gantt .tr i.done{background:var(--accent)}
+.gantt .tr i{position:absolute;top:3px;bottom:3px;border-radius:2px;background:var(--s-todo)}.gantt .tr i.st-doing{background:var(--s-doing)}.gantt .tr i.st-blocked{background:var(--s-blocked)}.gantt .tr i.st-done{background:var(--s-done)}
 .gantt .tr u{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--signal)}
 .gantt .sc{position:relative;height:16px;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
 .gantt .sc span{position:absolute;top:0}
@@ -485,7 +484,7 @@ nav .util svg{width:18px;height:18px}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .panel h2{font-size:1.02rem}
 .hero{font-family:var(--display);font-weight:700;font-size:3rem;line-height:1;font-variant-numeric:tabular-nums}
-:root{--s-done:#1baf7a;--s-doing:#2a78d6;--s-blocked:#eb6834}
+:root{--s-done:#1baf7a;--s-doing:#2a78d6;--s-blocked:#eb6834;--s-todo:#8a94a6}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--s-done:#199e70;--s-doing:#3987e5;--s-blocked:#d95926}}
 :root[data-theme="dark"]{--s-done:#199e70;--s-doing:#3987e5;--s-blocked:#d95926}
 .seg4{display:flex;gap:2px;height:26px}
@@ -731,7 +730,15 @@ table.rt td{vertical-align:top;padding-top:10px;padding-bottom:10px}table.rt but
 @media (max-width:860px){.htog [data-act=ws-hide]{display:none}}
 .htabs .htog{margin-left:auto;display:flex;gap:4px;align-items:center;padding-bottom:4px}.htabs .htog .btn{min-height:32px;font-weight:500;white-space:nowrap}
 .btn.icon{width:36px;min-height:36px;padding:0;justify-content:center}.btn.icon svg{width:17px;height:17px}
-.agzoom{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.agzoom input[type=range]{width:min(320px,50vw);accent-color:var(--accent)}
+.htabs .htog[hidden]{display:none}
+.thead.slim{gap:4px;padding-bottom:0;border-bottom:0}.ptitle{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap}.ptitle .facts{margin-left:auto}
+.ttog{display:inline-flex;gap:4px}.ttog .btn{min-height:30px;padding:0 9px;font-size:.8rem;font-weight:500;white-space:nowrap;color:var(--muted)}
+@media (max-width:760px){.ttog .only-wide{display:none}}@media (max-width:860px){.ttog [data-act=ws-hide]{display:none}}
+.agdates .seg button{min-height:38px;padding:6px 12px;font-size:.86rem;white-space:nowrap}.agdates .lbl{display:block;margin-bottom:6px}
+.gleg{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;font-size:.8rem;color:var(--ink)}.gleg>span{display:inline-flex;align-items:center;gap:6px}
+.gleg .sw{width:18px;height:10px;border-radius:2px;display:inline-block}.gleg .ln{width:18px;height:0;border-top:1.5px solid var(--link);display:inline-block}.gleg .ln.crit{border-color:var(--bad)}.gleg .ln.now{border-color:var(--signal);border-top-width:2px}
+.gleg .dm{width:9px;height:9px;transform:rotate(45deg);border:2px solid var(--k5);display:inline-block;margin:0 3px}
+.aghelp{margin-left:auto;font-size:.8rem}.aghelp summary{cursor:pointer;color:var(--accent);font-weight:600}.aghelp[open]{flex-basis:100%;margin-left:0}.aghelp p{margin:6px 0 0;color:var(--muted);max-width:90ch}
 .agbody.nogrid{background-image:none}.agbody .vl{position:absolute;top:0;bottom:0;width:1px;background:var(--line);z-index:0}
 .pviews{display:flex;flex-direction:column;gap:12px;min-width:0}
 .ag{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);min-width:0}
@@ -749,15 +756,16 @@ table.rt td{vertical-align:top;padding-top:10px;padding-bottom:10px}table.rt but
 .aghd span.t{border-left:1px solid var(--line)}.aghd b{font:600 .7rem var(--mono);color:var(--ink)}.aghd small{font-size:.62rem;color:var(--muted)}
 .agbody{position:relative;background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px)}
 .agline{position:relative;height:34px;box-sizing:border-box;border-bottom:1px solid var(--line)}
-.agline .bar{position:absolute;top:8px;height:18px;border-radius:5px;border:1.5px solid var(--c);background:color-mix(in srgb,var(--c) 22%,var(--surface));padding:0;z-index:2;cursor:pointer}
-.agline .bar.doing{background:linear-gradient(90deg,var(--c) 50%,color-mix(in srgb,var(--c) 22%,var(--surface)) 50%)}.agline .bar.done{background:var(--c)}
-.agline .bar.crit{box-shadow:0 0 0 2px var(--bad)}.agline .bar:hover,.agline .bar:focus-visible{filter:brightness(1.08);outline:2px solid var(--ink);outline-offset:1px}
+.agline .bar{position:absolute;top:9px;height:16px;border-radius:2px;border:0;background:var(--s-todo);padding:0;z-index:2;cursor:pointer;min-width:3px}
+.st-todo{background:var(--s-todo)}.st-doing{background:var(--s-doing)}.st-blocked{background:var(--s-blocked)}.st-done{background:var(--s-done)}
+.agline .bar.st-doing{background:var(--s-doing)}.agline .bar.st-blocked{background:var(--s-blocked)}.agline .bar.st-done{background:var(--s-done)}
+.agline .bar.crit{box-shadow:0 4px 0 -1px var(--bad)}.agline .bar:hover,.agline .bar:focus-visible{filter:brightness(1.08);outline:2px solid var(--ink);outline-offset:1px}
 .agline .sum{position:absolute;top:12px;height:8px;background:color-mix(in srgb,var(--c) 35%,var(--surface));border-radius:2px;z-index:1;display:block}
 .agline .sum::before,.agline .sum::after{content:"";position:absolute;top:0;width:3px;height:14px;background:var(--c)}.agline .sum::before{left:0}.agline .sum::after{right:0}
 .agline .sum b{display:block;height:100%;background:var(--c);border-radius:2px}
 .agline .dia{position:absolute;top:10px;width:13px;height:13px;margin-left:-7px;transform:rotate(45deg);border:2px solid var(--k5);background:var(--surface);z-index:2}.agline .dia.done{background:var(--k5)}
 .aglinks{position:absolute;left:0;top:0;pointer-events:none;z-index:3;overflow:visible}
-.aglinks path{fill:none;stroke:var(--link);stroke-width:1}.aglinks path.c{stroke:var(--bad)}.aglinks marker path{fill:var(--link);stroke:none}.aglinks marker path.c{fill:var(--bad)}
+.aglinks path{fill:none;stroke:var(--link);stroke-width:1}.aglinks path.c{stroke:var(--bad)}.aglinks marker path{fill:none;stroke:var(--link);stroke-width:1.6}.aglinks marker path.c{stroke:var(--bad)}
 .agnow{position:absolute;top:0;bottom:0;width:2px;background:var(--signal);z-index:3}
 .wbswrap{overflow-x:auto;padding:6px 2px 12px}
 .wbs{display:flex;flex-direction:column;align-items:center;min-width:max-content}
@@ -828,7 +836,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.47';
+const VERSION='v0.48';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2208,14 +2216,16 @@ function addLink(p,fromId,toId){
   (B.a.deps=B.a.deps||[]).push(fromId);if(num(B.a.start)>0){const S0=schedOf(p),ra=S0.by.get(fromId),rb=S0.by.get(toId);if(ra&&rb&&rb.start<ra.start+ra.weeks)delete B.a.start}
   save();return true;
 }
+const stLegend=()=>STATUS.map(([k,l])=>`<span><i class="sw st-${k}"></i>${l}</span>`).join('');
 function simpleGantt(p,S0){
   const W=S0.W,step=W<=8?1:W<=16?2:4,ticks=[];for(let w=1;w<=W;w+=step)ticks.push(`<span style="left:${100*(w-1)/W}%">W${w}</span>`);
   const now=p.active||p.custom?(Date.now()-S0.t0)/(7*DAY)/W*100:-1,mark=now>=0&&now<=100?`<u style="left:${now}%" title="Today, ${fmtShort(Date.now())}"></u>`:'';
-  return `<div class="gantt" style="--wk:${100/W}%" role="img" aria-label="Timeline of ${W} weeks"><span></span><div class="sc">${ticks.join('')}</div>${S0.rows.map((r,i)=>`<span class="gn">${i+1}. ${esc(r.a.name)}</span><div class="tr"><i class="${isDone(r.a)?'done':''}" style="left:${100*(r.start-1)/W}%;width:${100*r.weeks/W}%" title="${esc(r.a.name)}: week ${r.start}${r.weeks>1?' to '+(r.start+r.weeks-1):''}"></i>${mark}</div>`).join('')}</div>
-  <p class="small muted" style="margin:10px 0 0">W1 is the first week. Filled bars are finished tasks; the orange line is today.</p>`;
+  return `<div class="gantt" style="--wk:${100/W}%" role="img" aria-label="Timeline of ${W} weeks"><span></span><div class="sc">${ticks.join('')}</div>${S0.rows.map((r,i)=>`<span class="gn">${i+1}. ${esc(r.a.name)}</span><div class="tr"><i class="st-${isDone(r.a)?'done':r.a.status||'todo'}" style="left:${100*(r.start-1)/W}%;width:${100*r.weeks/W}%" title="${esc(r.a.name)}: week ${r.start}${r.weeks>1?' to '+(r.start+r.weeks-1):''} · ${stLabel(isDone(r.a)?'done':r.a.status)}"></i>${mark}</div>`).join('')}</div>
+  <div class="gleg" style="margin-top:10px">${stLegend()}<span><i class="ln now"></i>Today</span><span class="muted">W1 is the first week.</span></div>`;
 }
+function fitGantt(){const r=document.querySelector('.agr'),p=curPlan();if(!r||!p||!['m','q','fit'].includes(V.gscale))return;const W=schedOf(p).W,wk=Math.max(1.5,Math.min(60,(r.clientWidth-6)/W));if(Math.abs(wk-(+V.gfit||0))>0.05){V.gfit=wk;render()}}
 function advGantt(p,S0){
-  const RH=34,WK=Math.max(3,Math.min(40,+V.gzoom||30)),zm=WK>=18?'w':WK>=7?'m':'q',W=S0.W,groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,cols=V.gcols!==false,m=taskIndex(),crit=(criticalPaths(m).get(p.id)||{ids:new Set()}).ids;
+  const RH=34,W=S0.W,sc=['w','m','q','fit'].includes(V.gscale)?V.gscale:'w',fitW=Math.max(1.5,Math.min(60,+V.gfit||Math.max(1.5,700/W))),WK=sc==='w'?30:sc==='m'?Math.max(10,fitW):sc==='q'?Math.max(4,fitW):fitW,zm=sc==='fit'?(WK>=18?'w':WK>=6?'m':'q'):sc,groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,cols=V.gcols!==false,m=taskIndex(),crit=(criticalPaths(m).get(p.id)||{ids:new Set()}).ids;
   const left=[],right=[],pos=new Map();let r=0;
   const miles=(p.miles||[]).filter(x=>isoOk(x.date));
   if(miles.length){left.push(`<div class="agrow ms"><span></span><span class="nm"><b>Milestones</b></span><span class="x"></span><span class="x"></span><span class="x"></span><span class="x"></span><span class="x"></span></div>`);
@@ -2226,7 +2236,7 @@ function advGantt(p,S0){
       right.push(`<div class="agline">${rows.length?`<i class="sum" style="--c:${c};left:${(s-1)*WK}px;width:${(e-s)*WK}px" title="${esc(g.name||'Not in a phase')}: ${dn} of ${g.acts.length} done"><b style="width:${g.acts.length?100*dn/g.acts.length:0}%"></b></i>`:''}</div>`);r++}
     g.acts.forEach(({a,i},k)=>{const x=S0.by.get(a.id);pos.set(a.id,{r,x1:(x.start-1)*WK,x2:(x.start-1+x.weeks)*WK});
       left.push(`<div class="agrow ${isDone(a)?'done':''}" style="--c:${c}"><span class="no">${i+1}</span><span class="nm ${named?'in':''}"><input type="text" data-g="${i}|name" value="${esc(a.name)}" title="${esc(a.name)}" aria-label="Task name"></span><span class="x">${wbsCode(p,g,k)}</span><span class="x"><input type="date" data-g="${i}|start" value="${dash(weekDate(S0,x.start))}" aria-label="Planned start"></span><span class="x"><input type="text" inputmode="numeric" data-g="${i}|weeks" value="${x.weeks}" aria-label="Weeks"></span><span class="x"><input type="text" data-g="${i}|cost" value="${esc(a.cost||(a.budget?a.budget.cur+' '+num(a.budget.amt).toLocaleString('en-GB'):''))}" placeholder="-" aria-label="Planned cost"></span><span class="x"><input type="text" inputmode="decimal" data-g="${i}|hours" value="${num(a.hours)||''}" placeholder="-" aria-label="Work hours"></span></div>`);
-      right.push(`<div class="agline"><button class="bar ${isDone(a)?'done':a.status==='doing'?'doing':''} ${crit.has(a.id)&&!isDone(a)?'crit':''}" style="--c:${c};left:${(x.start-1)*WK}px;width:${x.weeks*WK}px" data-act="task-open" data-v="${p.id}:${i}" title="${i+1}. ${esc(a.name)}: ${fmtShort(weekDate(S0,x.start))}, ${x.weeks} week${x.weeks===1?'':'s'}${crit.has(a.id)?' · on the critical path':''}" aria-label="${esc(a.name)}" data-bid="${a.id}"></button><button class="lk" style="left:${(x.start-1+x.weeks)*WK-5}px" data-lk="${a.id}" aria-label="Link from ${esc(a.name)}" title="Drag to another bar, or click and then click the bar that follows"></button></div>`);r++})});
+      right.push(`<div class="agline"><button class="bar st-${isDone(a)?'done':a.status||'todo'} ${crit.has(a.id)&&!isDone(a)?'crit':''}" style="--c:${c};left:${(x.start-1)*WK}px;width:${x.weeks*WK}px" data-act="task-open" data-v="${p.id}:${i}" title="${i+1}. ${esc(a.name)}: ${fmtShort(weekDate(S0,x.start))}, ${x.weeks} week${x.weeks===1?'':'s'}${crit.has(a.id)?' · on the critical path':''} · ${stLabel(isDone(a)?'done':a.status)}" aria-label="${esc(a.name)}, ${stLabel(isDone(a)?'done':a.status)}" data-bid="${a.id}"></button><button class="lk" style="left:${(x.start-1+x.weeks)*WK-5}px" data-lk="${a.id}" aria-label="Link from ${esc(a.name)}" title="Drag to another bar, or click and then click the bar that follows"></button></div>`);r++})});
   const links=[];p.acts.forEach(a=>predsOf(a,m).filter(x=>x.p===p).forEach(pr=>{const A=pos.get(pr.a.id),B=pos.get(a.id);if(!A||!B)return;const y1=A.r*RH+RH/2,y2=B.r*RH+RH/2,x1=A.x2,x2=B.x1,cl=crit.has(a.id)&&crit.has(pr.a.id)?'c':'';
     const d=x2>=x1+12?`M${x1} ${y1}h6V${y2}H${x2-1}`:`M${x1} ${y1}h6V${y2-(y2>y1?RH/2:-RH/2)+0.5}H${x2-8}V${y2}H${x2-1}`;links.push(`<path d="${d}" class="${cl}" marker-end="url(#ah${cl})"/><path d="${d}" class="hit" data-unlink="${pr.a.id}|${a.id}"><title>Task ${pr.n} must finish before task ${p.acts.indexOf(a)+1}. Click to remove this link.</title></path>`)}));
   const head=[],vl=[],xOf=t=>(t-S0.t0)/(7*DAY)*WK,endT0=S0.t0+W*7*DAY;
@@ -2235,13 +2245,16 @@ function advGantt(p,S0){
     while(d.getTime()<endT0){const nx=new Date(d.getFullYear(),d.getMonth()+stepM,1),x1=Math.max(0,xOf(d.getTime())),x2=Math.min(W*WK,xOf(nx.getTime())),lab=zm==='m'?d.toLocaleDateString('en-GB',{month:'short'}):'Q'+(Math.floor(d.getMonth()/3)+1);
       if(x2-x1>1){head.push(`<span style="left:${x1}px;width:${x2-x1}px" class="t">${x2-x1>=30?`<b>${lab}</b><small>${d.getFullYear()}</small>`:''}</span>`);if(x1>0)vl.push(`<i class="vl" style="left:${x1}px"></i>`)}d=nx}}
   const now=(Date.now()-S0.t0)/(7*DAY)*WK,endT=S0.t0+W*7*DAY-DAY,lf=V.linkFrom&&V.linkFrom.pid===p.id?p.acts.find(a=>a.id===V.linkFrom.id):null,depJob=busy&&busy.topicId==='deps';
-  return `<div class="agdates"><div class="field"><label for="pstart">Project start date</label><input type="date" id="pstart" data-change="pstart" value="${dash(S0.t0)}"></div><div class="field"><label for="pend">Project end date</label><input type="date" id="pend" data-change="pend" value="${dash(endT)}"></div><span class="small muted grow">Changing either date moves every task, due date and milestone by the same number of days. The length is ${W} week${W===1?'':'s'}.</span>
-      <span class="row"><button class="btn primary small" data-act="dep-opt" ${busy?'disabled':''} title="The AI works out which tasks depend on which, connects them all and re-times the plan">Link and optimise with AI</button>${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small" data-act="gcols" aria-pressed="${!cols}">${cols?'Hide the detail columns':'Show the detail columns'}</button>${copyBtn('gantt')}</span></div>
-    <div class="agzoom"><label for="gzoom" class="lbl">Timeline scale</label><span class="small muted">Quarters</span><input type="range" id="gzoom" min="3" max="40" step="1" value="${WK}" data-change="gzoom" aria-label="Timeline scale, from quarters to weeks"><span class="small muted">Weeks</span><span class="pill on">${zm==='w'?'Showing weeks':zm==='m'?'Showing months':'Showing quarters'}</span></div>
+  if(sc!=='w')requestAnimationFrame(fitGantt);
+  return `<div class="agdates"><div class="field"><label for="pstart">Start date</label><input type="date" id="pstart" data-change="pstart" value="${dash(S0.t0)}"></div><div class="field"><label for="pend">End date</label><input type="date" id="pend" data-change="pend" value="${dash(endT)}"></div>
+      <div class="field" style="min-width:0"><span class="lbl" id="gsl">Timeline shows</span><div class="seg" role="group" aria-labelledby="gsl">${[['w','Weeks','One column per week'],['m','Months','One column per month'],['q','Quarters','Q1 to Q4 of each year'],['fit','Whole project','Fits the chart from the start to the project end date']].map(([k,l,t])=>`<button data-act="gscale" data-v="${k}" aria-pressed="${sc===k}" title="${t}">${l}</button>`).join('')}</div></div>
+      <span class="row" style="margin-left:auto"><button class="btn primary small" data-act="dep-opt" ${busy?'disabled':''} title="The AI works out which tasks depend on which, connects them all and re-times the plan">Link and optimise with AI</button>${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small" data-act="gcols" aria-pressed="${!cols}" title="${cols?'Hide the WBS, start, weeks, cost and hours columns':'Show the WBS, start, weeks, cost and hours columns'}">${cols?'Hide columns':'Show columns'}</button>${copyBtn('gantt')}</span></div>
     ${depJob?`<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`:''}
-    ${lf?`<div class="banner linking">Linking from task ${p.acts.indexOf(lf)+1}, "${esc(clip(lf.name,50))}". Now click the task that can only finish after it. <button class="btn ghost small" data-act="link-cancel">Cancel</button></div>`:`<span class="small muted">Type in any cell to change it. To link two tasks, drag from the dot at the end of a bar to another bar (or click the dot, then the other bar). Click a line to remove it. Thin red lines are the critical path; blue lines are the rest.</span>`}
+    ${lf?`<div class="banner linking">Linking from task ${p.acts.indexOf(lf)+1}, "${esc(clip(lf.name,50))}". Now click the task that can only finish after it. <button class="btn ghost small" data-act="link-cancel">Cancel</button></div>`:''}
+    <div class="gleg">${stLegend()}<span><i class="ln crit"></i>Critical path</span><span><i class="ln"></i>Other links</span><span><i class="dm"></i>Milestone</span>
+      <details class="aghelp"><summary>How to use this chart</summary><p>Changing the start or end date moves every task, due date and milestone by the same number of days. The project is ${W} week${W===1?'':'s'} long. Type in any cell to change it. To link two tasks, drag from the dot at the end of a bar to another bar, or click the dot and then the other bar. Click a line to remove it. Bar colour shows the task status; a red underline marks a task on the critical path.</p></details></div>
   <div class="ag ${cols?'':'nocols'}"><div class="agl"><div class="agrow hd"><span>#</span><span>Task name</span><span class="x">WBS</span><span class="x">Planned start</span><span class="x">Weeks</span><span class="x">Planned cost</span><span class="x">Work hours</span></div>${left.join('')}</div>
-    <div class="agr" tabindex="0" aria-label="Gantt chart, scroll sideways"><div class="agtl" style="width:${W*WK}px"><div class="aghd">${head.join('')}</div><div class="agbody ${zm==='w'?'':'nogrid'}" style="background-size:${WK}px 100%">${vl.join('')}${right.join('')}<svg class="aglinks" width="${W*WK}" height="${r*RH}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z"/></marker><marker id="ahc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" class="c"/></marker></defs>${links.join('')}</svg>${now>=0&&now<=W*WK?`<u class="agnow" style="left:${now}px" title="Today, ${fmtShort(Date.now())}"><b>Today ${fmtShort(Date.now())}</b></u>`:`<span class="agout small muted">${now<0?'Today is before the project starts':'Today is after the project ends'}</span>`}</div></div></div></div>`;
+    <div class="agr" tabindex="0" aria-label="Gantt chart, scroll sideways"><div class="agtl" style="width:${W*WK}px"><div class="aghd">${head.join('')}</div><div class="agbody ${zm==='w'?'':'nogrid'}" style="background-size:${WK}px 100%">${vl.join('')}${right.join('')}<svg class="aglinks" width="${W*WK}" height="${r*RH}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M2 1L9 5L2 9"/></marker><marker id="ahc" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M2 1L9 5L2 9" class="c"/></marker></defs>${links.join('')}</svg>${now>=0&&now<=W*WK?`<u class="agnow" style="left:${now}px" title="Today, ${fmtShort(Date.now())}"><b>Today ${fmtShort(Date.now())}</b></u>`:`<span class="agout small muted">${now<0?'Today is before the project starts':'Today is after the project ends'}</span>`}</div></div></div></div>`;
 }
 function wbsHtml(p){
   const groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,s=budSum(p),hrs=p.acts.reduce((t,a)=>t+num(a.hours),0);
@@ -2502,7 +2515,7 @@ function homeHead(){
   return `<div class="page wide hhead noprint">
   ${!hosted()?'<div class="banner">Preview inside Claude. Research here uses what Claude already knows, without live web search, and nothing is kept for long. The installed version searches the web and keeps your folders.</div>':''}
   <h1 class="hello">${(h=>h<12?'Good morning':h<17?'Good afternoon':'Good evening')(new Date().getHours())}${first?', <em>'+esc(first)+'</em>':''}</h1>
-  <div class="htabs" role="group" aria-label="Home sections">${[['day','My Day',''],['folders','Folders',S.topics.length],['tasks','Tasks Board',open],['research','Research','']].map(([k,l,n])=>`<button data-act="hview" data-v="${k}" aria-pressed="${hv===k}">${l}${n===''?'':`<b>${n}</b>`}</button>`).join('')}<span class="htog">${['topic','plan','guide'].includes(V.view)||V.doc?`<button class="btn ghost small" data-act="ws-hide" aria-pressed="${!!S.wsHidden}" title="${S.wsHidden?'Show the Folders list beside this page':'Hide the Folders list so this page uses the full width'}">${S.wsHidden?'&raquo; Show Folders list':'&laquo; Hide Folders list'}</button>`:''}<button class="btn ghost small only-wide" data-act="${S.railHidden?'rail-show':'rail-hide'}" aria-pressed="${!!S.railHidden}" title="${S.railHidden?'Show the left sidebar':'Hide the left sidebar'}">${S.railHidden?'&raquo; Show sidebar':'&laquo; Hide sidebar'}</button></span></div></div>`;
+  <div class="htabs" role="group" aria-label="Home sections">${[['day','My Day',''],['folders','Folders',S.topics.length],['tasks','Tasks Board',open],['research','Research','']].map(([k,l,n])=>`<button data-act="hview" data-v="${k}" aria-pressed="${hv===k}">${l}${n===''?'':`<b>${n}</b>`}</button>`).join('')}<span class="htog" ${V.view==='plan'?'hidden':''}>${['topic','plan','guide'].includes(V.view)||V.doc?`<button class="btn ghost small" data-act="ws-hide" aria-pressed="${!!S.wsHidden}" title="${S.wsHidden?'Show the Folders list beside this page':'Hide the Folders list so this page uses the full width'}">${S.wsHidden?'&raquo; Show Folders list':'&laquo; Hide Folders list'}</button>`:''}<button class="btn ghost small only-wide" data-act="${S.railHidden?'rail-show':'rail-hide'}" aria-pressed="${!!S.railHidden}" title="${S.railHidden?'Show the left sidebar':'Hide the left sidebar'}">${S.railHidden?'&raquo; Show sidebar':'&laquo; Hide sidebar'}</button></span></div></div>`;
 }
 function viewHome(){
   const depth=V.depth||S.profile.depth,first=(S.profile.name||'').split(' ')[0];
@@ -2618,9 +2631,10 @@ function viewPlanCore(){
   const p=curPlan();if(!p){V.view='actions';return viewActions()}
   const G=guideOf(p),mine=busy&&busy.topicId==='plan:'+p.id,n=p.acts.filter(isDone).length,timed=p.acts.some(a=>a.start);
   const fact=(l,v)=>v?`<span><b>${esc(l)}</b>${esc(v)}</span>`:'';
-  return `<div class="page"><div class="thead"><div class="row">${p.guide?`<button class="btn ghost" data-act="open-guide" data-v="${p.guide}">&larr; ${esc(G.title)}</button>`:`<button class="btn ghost" data-act="nav" data-v="${p.builtin?'tasks':'actions'}">&larr; ${p.builtin?'My Tasks':'Dashboard'}</button>`}</div>
-    <h1 style="font-size:1.4rem">${esc(p.name)}</h1>${p.what?`<p class="muted" style="margin:0">${esc(p.what)}</p>`:''}
-    <div class="facts" style="margin-top:0">${p.guide?fact(G.a,p.a)+fact(G.b,p.b)+fact('Payback',p.payback):''}${p.weeks?fact('Timeline',p.weeks+' weeks'):''}${p.active&&!p.builtin?fact('Started',since(p.started)):''}</div></div><!--tabs-->
+  const tog=`<span class="ttog"><button class="btn small" data-act="ws-hide" aria-pressed="${!!S.wsHidden}" aria-label="${S.wsHidden?'Show the Folders list':'Hide the Folders list'}" title="${S.wsHidden?'Show the Folders list beside this page':'Hide the Folders list so this page uses the full width'}">${S.wsHidden?'&raquo;':'&laquo;'} Folders</button><button class="btn small only-wide" data-act="${S.railHidden?'rail-show':'rail-hide'}" aria-pressed="${!!S.railHidden}" aria-label="${S.railHidden?'Show the left sidebar':'Hide the left sidebar'}" title="${S.railHidden?'Show the left sidebar':'Hide the left sidebar'}">${S.railHidden?'&raquo;':'&laquo;'} Sidebar</button></span>`;
+  return `<div class="page"><div class="thead slim">${p.guide?`<div class="row"><button class="btn ghost" data-act="open-guide" data-v="${p.guide}">&larr; ${esc(G.title)}</button></div>`:p.builtin?`<div class="row"><button class="btn ghost" data-act="nav" data-v="tasks">&larr; My Tasks</button></div>`:''}
+    <div class="ptitle">${tog}<h1 style="font-size:1.4rem">${esc(p.name)}</h1>
+    <div class="facts" style="margin-top:0">${p.guide?fact(G.a,p.a)+fact(G.b,p.b)+fact('Payback',p.payback):''}${p.weeks?fact('Timeline',p.weeks+' weeks'):''}${p.active&&!p.builtin?fact('Started',since(p.started)):''}</div></div>${p.what?`<p class="muted small" style="margin:0">${esc(p.what)}</p>`:''}</div><!--tabs-->
   ${mine?'<div class="card" id="stream"></div>':''}
   ${p.acts.length||p.custom?`
     <div class="row"><div class="bar"><i style="width:${pct(p)}%"></i></div><span class="pct">${pct(p)}%</span><span class="small muted">${n} of ${p.acts.length} done</span></div>
@@ -3115,7 +3129,7 @@ function wsWrap(body){
     ${(sel?[sel]:[]).map(g=>`${g.items.map(x=>`<button class="it" style="--band:${g.band}" data-act="${x.act}" data-v="${esc(x.v)}" aria-current="${!!x.on}"><span class="n">${x.dot?'<span class="dot" title="Unread update"></span> ':''}${esc(x.name)}</span><span class="m">${esc(x.meta)}${x.bar!==undefined?`<span class="bar"><i style="width:${x.bar}%"></i></span>`:''}</span></button>`).join('')}`).join('')}</aside>`;
   const pick=none?'':`<select class="wspick" id="wspick" data-change="wsgo" aria-label="Switch chat or project">${gs.map(g=>`<optgroup label="${g.label}">${g.items.map(x=>`<option value="${x.act}|${esc(x.v)}" ${x.on?'selected':''}>${esc(x.name)}</option>`).join('')}</optgroup>`).join('')}</select>`;
   const shut=!none&&S.wsHidden;
-  return `<div class="ws ${none?'none':''} ${shut?'nolist':''}">${side}<div class="wscol">${shut?`<button class="btn wstog show" data-act="ws-hide" aria-label="Show the Folders list" title="Show the Folders list">&raquo; <span>Folders</span></button>`:''}${pick}${body}</div></div>`;
+  return `<div class="ws ${none?'none':''} ${shut?'nolist':''}">${side}<div class="wscol">${shut&&V.view!=='plan'?`<button class="btn wstog show" data-act="ws-hide" aria-label="Show the Folders list" title="Show the Folders list">&raquo; <span>Folders</span></button>`:''}${pick}${body}</div></div>`;
 }
 const navState=()=>({view:V.view,topic:V.topic,guide:V.guide,plan:V.plan,tab:V.tab,doc:V.doc});
 let HIST=[],lastNav=null,goingBack=false,PUSHED=0;
@@ -3743,7 +3757,7 @@ const ACT={
   'ws-hide'(){S.wsHidden=!S.wsHidden},
   'link-cancel'(){V.linkFrom=null},
   async 'dep-opt'(){const p=curPlan();if(!p)return;if(p.acts.some(a=>(a.deps||[]).length||num(a.start)>0)&&!await confirmBox('The AI will replace the current links in "'+p.name+'" and re-time the tasks so each starts when the tasks before it finish. Task names, lengths and phases stay as they are.','Link and optimise'))return;aiDeps(p,true)},
-  gcols(){V.gcols=V.gcols===false},
+  gcols(){V.gcols=V.gcols===false},gscale(v){V.gscale=v},
   'pv-copy'(v){const p=curPlan();if(p)(navigator.clipboard?navigator.clipboard.writeText(planText(p,v)):Promise.reject()).then(()=>toast(v==='wbs'?'WBS copied as an outline.':'Gantt chart copied as a table. Paste it into Excel or Word.')).catch(()=>toast('Could not copy on this device.'))},'brief-fold'(){V.briefShut=V.briefShut!==true},
   'ph-ai'(){const p=curPlan();if(p)suggestPhases(p)},
   'ph-add'(){const p=curPlan();if(!p)return;p.phases=(p.phases||[]).filter(Boolean);let n='New phase',k=2;while(p.phases.includes(n))n='New phase '+k++;if(!p.phases.length&&p.acts.length){p.phases.push('Phase 1');p.acts.forEach(a=>{a.phase='Phase 1'})}p.phases.push(n);V.ptab='wbs';setTimeout(()=>{const e=[...document.querySelectorAll('.wph .ed')].pop();if(e){e.focus();getSelection().selectAllChildren(e)}},60)},
@@ -3889,7 +3903,6 @@ document.addEventListener('change',e=>{
       {const S1=schedOf(P);P.weeks=Math.max(...S1.rows.map(r=>r.start+r.weeks-1),1)}
       save();const key=e.target.dataset.g;setTimeout(()=>{const act=document.activeElement,k2=act&&act.dataset&&act.dataset.g;render();if(k2&&k2!==key){const n=document.querySelector(`[data-g="${k2}"]`);if(n)n.focus()}},0)}}
   if(e.target.dataset.gp!==undefined&&e.target.dataset.gp!==''){const P=curPlan(),i=+e.target.dataset.gp,old=P&&(P.phases||[])[i],v=clip(e.target.value.trim(),40);if(old!==undefined&&v&&v!==old&&!P.phases.includes(v)){P.acts.forEach(a=>{if(a.phase===old)a.phase=v});P.phases[i]=v;save()}setTimeout(render,0)}
-  if(e.target.dataset.change==='gzoom'){V.gzoom=+e.target.value;render();const z=document.querySelector('#gzoom');if(z)z.focus()}
   if(e.target.dataset.change==='pstart'||e.target.dataset.change==='pend'){const P=curPlan(),v=e.target.value;if(P&&isoOk(v)){const S0=schedOf(P),cur=e.target.dataset.change==='pstart'?dash(S0.t0):dash(S0.t0+S0.W*7*DAY-DAY),days=Math.round((new Date(v+'T12:00')-new Date(cur+'T12:00'))/DAY);if(!P.started)P.started=S0.t0;shiftProject(P,days);save();if(days)toast('Project moved '+Math.abs(days)+' day'+(Math.abs(days)===1?'':'s')+(days>0?' later.':' earlier.'))}render()}
   if(e.target.dataset.change==='vatin'){budOf(curPlan()).vatIn=e.target.checked;save();render()}
   if(e.target.dataset.change==='towner'){V.towner=e.target.value;render()}
