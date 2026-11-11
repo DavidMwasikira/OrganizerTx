@@ -1,9 +1,14 @@
-ORGANIZERTX v0.48
+ORGANIZERTX v0.49
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.49 Risks and issues: "Resolve Issues" asks the AI for a resolution to
+        every open item, and each row has its own "Resolve" button. Each
+        suggestion is shown for you to Accept and save, or Discard.
+        Simple Gantt redrawn: phase labels, date columns, today's column
+        highlighted, bars labelled Done / On-Going / Upcoming / Blocked.
   v0.48 Project heading tidied: no Dashboard link, the Folders and Sidebar
         hide/show buttons sit before the project title, facts on the same
         line. Gantt toolbar on one row with a Weeks / Months / Quarters /

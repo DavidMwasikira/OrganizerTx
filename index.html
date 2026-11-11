@@ -672,7 +672,28 @@ table.dt td[style*="text-align:right"]{white-space:nowrap}
 .bcat .pl{background:color-mix(in srgb,var(--accent) 22%,var(--sunk))}.bcat .ac{background:var(--accent);height:8px!important;top:3px!important}.bcat .ac.over{background:var(--bad)}
 .bcat b{text-align:right;font-variant-numeric:tabular-nums;font-size:.9rem}
 table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt select{min-height:36px;width:100%}table.bt tfoot td{border-top:2px solid var(--line);padding-top:10px}
-.rrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:10px 0}.rrow:first-child{border-top:0}
+.rrow{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:10px 0}.rrow:first-child{border-top:0}
+.rrow .rmain{display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;background:none;border:0;padding:0;color:inherit;font:inherit}
+.rrow .res{margin-top:3px;color:var(--ink)}.rrow .res i{color:var(--signal);font-style:normal;font-weight:600}.rrow.closed .res{color:var(--muted)}
+.fix{display:flex;flex-direction:column;gap:8px;margin:0 0 12px 82px;padding:12px 14px;border:1px dashed var(--accent);border-radius:10px;background:var(--accent-soft)}.fix p{margin:0}
+@media (max-width:640px){.fix{margin-left:0}.rrow{flex-wrap:wrap}}
+.sg{display:grid;grid-template-columns:minmax(110px,24%) minmax(0,1fr);font-size:.84rem;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.sg .sgh{display:flex;align-items:center;padding:0 12px;font-weight:700;background:var(--sunk);border-bottom:1px solid var(--line);height:38px}
+.sg .sgd{position:relative;height:38px;background:var(--sunk);border-bottom:1px solid var(--line)}
+.sg .sgd span{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--muted);border-left:1px solid var(--line);white-space:nowrap;overflow:hidden;box-sizing:border-box}
+.sg .sgd span.now{background:var(--s-done);color:#fff;font-weight:700}
+.sg .sgp{display:flex;align-items:center;padding:8px 12px 2px;height:34px;box-sizing:border-box}.sg .sgp b{background:color-mix(in srgb,var(--c) 55%,var(--surface));color:var(--ink);padding:3px 10px;border-radius:4px;font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.sg .sgn{display:block;text-align:left;background:none;border:0;padding:0 12px;height:30px;line-height:30px;font:inherit;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sg .sgn:hover{color:var(--accent)}.sg.flat .sgn:first-of-type{margin-top:0}
+.sg .tr{position:relative;min-height:30px;background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:var(--col) 100%}
+.sg .nowcol{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--s-done) 12%,transparent);border-left:1px solid color-mix(in srgb,var(--s-done) 45%,transparent);border-right:1px solid color-mix(in srgb,var(--s-done) 45%,transparent);box-sizing:border-box}
+.sg .sb{position:absolute;top:5px;height:20px;padding:0;border:0;border-radius:3px;background:color-mix(in srgb,var(--c) 20%,var(--surface));overflow:hidden;cursor:pointer;min-width:6px;z-index:1}
+.sg .sb .fill{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--c) 58%,var(--surface))}
+.sg .sb em,.sg .sbo{font-style:normal;font-size:.7rem;font-weight:700;color:var(--ink);white-space:nowrap}.sg .sb em{position:absolute;left:7px;top:0;line-height:20px}
+.sg .sbo{position:absolute;top:5px;line-height:20px;z-index:1}
+.sg .sb u{position:absolute;right:5px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--surface);box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 70%,var(--ink))}.sg .sb.done u{background:var(--ink);box-shadow:none}
+.sg .sb.blocked{outline:1.5px dashed var(--bad);outline-offset:-1.5px}.sg .sb.blocked u{background:var(--bad);box-shadow:none}
+.sg .sb:hover,.sg .sb:focus-visible{filter:brightness(.95);box-shadow:0 0 0 2px var(--ink)}
+.sgk{--c:var(--k1);background:color-mix(in srgb,var(--c) 20%,var(--surface))}.sgk.done{background:color-mix(in srgb,var(--c) 58%,var(--surface))}.sgk.doing{background:linear-gradient(90deg,color-mix(in srgb,var(--c) 58%,var(--surface)) 50%,color-mix(in srgb,var(--c) 20%,var(--surface)) 50%)}.sgk.blocked{outline:1.5px dashed var(--bad);outline-offset:-1.5px}.sgk.nowk{background:var(--s-done)}
 .rrow .lv{flex:none;min-width:70px;text-align:center;font-size:.76rem;font-weight:700;padding:3px 8px;border-radius:999px;border:1.5px solid var(--c);color:var(--ink);background:color-mix(in srgb,var(--c) 14%,var(--surface))}
 .rrow.closed .b{color:var(--muted);text-decoration:line-through}
 .mstrip{display:flex;gap:0;overflow-x:auto;padding:4px 0}
@@ -836,7 +857,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.48';
+const VERSION='v0.49';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1997,6 +2018,33 @@ Reply with only a JSON object: {"currency":"as written in the document or empty"
     V.budImp={pid:p.id,name:file.name,lines,stated:num(o.stated_total),cur:String(o.currency||'').trim(),notes:String(o.notes||'').trim()};V.ptab='budget';
   });
 }
+const FIX=new Map();   /* risk object -> suggested resolution waiting for the user to accept */
+function resolveRisks(p,idxs){
+  if(needKey())return;const todo=idxs.map(i=>(p.risks||[])[i]).filter(r=>r&&r.status!=='closed');if(!todo.length){toast('There is nothing open to resolve.');return}
+  const bs=budSum(p);
+  job('risks',todo.length===1?'Working out a resolution':'Working through '+todo.length+' risks and issues',async(signal,onText,onStatus)=>{
+    const r=await callAI({system:systemPrompt(),depth:'moderate',search:hosted()?2:0,maxTokens:1200+900*todo.length,signal,onStatus,messages:[{role:'user',content:
+`Project: ${p.name}${p.what?' - '+p.what:''}. Place: ${place()}.${bs.n?' Budget '+money(bs.planned)+', spent '+money(bs.actual)+'.':''}
+Plan tasks: ${p.acts.map((a,i)=>(i+1)+'. '+a.name+' ('+stLabel(a.status)+')').join('; ')||'none yet'}.
+
+Work out a practical resolution for each of these open risks and issues:
+${todo.map((x,k)=>(k+1)+'. ['+(x.type==='issue'?'Issue':'Risk')+', '+(LEVELS3[x.level]||LEVELS3.med)[0]+'] '+x.title+(x.action?' | current response: '+x.action:'')).join('\n')}
+
+For each one give a resolution the user can act on this week: specific to this project and place, honest about cost and time, and naming who should do it by role. If something cannot be settled without a decision or information only the user has, say exactly what is needed in "needs" and still give the best next step.
+Reply with only a JSON array, one object per item: [{"n":1,"resolution":"2 to 4 plain sentences","owner":"role best placed to do it","reviewInWeeks":2,"tasks":["at most 2 short follow-up tasks to add to the plan, or none"],"levelAfter":"high, med or low once this is done","settled":true if doing this fully removes or closes the item, otherwise false,"needs":"what the user must decide or supply, or empty"}]`}]});
+    const arr=grab(r.text,'[',']')||grabObjects(r.text);if(!Array.isArray(arr)||!arr.length)throw new Error('The resolutions came back in a form that could not be read. Try again.');
+    let n=0;arr.forEach(o=>{const x=todo[(+o.n)-1];if(!x||!str(o.resolution))return;FIX.set(x,{text:clip(str(o.resolution),700),owner:clip(str(o.owner),60),weeks:Math.max(0,Math.min(52,parseInt(o.reviewInWeeks,10)||0)),tasks:(Array.isArray(o.tasks)?o.tasks:[]).map(t=>clip(str(t),90)).filter(t=>t&&!/^none$/i.test(t)).slice(0,2),level:['high','med','low'].includes(o.levelAfter)?o.levelAfter:x.level,settled:o.settled===true,needs:clip(str(o.needs),240)});n++});
+    if(!n)throw new Error('No resolution was suggested. Try again.');
+    toast(n+' suggested resolution'+(n===1?'':'s')+' ready. Accept each one to save it.');
+  });
+}
+function acceptFix(p,r){
+  const f=FIX.get(r);if(!f)return;
+  r.resolution=f.text;r.resolved=dash(Date.now());r.level=f.level;if(!r.owner&&f.owner)r.owner=f.owner;if(!r.due&&f.weeks&&!f.settled)r.due=dash(Date.now()+f.weeks*7*DAY);if(f.needs)r.needs=f.needs;else delete r.needs;
+  if(f.settled)r.status='closed';
+  f.tasks.forEach(t=>{if(!p.acts.some(a=>a.name.toLowerCase()===t.toLowerCase()))p.acts.push({id:uid(),name:t,detail:'Follow-up from the '+(r.type==='issue'?'issue':'risk')+': '+r.title,status:'todo',owner:r.owner||'',weeks:1,deps:[]})});
+  FIX.delete(r);
+}
 function riskModal(i){
   const p=curPlan(),ex=i!==undefined&&i!==''?(p.risks||[])[+i]:null,r=ex||{type:'risk',title:'',level:'med',owner:'',due:'',action:'',status:'open'};
   modal(`<form class="card wide"><h2 style="font-size:1.2rem">${ex?'Edit':'New'} risk or issue</h2>
@@ -2005,12 +2053,13 @@ function riskModal(i){
     <div class="field" style="flex:1;min-width:120px"><label for="rstat">Status</label><select id="rstat"><option value="open" ${r.status!=='closed'?'selected':''}>Open</option><option value="closed" ${r.status==='closed'?'selected':''}>Closed</option></select></div></div>
     <div class="field"><label for="rtitle">What is it?</label><input type="text" id="rtitle" value="${esc(r.title)}" placeholder="For example: casing delivery may slip a week"></div>
     <div class="field"><label for="raction">Response or next action</label><textarea id="raction" rows="2" placeholder="What will be done about it">${esc(r.action||'')}</textarea></div>
+    <div class="field"><label for="rres">Resolution</label><textarea id="rres" rows="3" placeholder="How it was, or will be, settled. Resolve with AI fills this in when you accept its suggestion.">${esc(r.resolution||'')}</textarea></div>
     <div class="row" style="align-items:flex-start"><div class="field" style="flex:1;min-width:140px"><label for="rowner">Owner</label><input type="text" id="rowner" list="ownerlist" value="${esc(r.owner||'')}" placeholder="Who is handling it?"><datalist id="ownerlist">${owners().map(o=>`<option value="${esc(o)}">`).join('')}</datalist></div>
     <div class="field" style="flex:1;min-width:140px"><label for="rdue">Review or due date</label><input type="date" id="rdue" value="${esc(r.due||'')}"></div></div>
     <div class="row" style="justify-content:space-between">${ex?'<button type="button" class="btn danger" data-x="del">Delete</button>':'<span></span>'}<span class="row"><button type="button" class="btn" data-x="cancel">Cancel</button><button type="submit" class="btn primary" data-x="save">Save</button></span></div></form>`,{
     cancel(){},
     save(el){const title=el.querySelector('#rtitle').value.trim();if(!title){toast('Say what the risk or issue is.');return false}
-      const q=id=>el.querySelector(id).value;Object.assign(r,{type:q('#rtype'),level:q('#rlevel'),status:q('#rstat'),title,action:q('#raction').trim(),owner:q('#rowner').trim(),due:q('#rdue')||''});
+      const q=id=>el.querySelector(id).value;Object.assign(r,{type:q('#rtype'),level:q('#rlevel'),status:q('#rstat'),title,action:q('#raction').trim(),resolution:q('#rres').trim(),owner:q('#rowner').trim(),due:q('#rdue')||''});
       if(!ex)(p.risks=p.risks||[]).push(r);save();render()},
     del(){p.risks.splice(+i,1);save();render()}
   });
@@ -2038,8 +2087,11 @@ function controlsHtml(p,tab){
   }
   if(tab==='risks'){
     const R=(p.risks||[]).map((r,i)=>({r,i})).sort((a,b)=>(a.r.status==='closed')-(b.r.status==='closed')||['high','med','low'].indexOf(a.r.level)-['high','med','low'].indexOf(b.r.level)),open=R.filter(x=>x.r.status!=='closed');
-    return `<div class="row" style="justify-content:space-between"><span class="row" style="gap:6px"><span class="pill ${open.filter(x=>x.r.level==='high').length?'due':''}">${open.filter(x=>x.r.level==='high').length} high</span><span class="pill">${open.filter(x=>x.r.type==='risk').length} open risks</span><span class="pill">${open.filter(x=>x.r.type==='issue').length} open issues</span></span><button class="btn primary" data-act="risk-new">+ Add risk or issue</button></div>
-      <section class="card">${R.length?R.map(({r,i})=>`<button class="rrow ${r.status==='closed'?'closed':''}" data-act="risk-open" data-v="${i}"><span class="lv" style="--c:${LEVELS3[r.level]?LEVELS3[r.level][1]:'var(--line)'}">${(LEVELS3[r.level]||LEVELS3.med)[0]}</span><span class="grow"><span class="b" style="font-weight:600">${esc(r.title)}</span><span class="b small muted">${r.type==='issue'?'Issue':'Risk'}${r.owner?' · '+esc(r.owner):''}${r.due?' · review '+fmtShort(r.due):''}${r.action?' · '+esc(clip(r.action,90)):''}</span></span><span class="pill ${r.status==='closed'?'on':''}">${r.status==='closed'?'Closed':'Open'}</span></button>`).join(''):'<p class="small muted" style="margin:0">Nothing logged. A risk is something that might go wrong; an issue is something that already has. Log each with an owner and a response so nothing is forgotten.</p>'}</section>`;
+    const pend=open.filter(x=>FIX.has(x.r)),mine=busy&&busy.topicId==='risks';
+    return `<div class="row" style="justify-content:space-between"><span class="row" style="gap:6px"><span class="pill ${open.filter(x=>x.r.level==='high').length?'due':''}">${open.filter(x=>x.r.level==='high').length} high</span><span class="pill">${open.filter(x=>x.r.type==='risk').length} open risks</span><span class="pill">${open.filter(x=>x.r.type==='issue').length} open issues</span></span>
+      <span class="row">${pend.length>1?`<button class="btn" data-act="fix-all">Accept all ${pend.length}</button>`:''}${open.length?`<button class="btn" data-act="risk-fix" data-v="all" ${busy?'disabled':''} title="The AI works through every open risk and issue and suggests a resolution for each. Nothing is saved until you accept it.">Resolve Issues</button>`:''}<button class="btn primary" data-act="risk-new">+ Add risk or issue</button></span></div>
+      ${mine?`<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`:''}
+      <section class="card">${R.length?R.map(({r,i})=>{const f=FIX.get(r),shut=r.status==='closed';return `<div class="rrow ${shut?'closed':''}"><button class="rmain" data-act="risk-open" data-v="${i}"><span class="lv" style="--c:${LEVELS3[r.level]?LEVELS3[r.level][1]:'var(--line)'}">${(LEVELS3[r.level]||LEVELS3.med)[0]}</span><span class="grow"><span class="b" style="font-weight:600">${esc(r.title)}</span><span class="b small muted">${r.type==='issue'?'Issue':'Risk'}${r.owner?' · '+esc(r.owner):''}${r.due?' · review '+fmtShort(r.due):''}${r.action?' · '+esc(clip(r.action,90)):''}</span>${r.resolution?`<span class="b small res"><b>Resolution${r.resolved?' ('+fmtShort(r.resolved)+')':''}:</b> ${esc(r.resolution)}${r.needs?` <i>Needs from you: ${esc(r.needs)}</i>`:''}</span>`:''}</span><span class="pill ${shut||r.resolution?'on':''}">${shut?'Closed':r.resolution?'Resolution saved':'Open'}</span></button>${shut?'':`<button class="btn small" data-act="risk-fix" data-v="${i}" ${busy?'disabled':''} title="Suggest a resolution for this one only">${r.resolution?'Resolve again':'Resolve'}</button>`}</div>${f?`<div class="fix"><span class="lbl">Suggested resolution - not saved yet</span><p>${esc(f.text)}</p><div class="facts" style="margin-top:0">${f.owner?`<span><b>Who</b>${esc(f.owner)}</span>`:''}<span><b>Level after</b>${(LEVELS3[f.level]||LEVELS3.med)[0]}</span><span><b>Then</b>${f.settled?'Close it':f.weeks?'Keep open, review in '+f.weeks+' week'+(f.weeks===1?'':'s'):'Keep open'}</span></div>${f.tasks.length?`<p class="small" style="margin:0"><b>Adds to the plan:</b> ${f.tasks.map(esc).join('; ')}</p>`:''}${f.needs?`<p class="small" style="margin:0"><b>Needs from you:</b> ${esc(f.needs)}</p>`:''}<div class="row"><button class="btn primary small" data-act="fix-ok" data-v="${i}">Accept and save</button><button class="btn small" data-act="fix-no" data-v="${i}">Discard</button></div></div>`:''}`}).join(''):'<p class="small muted" style="margin:0">Nothing logged. A risk is something that might go wrong; an issue is something that already has. Log each with an owner and a response so nothing is forgotten.</p>'}</section>`;
   }
   budOf(p);const M=(p.miles||[]).map((m,i)=>({m,i})).sort((a,b)=>(a.m.date||'9')<(b.m.date||'9')?-1:1);
   return `${M.length?`<section class="card"><div class="mstrip">${M.map(({m})=>`<div class="${m.done?'done':isoOk(m.date)&&m.date<dash(Date.now())?'late':''}"><i></i><span class="b" style="font-weight:600">${esc(m.name)}</span><span class="b small muted">${m.date?fmtShort(m.date):'No date'}</span></div>`).join('')}</div></section>`:''}
@@ -2218,10 +2270,18 @@ function addLink(p,fromId,toId){
 }
 const stLegend=()=>STATUS.map(([k,l])=>`<span><i class="sw st-${k}"></i>${l}</span>`).join('');
 function simpleGantt(p,S0){
-  const W=S0.W,step=W<=8?1:W<=16?2:4,ticks=[];for(let w=1;w<=W;w+=step)ticks.push(`<span style="left:${100*(w-1)/W}%">W${w}</span>`);
-  const now=p.active||p.custom?(Date.now()-S0.t0)/(7*DAY)/W*100:-1,mark=now>=0&&now<=100?`<u style="left:${now}%" title="Today, ${fmtShort(Date.now())}"></u>`:'';
-  return `<div class="gantt" style="--wk:${100/W}%" role="img" aria-label="Timeline of ${W} weeks"><span></span><div class="sc">${ticks.join('')}</div>${S0.rows.map((r,i)=>`<span class="gn">${i+1}. ${esc(r.a.name)}</span><div class="tr"><i class="st-${isDone(r.a)?'done':r.a.status||'todo'}" style="left:${100*(r.start-1)/W}%;width:${100*r.weeks/W}%" title="${esc(r.a.name)}: week ${r.start}${r.weeks>1?' to '+(r.start+r.weeks-1):''} · ${stLabel(isDone(r.a)?'done':r.a.status)}"></i>${mark}</div>`).join('')}</div>
-  <div class="gleg" style="margin-top:10px">${stLegend()}<span><i class="ln now"></i>Today</span><span class="muted">W1 is the first week.</span></div>`;
+  const W=S0.W,step=W<=10?1:W<=20?2:W<=44?4:W<=96?8:13,groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,nowW=(Date.now()-S0.t0)/(7*DAY);
+  const cols=[];for(let w=0;w<W;w+=step)cols.push(w);
+  const cur=nowW>=0&&nowW<W?Math.floor(nowW/step)*step:-1,band=cur>=0?`<i class="nowcol" style="left:${100*cur/W}%;width:${100*Math.min(step,W-cur)/W}%"></i>`:'';
+  const track=inner=>`<div class="tr" style="--col:${100*step/W}%">${band}${inner}</div>`;
+  const LAB={done:'Done',doing:'On-Going',blocked:'Blocked',todo:'Upcoming'};
+  const rows=[`<span class="sgh">Timeline</span><div class="sgd">${cols.map(w=>`<span class="${w===cur?'now':''}" style="left:${100*w/W}%;width:${100*Math.min(step,W-w)/W}%"${w===cur?' title="This column includes today"':''}>${fmtShort(weekDate(S0,w+1))}</span>`).join('')}</div>`];
+  groups.forEach(g=>{const c=PHC[(g.idx<0?groups.length-1:g.idx)%PHC.length];
+    if(named)rows.push(`<span class="sgp"><b style="--c:${c}">${esc(g.name||'Not in a phase')}</b></span>${track('')}`);
+    g.acts.forEach(({a,i})=>{const r=S0.by.get(a.id),st=isDone(a)?'done':a.status||'todo',x=100*(r.start-1)/W,w=100*r.weeks/W,prog=st==='done'?100:st==='doing'?Math.max(25,Math.min(85,Math.round(100*(nowW-(r.start-1))/r.weeks)||50)):0,out=w<11;
+      rows.push(`<button class="sgn" data-act="task-open" data-v="${p.id}:${i}">${i+1}. ${esc(a.name)}</button>${track(`<button class="sb ${st}" style="--c:${c};left:${x}%;width:${w}%" data-act="task-open" data-v="${p.id}:${i}" title="${i+1}. ${esc(a.name)}: ${fmtShort(weekDate(S0,r.start))} to ${fmtShort(weekDate(S0,r.start+r.weeks)-DAY)}, ${r.weeks} week${r.weeks===1?'':'s'} · ${stLabel(st)}" aria-label="${esc(a.name)}, ${LAB[st]}">${prog?`<i class="fill" style="width:${prog}%"></i>`:''}${out?'':`<em>${LAB[st]}</em>`}<u></u></button>${out?`<em class="sbo" style="${x+w>82?`right:${100-x+0.6}%`:`left:${x+w+0.6}%`}">${LAB[st]}</em>`:''}`)}`)})});
+  return `<div class="sg ${named?'':'flat'}">${rows.join('')}</div>
+  <div class="gleg" style="margin-top:12px"><span><i class="sw sgk done"></i>Done</span><span><i class="sw sgk doing"></i>On-Going</span><span><i class="sw sgk todo"></i>Upcoming</span><span><i class="sw sgk blocked"></i>Blocked</span><span><i class="sw sgk nowk"></i>Today's column</span><span class="muted">${named?'Bar colour is the phase. ':''}Click a bar to open the task.</span></div>`;
 }
 function fitGantt(){const r=document.querySelector('.agr'),p=curPlan();if(!r||!p||!['m','q','fit'].includes(V.gscale))return;const W=schedOf(p).W,wk=Math.max(1.5,Math.min(60,(r.clientWidth-6)/W));if(Math.abs(wk-(+V.gfit||0))>0.05){V.gfit=wk;render()}}
 function advGantt(p,S0){
@@ -2276,7 +2336,7 @@ function projView(p,kind){
   const S0=schedOf(p),mine=busy&&busy.topicId==='phases',work=mine?`<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`:'';
   if(kind==='brief')return `<section class="card pviews"><button class="fold" data-act="brief-fold" aria-expanded="${V.briefShut!==true}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg><span class="lbl">Project brief</span></button>${V.briefShut===true?'':`<p style="margin:0">${p.summary?esc(p.summary):p.what?esc(p.what):'<span class="muted">No brief yet. Draft the plan with AI, or describe the project when you create it.</span>'}</p><div class="facts" style="margin-top:4px"><span><b>Timeline</b>${S0.W} week${S0.W===1?'':'s'}</span><span><b>Starts</b>${fmtShort(S0.t0)}</span><span><b>Ends about</b>${fmtShort(S0.t0+S0.W*7*DAY-DAY)}</span><span><b>Tasks</b>${p.acts.length}</span><span><b>Done</b>${pct(p)}%</span></div>`}</section>`;
   if(!p.acts.length)return `<section class="card"><p class="muted" style="margin:0">No tasks yet. Add tasks under Plan and Tasks, or draft the plan with AI, and this view fills in.</p></section>`;
-  return `<section class="card pviews">${work}${kind==='gsimple'?`<div class="row" style="justify-content:space-between"><span class="lbl">Timeline by week</span>${copyBtn('gantt')}</div>${simpleGantt(p,S0)}`:kind==='gadv'?advGantt(p,S0):wbsHtml(p)}</section>`;
+  return `<section class="card pviews">${work}${kind==='gsimple'?`<div class="row" style="justify-content:space-between"><h2 style="font-size:1.1rem">${esc(p.name)}</h2>${copyBtn('gantt')}</div>${simpleGantt(p,S0)}`:kind==='gadv'?advGantt(p,S0):wbsHtml(p)}</section>`;
 }
 
 /* ---------- My Day briefing ----------
@@ -3779,6 +3839,10 @@ const ACT={
   'bud-accept'(v){const p=curPlan(),imp=V.budImp;if(imp&&v){const B=budOf(p);B.lines=v==='replace'?imp.lines:[...B.lines,...imp.lines];toast(imp.lines.length+' budget lines '+(v==='replace'?'set.':'added.'))}V.budImp=null},
   'spend-new'(v){v=String(v||'');spendModal(undefined,v.startsWith('line:')?{lineId:v.slice(5)}:v.startsWith('mile:')?{mileId:v.slice(5)}:null)},'spend-open'(v){spendModal(v)},
   'risk-new'(){riskModal()},'risk-open'(v){riskModal(v)},
+  'risk-fix'(v){const p=curPlan();if(p)resolveRisks(p,v==='all'?(p.risks||[]).map((_,i)=>i):[+v])},
+  'fix-ok'(v){const p=curPlan(),r=p&&(p.risks||[])[+v];if(r){acceptFix(p,r);save();toast('Resolution saved to the project.')}},
+  'fix-no'(v){const p=curPlan(),r=p&&(p.risks||[])[+v];if(r)FIX.delete(r)},
+  'fix-all'(){const p=curPlan();if(!p)return;let n=0;(p.risks||[]).slice().forEach(r=>{if(FIX.has(r)){acceptFix(p,r);n++}});save();toast(n+' resolution'+(n===1?'':'s')+' saved to the project.')},
   'mile-add'(){const n=$('#mname').value.trim(),d=$('#mdate2').value;if(!n){toast('Name the milestone.');return}const p=curPlan();(p.miles=p.miles||[]).push({name:n,date:d||'',done:false})},
   'mile-tick'(v){const m=curPlan().miles[+v];m.done=!m.done},'mile-del'(v){curPlan().miles.splice(+v,1)},
   atab(v){V.atab=v;V.paper=null},
