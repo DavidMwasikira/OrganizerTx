@@ -2,7 +2,7 @@
 
 An AI-enabled everyday desktop for managers, engineers and project managers: research, tasks, projects, budgets, field capture, minutes and reports in one app that runs in the browser and installs on Android.
 
-Current version: **v0.54** (see the version history at the top of `README.txt`).
+Current version: **v0.55** (see the version history at the top of `README.txt`).
 
 ## What it does
 

@@ -681,6 +681,24 @@ table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt 
 :root{--c1:#1F6FD0;--c2:#B86A00;--c3:#7048C8;--c4:#0B8F6E}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--c1:#3987e5;--c2:#c98222;--c3:#8f6ae0;--c4:#199e70}}
 :root[data-theme="dark"]{--c1:#3987e5;--c2:#c98222;--c3:#8f6ae0;--c4:#199e70}
+.dp{font-size:.8rem;margin-top:16px;gap:10px}.dpwrap{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:12px;align-items:start}
+.dpcols{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:10px;overflow-x:auto;padding-bottom:4px}
+.dpcol{display:flex;flex-direction:column;gap:6px;min-width:0;padding:8px;border-radius:10px;background:var(--sunk);min-height:150px}.dpcol.now{box-shadow:inset 0 2px 0 var(--accent)}.dpcol.over{outline:2px dashed var(--accent);outline-offset:-2px}
+.dph{display:flex;align-items:baseline;gap:6px;padding:2px 2px 4px}.dph b{font:700 .95rem var(--display)}.dph span{color:var(--muted);font-size:.74rem}.dph .es{margin-left:auto}
+.dp .es{font:500 .68rem var(--mono);background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--muted);white-space:nowrap}
+.dpadd{min-height:30px;font-size:.8rem;padding:4px 8px;border:1px dashed var(--line);border-radius:7px;background:var(--surface)}.dpadd:focus{border-style:solid}
+.dpc{display:flex;flex-direction:column;gap:5px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 8px;cursor:grab}.dpc.done .nm{text-decoration:line-through;color:var(--muted)}
+.dpt{display:flex;align-items:flex-start;gap:6px}.dpt .nm{flex:1;text-align:left;background:none;border:0;padding:0;font:inherit;font-weight:600;color:var(--ink);overflow-wrap:anywhere;line-height:1.3}.dpt .nm:hover{color:var(--accent)}
+.dpt .tm{font:600 .68rem var(--mono);background:var(--signal);color:var(--surface);border-radius:5px;padding:1px 5px;white-space:nowrap}
+.dps{display:flex;flex-direction:column;gap:2px}.dps button{display:flex;align-items:center;gap:6px;text-align:left;background:none;border:0;padding:1px 0;font:inherit;color:var(--ink)}.dps i{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--muted);flex:none}.dps .on{color:var(--muted);text-decoration:line-through}.dps .on i{background:var(--s-done);border-color:var(--s-done)}
+.dpf{display:flex;align-items:center;gap:6px}.dpf .ck{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--muted);background:none;padding:0;flex:none}.dpf .ck.on{background:var(--s-done);border-color:var(--s-done)}
+.dpf input[type=time]{min-height:0;height:20px;width:98px;padding:0 2px;font-size:.68rem;border:1px solid transparent;border-radius:5px;background:none;color:var(--muted)}.dpf input[type=time]:hover,.dpf input[type=time]:focus{border-color:var(--line);background:var(--surface)}
+.dpf .tg{margin-left:auto;font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dpf .tg::first-letter{color:var(--c);font-weight:700}.dpf .late{font-size:.68rem;color:var(--bad);white-space:nowrap}
+.dpe{margin:6px 2px;color:var(--muted);font-size:.74rem}
+.dpcal{border:1px solid var(--line);border-radius:10px;padding:8px;min-width:0}.dpgrid{position:relative}.dpgrid .hr{position:absolute;left:0;right:0;border-top:1px solid var(--line);height:0}.dpgrid .hr span{position:absolute;top:-1px;left:0;font:500 .64rem var(--mono);color:var(--muted);background:var(--surface);padding-right:4px;transform:translateY(-50%)}
+.dpgrid .blk{position:absolute;display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:0;border-radius:6px;padding:2px 6px;background:color-mix(in srgb,var(--c) 30%,var(--surface));border-left:3px solid var(--c);color:var(--ink);font:inherit;font-size:.7rem;overflow:hidden;line-height:1.25}.dpgrid .blk b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.dpgrid .blk span{color:var(--muted);font-size:.64rem}.dpgrid .blk.done{opacity:.55}
+.dpgrid .nowl{position:absolute;left:40px;right:0;border-top:2px solid var(--bad);z-index:2}
+@media (max-width:900px){.dpwrap{grid-template-columns:1fr}.dphint{display:none}.dpcols{grid-template-columns:repeat(5,minmax(210px,78vw))}}
 .an{display:flex;flex-direction:column;gap:16px}
 .ansteps{display:flex;gap:6px;flex-wrap:wrap}.ansteps button{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:40px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--muted);font-weight:600;font-size:.88rem}
 .ansteps button i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--sunk);display:grid;place-items:center;font-size:.75rem;color:var(--ink)}
@@ -900,7 +918,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.54';
+const VERSION='v0.55';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -3013,6 +3031,30 @@ function anChange(e){
   save();render();return true;
 }
 
+/* ---- day planner on My Day: a column per day with quick add, and today's hours beside it ---- */
+const dpEst=h=>{h=num(h);if(!h)return '';const m=Math.round(h*60);return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')};
+function dpParse(text){let name=text.trim(),time='',hours=0,m;
+  if((m=name.match(/^(\d{1,2})[:.](\d{2})\s*(am|pm)?\s+/i))||(m=name.match(/^(\d{1,2})()\s*(am|pm)\s+/i))){let h=+m[1];const mm=+(m[2]||0),ap=(m[3]||'').toLowerCase();if(ap==='pm'&&h<12)h+=12;if(ap==='am'&&h===12)h=0;if(h<24&&mm<60){time=String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0');name=name.slice(m[0].length)}}
+  if((m=name.match(/\s+(\d+(?:\.\d+)?)\s*(h|hr|hrs|hour|hours|m|min|mins|minutes)$/i))){hours=/^m/i.test(m[2])?+m[1]/60:+m[1];name=name.slice(0,m.index)}
+  return {name:name.trim(),time,hours:Math.round(hours*100)/100}}
+function dayPlanHtml(){
+  const today=dash(Date.now()),t0=new Date(today+'T12:00').getTime()+(+V.dpOff||0)*DAY,days=[0,1,2,3,4].map(i=>dash(t0+i*DAY)),all=allTasks(),tag=pl=>PHC[Math.max(0,S.plans.indexOf(pl))%PHC.length];
+  const card=(t,late)=>{const a=t.a,dn=isDone(a);return `<div class="dpc ${dn?'done':''}" draggable="true" data-dpid="${esc(t.id)}"><div class="dpt">${a.time?`<span class="tm">${esc(a.time)}</span>`:''}<button class="nm" data-act="task-open" data-v="${esc(t.id)}">${esc(a.name)}</button>${dpEst(a.hours)?`<span class="es" title="Time planned">${dpEst(a.hours)}</span>`:''}</div>
+      ${(a.subs||[]).length?`<div class="dps">${a.subs.map((x,i)=>`<button class="${x.done?'on':''}" data-act="dp-sub" data-v="${esc(t.id)}|${i}" role="checkbox" aria-checked="${!!x.done}"><i></i>${esc(x.name)}</button>`).join('')}</div>`:''}
+      <div class="dpf"><button class="ck ${dn?'on':''}" data-act="task-done" data-v="${esc(t.id)}" role="checkbox" aria-checked="${dn}" aria-label="Mark ${esc(a.name)} complete"></button><input type="time" value="${esc(a.time||'')}" data-change="dp-time" data-v="${esc(t.id)}" aria-label="Start time" title="Start time">${late?`<span class="late">was due ${fmtShort(t.due)}</span>`:''}<span class="tg" style="--c:${tag(t.p)}"># ${esc(clip(t.p.name,22))}</span></div></div>`};
+  const cols=days.map(d=>{const mine=all.filter(t=>t.due===d).sort((a,b)=>(isDone(a.a)-isDone(b.a))||((a.a.time||'99')<(b.a.time||'99')?-1:1)),late=d===today?all.filter(t=>t.due&&t.due<today&&!isDone(t.a)):[],hrs=[...late,...mine].filter(t=>!isDone(t.a)).reduce((n,t)=>n+num(t.a.hours),0),dt=new Date(d+'T12:00');
+    return `<div class="dpcol ${d===today?'now':''}" data-dpday="${d}"><div class="dph"><b>${d===today?'Today':dt.toLocaleDateString('en-GB',{weekday:'long'})}</b><span>${dt.toLocaleDateString('en-GB',{day:'numeric',month:'long'})}</span>${dpEst(hrs)?`<span class="es" title="Time planned for open tasks">${dpEst(hrs)}</span>`:''}</div>
+      <input class="dpadd" type="text" data-dpadd="${d}" placeholder="+ Add task" aria-label="Add a task for ${fmtShort(d)}">${late.map(t=>card(t,true)).join('')}${mine.map(t=>card(t,false)).join('')}${late.length||mine.length?'':'<p class="dpe">Nothing planned</p>'}</div>`}).join('');
+  const H0=6,H1=20,PX=30,sel=days.includes(today)?today:days[0],timed=all.filter(t=>t.due===sel&&t.a.time).sort((a,b)=>a.a.time<b.a.time?-1:1),ends=[];
+  const blocks=timed.map(t=>{const [h,m]=t.a.time.split(':').map(Number),st=h+m/60,du=Math.max(.5,num(t.a.hours)||.5);let lane=ends.findIndex(e=>e<=st);if(lane<0)lane=ends.length;ends[lane]=st+du;return {t,st,du,lane}}),lanes=Math.max(1,ends.length);
+  const nowH=new Date().getHours()+new Date().getMinutes()/60;
+  return `<section class="card dp" aria-label="Day planner"><div class="row" style="justify-content:space-between"><span class="lbl">Day planner</span><span class="row" style="gap:4px"><span class="small muted dphint">Type a task and press Enter. Start with a time and end with a length to plan it, for example "10:00 Site meeting 1h". Drag a card to another day.</span><button class="btn small ghost" data-act="dp-go" data-v="-5" aria-label="Earlier days">&lsaquo;</button><button class="btn small" data-act="dp-go" data-v="0">Today</button><button class="btn small ghost" data-act="dp-go" data-v="5" aria-label="Later days">&rsaquo;</button></span></div>
+    <div class="dpwrap"><div class="dpcols">${cols}</div>
+      <div class="dpcal" aria-label="Hours of ${fmtShort(sel)}"><div class="dph"><b>${sel===today?'Today':new Date(sel+'T12:00').toLocaleDateString('en-GB',{weekday:'short'})}</b><span>${new Date(sel+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})} by the hour</span></div>
+        <div class="dpgrid" style="height:${(H1-H0)*PX}px">${Array.from({length:H1-H0},(_,i)=>`<div class="hr" style="top:${i*PX}px"><span>${String(H0+i).padStart(2,'0')}:00</span></div>`).join('')}${sel===today&&nowH>=H0&&nowH<=H1?`<i class="nowl" style="top:${(nowH-H0)*PX}px" title="Now"></i>`:''}
+          ${blocks.filter(b=>b.st<H1&&b.st+b.du>H0).map(b=>{const top=(Math.max(H0,b.st)-H0)*PX,ht=Math.max(15,(Math.min(H1,b.st+b.du)-Math.max(H0,b.st))*PX-2);return `<button class="blk ${isDone(b.t.a)?'done':''}" style="--c:${tag(b.t.p)};top:${top}px;height:${ht}px;left:calc(46px + ${b.lane} * (100% - 50px) / ${lanes});width:calc((100% - 50px) / ${lanes} - 3px)" data-act="task-open" data-v="${esc(b.t.id)}" title="${esc(b.t.a.name)}, ${b.t.a.time}${dpEst(b.t.a.hours)?', '+dpEst(b.t.a.hours):''}"><b>${esc(b.t.a.name)}</b>${ht>=26?`<span>${b.t.a.time}${dpEst(b.t.a.hours)?' · '+dpEst(b.t.a.hours):''}</span>`:''}</button>`}).join('')}</div>
+        ${timed.length?'':'<p class="dpe">Give a task a start time and it appears here.</p>'}</div></div></section>`;
+}
 function homeHead(){
   const first=(S.profile.name||'').split(' ')[0],open=allTasks().filter(x=>!isDone(x.a)).length;
   const hv=V.view==='home'?(['folders','tasks','research','analytics'].includes(V.hview)?V.hview:'day'):['topics','topic','plan','guide'].includes(V.view)||V.doc?'folders':V.view==='tasks'?'tasks':'';
@@ -3042,7 +3084,7 @@ function viewHome(){
     ${recent.length?recent.map(({t,d})=>`<button class="item" data-act="open-topic" data-v="${t.id}">${t.unread&&d===t.docs[t.docs.length-1]?'<span class="dot" title="Unread"></span>':''}<span class="grow"><span class="t">${esc(d.title)}</span><br><span class="mono muted">${esc(d.ref)}</span></span><span class="pill ${d.type==='U'?'due':'on'}">${kindOf(d)}</span></button>`).join(''):'<p class="muted small">Your reports and updates will appear here.</p>'}
   </div></section>`:''}
     </div>
-  </div></div>`;
+  </div>${dayPlanHtml()}</div>`;
 }
 function weeklyHtml(){
   const w=S.weekly,mine=busy&&busy.topicId==='weekly',at=S.dailyAt||'07:00';
@@ -4379,7 +4421,14 @@ const ACT={
   backup(){saveFile(`organizertx-backup-${ymd(Date.now())}.json`,JSON.stringify({...S,key:''},null,1),'application/json')},
   async reset(){if(await confirmBox('Erase every folder, document and the AI brain from this device?','Erase')){S=fresh();seedExample();ensureShape();V={view:'home',topic:null,tab:'chat',doc:null,depth:null,level:null,objList:[],objSel:[],objOpen:false,askPrev:'',helpQ:'',helpChat:[],dq:'',dcat:'all',dmode:'grid',btab:'map',bsec:'all',lib:'',skill:'',guide:null,plan:null,tfilter:'all',tmode:'board',draft:'',ask:''};save();render()}}
 };
-Object.assign(ACT,AN_ACT);
+Object.assign(ACT,AN_ACT,{
+  'dp-go'(v){V.dpOff=+v?(+V.dpOff||0)+(+v):0},
+  'dp-sub'(v){const [id,i]=[v.slice(0,v.lastIndexOf('|')),+v.slice(v.lastIndexOf('|')+1)],t=findTask(id);if(t&&t.a.subs&&t.a.subs[i])t.a.subs[i].done=!t.a.subs[i].done}});
+function dpAdd(day,text){const o=dpParse(text);if(!o.name)return;const my=S.plans.find(p=>p.id==='my');if(!my)return;my.acts.push({id:uid(),name:clip(o.name,160),detail:'',status:'todo',due:day,deps:[],...(o.time?{time:o.time}:{}),...(o.hours?{hours:o.hours}:{})});save();render();const el=document.querySelector('[data-dpadd="'+day+'"]');if(el)el.focus()}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.dpadd){e.preventDefault();dpAdd(e.target.dataset.dpadd,e.target.value)}});
+document.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('[data-dpid]');if(c){e.dataTransfer.setData('text/dp',c.dataset.dpid);e.dataTransfer.effectAllowed='move'}});
+document.addEventListener('dragover',e=>{const c=e.target.closest&&e.target.closest('[data-dpday]');if(c&&[...e.dataTransfer.types].includes('text/dp')){e.preventDefault();document.querySelectorAll('.dpcol.over').forEach(x=>x!==c&&x.classList.remove('over'));c.classList.add('over')}});
+document.addEventListener('drop',e=>{const c=e.target.closest&&e.target.closest('[data-dpday]'),id=e.dataTransfer&&e.dataTransfer.getData('text/dp');if(c&&id){e.preventDefault();const t=findTask(id);if(t){t.a.due=c.dataset.dpday;save();render()}}});
 document.addEventListener('dragover',e=>{if(e.target.closest&&e.target.closest('[data-drop=an]')){e.preventDefault();e.target.closest('[data-drop=an]').classList.add('over')}});
 document.addEventListener('dragleave',e=>{const z=e.target.closest&&e.target.closest('[data-drop=an]');if(z&&!z.contains(e.relatedTarget))z.classList.remove('over')});
 document.addEventListener('drop',e=>{const z=e.target.closest&&e.target.closest('[data-drop=an]');if(z){e.preventDefault();z.classList.remove('over');if(e.dataTransfer&&e.dataTransfer.files.length)anImport(e.dataTransfer.files)}});
@@ -4405,6 +4454,7 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('change',e=>{
   if(anChange(e))return;
+  if(e.target.dataset.change==='dp-time'){const t=findTask(e.target.dataset.v);if(t){if(e.target.value)t.a.time=e.target.value;else delete t.a.time;save();render()}return}
   if(e.target.dataset.change==='interval'){ACT.follow(e.target.value);save();render()}
   if(e.target.id==='blabels')BM.labels=e.target.checked;
   if(e.target.dataset.change==='bsec'){V.bsec=e.target.value;render()}
