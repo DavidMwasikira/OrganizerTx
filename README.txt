@@ -1,9 +1,13 @@
-ORGANIZERTX v0.41
+ORGANIZERTX v0.42
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.42 Task dialog: a budget amount with currency, and sub-tasks in a panel
+        that opens beside the dialog. Sub-tasks can be typed, or read from an
+        attached list (text, Word, Excel, CSV; PDF or photo with the AI).
+        Board cards show the budget and sub-task progress.
   v0.41 "Current News Flash" suggestions are a vertical list with a scroll
         bar, and each suggestion has its own heading.
   v0.40 Research tab: two columns under the research box. Left: "Current News

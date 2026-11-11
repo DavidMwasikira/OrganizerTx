@@ -687,6 +687,14 @@ table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt 
 .svert::-webkit-scrollbar{width:10px}.svert::-webkit-scrollbar-track{background:var(--sunk);border-radius:6px}.svert::-webkit-scrollbar-thumb{background:var(--accent);border-radius:6px;border:2px solid var(--sunk)}
 .svert .scard{flex:none;flex-direction:column;align-items:flex-start;gap:3px;min-height:0;width:100%}
 .scard .st{font:700 .98rem/1.3 var(--display);color:var(--accent)}.scard .sx{color:var(--ink)}
+.modal:has(.tduo){align-items:flex-start;overflow-y:auto}
+.tduo{display:flex;gap:14px;align-items:flex-start;justify-content:center;width:100%;max-width:900px;margin:auto}
+.tduo>form{flex:0 1 520px;min-width:0}.modal .tduo .tsub{flex:0 1 340px;max-width:340px;gap:12px}.tduo .tsub[hidden]{display:none}
+.subbtn{justify-content:space-between;width:100%}.subbtn b{font-family:var(--mono);font-weight:400;font-size:.8rem;margin-left:6px;padding:1px 7px;border-radius:999px;background:var(--sunk)}.subbtn b:empty{display:none}
+.subbtn[aria-expanded="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--glow)}
+.tsublist{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;padding-right:2px}
+.tsrow{display:flex;align-items:center;gap:8px}.tsrow input{flex:1;min-width:0;min-height:36px;padding:4px 8px}.tsrow.done input{text-decoration:line-through;color:var(--muted)}
+@media (max-width:760px){.tduo{flex-direction:column;align-items:stretch}.tduo>form{flex:none}.modal .tduo .tsub{flex:none;max-width:none}}
 .rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}.rgrid>*{min-width:0}
 .rsug{display:flex;flex-direction:column;gap:10px}
 .ttl2{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;font-size:1rem}
@@ -733,7 +741,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.41';
+const VERSION='v0.42';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1536,7 +1544,7 @@ function dataContext(q){
   const docs=S.topics.flatMap(t=>t.docs.map(d=>({t,d,s:score(d.title+' '+t.title+' '+String(d.md).slice(0,6000))}))).sort((a,b)=>b.s-a.s||b.d.date-a.d.date);
   return {today:dash(Date.now()),weekday:new Date().toLocaleDateString('en-GB',{weekday:'long'}),
     projects:S.plans.filter(onBoard).map(p=>({id:p.id,name:p.name,progress:pct(p)+'%',tasks:p.acts.length})),
-    tasks:allTasks().slice(0,160).map(t=>({id:t.id,task:t.a.name,project:t.p.name,status:stLabel(t.a.status),due:t.due||'',owner:t.a.owner||'',notes:clip(t.a.detail||'',120)})),
+    tasks:allTasks().slice(0,160).map(t=>({id:t.id,task:t.a.name,project:t.p.name,status:stLabel(t.a.status),due:t.due||'',owner:t.a.owner||'',...(t.a.budget?{budget:t.a.budget.cur+' '+num(t.a.budget.amt)}:{}),...((t.a.subs||[]).length?{subTasks:t.a.subs.map(x=>(x.done?'[done] ':'')+x.name)}:{}),notes:clip(t.a.detail||'',120)})),
     documents:docs.slice(0,24).map(({t,d,s},i)=>({ref:d.ref,folder:t.title,title:d.title,date:dash(d.date),text:plainMd(d.md).slice(0,i<3&&s?2600:240)})),
     fieldLog:S.plans.flatMap(p=>(p.log||[]).map(e=>({project:p.name,date:dash(e.date),kind:LOGK[e.kind][0],text:clip(e.text||e.title||e.url||'',240)}))).sort((a,b)=>a.date<b.date?1:-1).slice(0,40),
     minutesAndReports:S.papers.map(p=>({p,s:score(p.title+' '+p.md)})).sort((a,b)=>b.s-a.s||b.p.date-a.p.date).slice(0,8).map(({p,s},i)=>({kind:PKIND[p.kind],title:p.title,date:dash(p.date),text:plainMd(p.md).slice(0,i<2&&s?2000:260)})),
@@ -1793,7 +1801,7 @@ function sweepRecurring(){
   S.plans.forEach(p=>p.acts.slice().forEach(a=>{if(!a.repeat||!REPEAT[a.repeat]||!isDone(a)||a.spawned)return;a.spawned=true;
     let due=nextDate(a.due,a.repeat),guard=0;while(due<=today&&guard++<400)due=nextDate(due,a.repeat);
     const shift=a.remind&&a.due?new Date(a.remind).getTime()-new Date(a.due+'T00:00').getTime():null;
-    made={name:a.name,detail:a.detail||'',owner:a.owner||'',status:'todo',due,repeat:a.repeat,remind:shift!==null&&isFinite(shift)?localISO(new Date(due+'T00:00').getTime()+shift):''};p.acts.push(made)}));
+    made={name:a.name,detail:a.detail||'',owner:a.owner||'',status:'todo',due,repeat:a.repeat,budget:a.budget||null,subs:(a.subs||[]).map(x=>({name:x.name,done:false})),remind:shift!==null&&isFinite(shift)?localISO(new Date(due+'T00:00').getTime()+shift):''};p.acts.push(made)}));
   if(made){save();setTimeout(()=>toast('Repeating task: the next "'+clip(made.name,40)+'" is set for '+fmtShort(made.due)+'.'),50)}
 }
 async function notifyNow(title,body,tag){if(!('Notification' in window)||Notification.permission!=='granted')return;try{const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(reg)reg.showNotification(title,{body,icon:'icon-192.png',tag});else new Notification(title,{body})}catch(e){}}
@@ -2206,7 +2214,7 @@ function weeklyHtml(){
 function viewTasks(){
   const f=V.tfilter,mode=V.tmode,projs=S.plans.filter(onBoard);
   const who=V.towner&&owners().includes(V.towner)?V.towner:'all',tasks=allTasks().filter(t=>(f==='all'||t.p.id===f)&&(who==='all'||(t.a.owner||'')===who));
-  const card=t=>`<div class="kcard" role="button" tabindex="0" draggable="true" data-s="${t.a.status}" data-act="task-open" data-v="${esc(t.id)}"><span class="tag">${esc(t.p.name)}</span><span class="t">${esc(t.a.name)}</span>${t.a.owner||t.a.repeat||t.a.remind?`<span class="row small muted" style="gap:6px">${t.a.owner?`<span class="ava" title="Owner: ${esc(t.a.owner)}">${esc(initials(t.a.owner))}</span>${esc(t.a.owner)}`:''}${t.a.repeat?`<span title="${REPEAT[t.a.repeat]}">&#8635; ${REPEAT[t.a.repeat].replace('Every ','')}</span>`:''}${t.a.remind&&!t.a.reminded&&!isDone(t.a)?`<span title="Reminder set for ${esc(t.a.remind.replace('T',' '))}" style="display:inline-flex;width:14px;height:14px">${ICON.bell}</span>`:''}</span>`:''}${t.due?`<span>${dueLabel(t.due,isDone(t.a))}</span>`:''}</div>`;
+  const card=t=>`<div class="kcard" role="button" tabindex="0" draggable="true" data-s="${t.a.status}" data-act="task-open" data-v="${esc(t.id)}"><span class="tag">${esc(t.p.name)}</span><span class="t">${esc(t.a.name)}</span>${t.a.budget||(t.a.subs||[]).length?`<span class="row small" style="gap:6px">${t.a.budget?`<span class="pill" title="Budget for this task">${esc(t.a.budget.cur)} ${num(t.a.budget.amt).toLocaleString('en-GB')}</span>`:''}${(t.a.subs||[]).length?`<span class="pill ${t.a.subs.every(x=>x.done)?'on':''}" title="Sub-tasks done">&#9745; ${t.a.subs.filter(x=>x.done).length}/${t.a.subs.length}</span>`:''}</span>`:''}${t.a.owner||t.a.repeat||t.a.remind?`<span class="row small muted" style="gap:6px">${t.a.owner?`<span class="ava" title="Owner: ${esc(t.a.owner)}">${esc(initials(t.a.owner))}</span>${esc(t.a.owner)}`:''}${t.a.repeat?`<span title="${REPEAT[t.a.repeat]}">&#8635; ${REPEAT[t.a.repeat].replace('Every ','')}</span>`:''}${t.a.remind&&!t.a.reminded&&!isDone(t.a)?`<span title="Reminder set for ${esc(t.a.remind.replace('T',' '))}" style="display:inline-flex;width:14px;height:14px">${ICON.bell}</span>`:''}</span>`:''}${t.due?`<span>${dueLabel(t.due,isDone(t.a))}</span>`:''}</div>`;
   const body=mode==='cal'?calendarHtml(tasks):mode==='board'
     ?`<div class="board">${STATUS.map(([k,l])=>{const ts=tasks.filter(t=>t.a.status===k);return `<section class="lane" data-lane="${k}" aria-label="${l}"><header tabindex="0" data-tip="Status: ${l}&#10;${ts.length} card${ts.length===1?'':'s'}"><span class="lh"><i></i>${l}</span><span class="mono muted">(${ts.length})</span></header>${ts.map(card).join('')}<button class="laneadd" data-act="task-new" data-v="${k}" aria-label="Add a task to ${l}" title="Add a task to ${l}">+</button></section>`}).join('')}</div>
       <p class="small muted" style="margin:0">Point at a lane title to highlight its column. Drag a card to another lane, or open it to change its status.</p>`
@@ -2833,7 +2841,8 @@ function modal(html,handlers){
 function taskModal(id,preset,pid,day){
   const ex=id?findTask(id):null,a=ex?ex.a:{name:'',detail:'',status:preset||'todo',due:day||''};
   const proj=ex?ex.p.id:(pid||(V.tfilter!=='all'&&V.view==='tasks'?V.tfilter:'my'));
-  modal(`<form class="card wide"><h2 style="font-size:1.2rem">${ex?'Task':'New task'}</h2>
+  const subs=(a.subs||[]).map(x=>({name:x.name,done:!!x.done})),curs=[...new Set([curSym()||'USD','USD','EUR','GBP','Kshs','UGX','TZS','RWF','ZAR',(a.budget&&a.budget.cur)||''].filter(Boolean))],bcur=(a.budget&&a.budget.cur)||curSym()||'USD';
+  const el=modal(`<div class="tduo"><form class="card wide"><h2 style="font-size:1.2rem">${ex?'Task':'New task'}</h2>
     <div class="field"><label for="tname">Task</label><input type="text" id="tname" value="${esc(a.name)}" placeholder="What needs doing?"></div>
     <div class="row" style="align-items:flex-start"><div class="field" style="flex:1;min-width:150px"><label for="tproj">Project</label><select id="tproj" ${ex?'disabled':''}>${S.plans.filter(onBoard).map(p=>`<option value="${p.id}" ${p.id===proj?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div>
     <div class="field" style="flex:1;min-width:150px"><label for="tstat">Status</label><select id="tstat">${STATUS.map(([k,l])=>`<option value="${k}" ${k===a.status?'selected':''}>${l}</option>`).join('')}</select></div></div>
@@ -2842,17 +2851,47 @@ function taskModal(id,preset,pid,day){
     <div class="row" style="align-items:flex-start"><div class="field" style="flex:1;min-width:150px"><label for="trep">Repeats</label><select id="trep">${Object.entries(REPEAT).map(([k,l])=>`<option value="${k}" ${k===(a.repeat||'')?'selected':''}>${l}</option>`).join('')}</select></div>
     <div class="field" style="flex:1;min-width:150px"><label for="trem">Remind me</label><input type="datetime-local" id="trem" value="${esc(a.remind||'')}"></div></div>
     <span class="small muted" style="margin-top:-8px">A repeating task makes its next copy when you complete it. Reminders appear while OrganizerTX is open${'Notification' in window&&Notification.permission==='granted'?', with a notification on this device':'; turn on notifications in Settings to also get a device notification'}.</span>
+    <div class="row" style="align-items:flex-start"><div class="field" style="flex:1.4;min-width:150px"><label for="tbud">Budget for this task</label><input type="text" inputmode="decimal" id="tbud" value="${a.budget&&num(a.budget.amt)?num(a.budget.amt).toLocaleString('en-GB'):''}" placeholder="Amount, for example 50,000"></div>
+    <div class="field" style="flex:1;min-width:110px"><label for="tcur">Currency</label><select id="tcur">${curs.map(c=>`<option ${c===bcur?'selected':''}>${esc(c)}</option>`).join('')}</select></div></div>
     <div class="field"><label for="tnote">Notes</label><textarea id="tnote" rows="3">${esc(a.detail||'')}</textarea></div>
-    <div class="row" style="justify-content:space-between">${ex?'<button type="button" class="btn danger" data-x="del">Delete</button>':'<span></span>'}<span class="row"><button type="button" class="btn" data-x="cancel">Cancel</button><button type="submit" class="btn primary" data-x="save">Save</button></span></div></form>`,{
+    <button type="button" class="btn subbtn" id="tsubbtn" aria-expanded="false"><span>Sub-tasks <b id="tsubn"></b></span><span aria-hidden="true">&rsaquo;</span></button>
+    <div class="row" style="justify-content:space-between">${ex?'<button type="button" class="btn danger" data-x="del">Delete</button>':'<span></span>'}<span class="row"><button type="button" class="btn" data-x="cancel">Cancel</button><button type="submit" class="btn primary" data-x="save">Save</button></span></div></form>
+    <aside class="card tsub" id="tsub" hidden aria-label="Sub-tasks"><div class="row" style="justify-content:space-between"><h2 style="font-size:1.1rem">Sub-tasks</h2><button type="button" class="btn ghost small" id="tsubx" aria-label="Close sub-tasks">&times;</button></div>
+      <div class="bar" style="height:6px"><i id="tsubbar" style="width:0"></i></div>
+      <div id="tsublist" class="tsublist"></div>
+      <div class="row" style="flex-wrap:nowrap"><input type="text" id="tsubnew" placeholder="Add a sub-task and press Enter" aria-label="New sub-task" style="flex:1;min-width:0"><button type="button" class="btn primary" id="tsubadd">Add</button></div>
+      <label class="btn" for="tsubfile" style="justify-content:center">Attach a task list document</label><input type="file" id="tsubfile" hidden accept=".txt,.md,.csv,.docx,.xlsx,.xls,.pdf,image/*">
+      <span class="small muted" id="tsubmsg">A text, Word, Excel or CSV file becomes one sub-task per line or row. A PDF or photo is read by the AI.</span></aside></div>`,{
     cancel(){},
     save(el){
       const name=el.querySelector('#tname').value.trim();if(!name){toast('Give the task a name.');return false}
       const p=ex?ex.p:S.plans.find(x=>x.id===el.querySelector('#tproj').value),t=ex?a:{};
       t.name=name;t.status=el.querySelector('#tstat').value;t.due=el.querySelector('#tdued').value||'';t.owner=el.querySelector('#towner').value.trim();t.repeat=el.querySelector('#trep').value;{const rm=el.querySelector('#trem').value||'';if(rm!==(t.remind||''))t.reminded=false;t.remind=rm}if(t.status==='done'&&!t.closed)t.closed=Date.now();if(t.status!=='done')t.spawned=false;t.detail=el.querySelector('#tnote').value.trim();
+      {const amt=num(el.querySelector('#tbud').value);t.budget=amt>0?{amt,cur:el.querySelector('#tcur').value}:null;const pend=el.querySelector('#tsubnew').value.trim();if(pend)subs.push({name:clip(pend,140),done:false});t.subs=subs}
       if(!ex)p.acts.push(t);save();render();
     },
     del(){ex.p.acts.splice(ex.i,1);save();render()}
   });
+  /* the sub-task panel opens beside the dialog; its list is kept here until Save */
+  const q=x=>el.querySelector(x),paint=()=>{const d=subs.filter(x=>x.done).length;q('#tsubn').textContent=subs.length?d+'/'+subs.length:'';q('#tsubbar').style.width=(subs.length?100*d/subs.length:0)+'%';
+    q('#tsublist').innerHTML=subs.length?subs.map((x,i)=>`<div class="tsrow ${x.done?'done':''}"><button type="button" class="box" role="checkbox" aria-checked="${x.done}" aria-label="Mark done" data-st="${i}">${x.done?'&#10003;':''}</button><input type="text" value="${esc(x.name)}" data-sn="${i}" aria-label="Sub-task"><button type="button" class="btn ghost small" data-sd="${i}" aria-label="Remove sub-task">&times;</button></div>`).join(''):'<p class="small muted" style="margin:0">No sub-tasks yet. Add them one by one, or attach a document with the list.</p>'};
+  const addMany=names=>{let n=0;names.forEach(t=>{t=clip(String(t||'').trim(),140);if(t.length>1&&!subs.some(x=>x.name.toLowerCase()===t.toLowerCase())&&subs.length<80){subs.push({name:t,done:false});n++}});paint();return n};
+  const openSub=on=>{q('#tsub').hidden=!on;q('#tsubbtn').setAttribute('aria-expanded',on);if(on)q('#tsubnew').focus()};
+  q('#tsubbtn').addEventListener('click',()=>openSub(q('#tsub').hidden));q('#tsubx').addEventListener('click',()=>openSub(false));
+  const addOne=()=>{const v=q('#tsubnew').value.trim();if(v){addMany([v]);q('#tsubnew').value=''}q('#tsubnew').focus()};
+  q('#tsubadd').addEventListener('click',addOne);q('#tsubnew').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addOne()}});
+  q('#tsublist').addEventListener('click',e=>{const t=e.target.closest('[data-st]'),d=e.target.closest('[data-sd]');if(t){subs[+t.dataset.st].done=!subs[+t.dataset.st].done;paint()}else if(d){subs.splice(+d.dataset.sd,1);paint()}});
+  q('#tsublist').addEventListener('change',e=>{const n=e.target.dataset.sn;if(n!==undefined){const v=e.target.value.trim();if(v)subs[+n].name=clip(v,140);else{subs.splice(+n,1);paint()}}});
+  q('#tsubfile').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const msg=q('#tsubmsg'),say=t=>{msg.textContent=t};
+    try{const k=fileKind(f);let names=[];
+      if(k==='pdf'||k==='image'){if(!hosted()){say('PDFs and photos can be read in the installed version. Here, use a text, Word, Excel or CSV file.');return}if(hosted()&&!cred()){say('Add your '+credName()+' in Settings to read a PDF or photo, or attach a text, Word or Excel file.');return}
+        say('Reading '+f.name+'...');const r=await callAI({system:systemPrompt(),depth:'brief',search:0,maxTokens:4000,messages:[{role:'user',content:[...await fileBlocks(f,'TASK LIST'),{type:'text',text:'List every task or to-do item in this document, in order, each as a short action. Copy the wording; do not invent or merge items. Reply with only a JSON array of strings.'}]}]});
+        const arr=grab(r.text,'[',']');names=Array.isArray(arr)?arr.filter(x=>typeof x==='string'):[]}
+      else{say('Reading '+f.name+'...');const txt=(await fileBlocks(f,'LIST')).map(b=>b.text||'').join('\n').split('\n').slice(1);
+        names=txt.map(l=>k==='sheet'||/\.csv$/i.test(f.name)?(l.split(',').map(c=>c.replace(/^"|"$/g,'').trim()).find(c=>c&&!/^[\d.,\s-]+$/.test(c))||''):l).map(l=>l.replace(/^\s*(?:[-*\u2022\u25CF\u25A1\u2610]|\[[ xX]?\]|\d+[.)])\s*/,'').trim()).filter(l=>l.length>1&&!/^(sheet ".*":|tasks?|items?|activity|activities|description|to-?do( list)?|#|no\.?)$/i.test(l)&&!/\b(task|to-?do|check|action)\s*list\b/i.test(l))}
+      const n=addMany(names);say(n?n+' sub-task'+(n===1?'':'s')+' added from '+f.name+'. Check them, then Save.':'No tasks could be read from '+f.name+'.')}
+    catch(err){say(err.message||'Could not read that file.')}});
+  paint();if(subs.length)openSub(true);
 }
 function projectModal(){
   modal(`<form class="card wide"><h2 style="font-size:1.2rem">New project</h2>
