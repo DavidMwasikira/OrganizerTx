@@ -1,9 +1,12 @@
-ORGANIZERTX v0.38
+ORGANIZERTX v0.39
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.39 Sidebar tidied: Folders is reached from the Home tabs, and Rules and
+        skills from a new "Rules & Skills" tab beside "Settings" on the
+        Settings page. Both buttons are removed from the sidebar.
   v0.38 The greeting and the four Home tabs (My Day, Folders, Tasks Board,
         Research) now stay at the top of every page.
   v0.37 Home is now four tabs. My Day (the default) shows the briefing on the

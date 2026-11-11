@@ -683,6 +683,7 @@ table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt 
 @media (max-width:760px){.rembar{margin:10px 14px 0}.cal .cc{min-height:74px;padding:2px}.cal .ce{font-size:.66rem;padding:1px 3px}.cal .ch{padding:4px 2px;font-size:.6rem;text-align:center}.bcat>div{grid-template-columns:minmax(0,1fr)}.bcat b{text-align:left}}
 @media (prefers-reduced-motion:reduce){.cal .cc{transition:none}}
 @media print{.rembar{display:none!important}}
+.settop button{font-family:var(--display);font-size:1.25rem;padding:8px 16px}
 .page.hhead{padding-bottom:0;gap:12px;flex:none}.hhead+.desk{margin-top:10px}.hhead+.page{padding-top:14px}.hhead+.ws{margin-top:6px;border-top:1px solid var(--line)}
 .hgrid.day .hside{display:flex;flex-direction:column;gap:12px}
 .hgrid>*{min-width:0}
@@ -721,7 +722,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.38';
+const VERSION='v0.39';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2565,7 +2566,8 @@ function viewSettings(){
       ${row('<span style="color:var(--bad)">Erase everything</span>','Removes every folder, document and the AI brain from this device. This cannot be undone.',`<button class="btn danger" data-act="reset">Erase everything</button>`)}`
   }[tab]();
   return `<div class="page wide sett" style="gap:0">
-    <div class="row" style="justify-content:space-between;margin-bottom:10px"><div><h1 style="font-size:1.7rem">Settings</h1><p class="muted small" style="margin:.2em 0 0">Changes are kept on this device as you make them.</p></div><button class="btn primary" data-act="save-settings">Save changes</button></div>
+    ${setTop('settings')}
+    <div class="row" style="justify-content:space-between;margin:12px 0 10px"><p class="muted small" style="margin:0">Changes are kept on this device as you make them.</p><button class="btn primary" data-act="save-settings">Save changes</button></div>
     <div class="htabs" role="group" aria-label="Settings sections">${tabs.map(([k,l])=>`<button data-act="stab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>
     <div class="sbody">${body}</div>
     <p class="small muted" style="margin:22px 0 0">Updates run while OrganizerTX is open, and it catches up on anything due as soon as you open it again. Sign-in, teams and billing will come with the online version. <span class="mono">OrganizerTX ${VERSION}</span></p></div>`;
@@ -2769,13 +2771,13 @@ function render(){
   const ns=navState();
   if(lastNav&&JSON.stringify(ns)!==JSON.stringify(lastNav)&&!goingBack){HIST.push(lastNav);if(HIST.length>40)HIST.shift();if(hosted()){try{history.pushState({otx:1},'');PUSHED++}catch(e){}}}
   lastNav=ns;goingBack=false;
-  const tabs=[['home','Home'],['assist','Assistant'],['desk','Desktop'],['tasks','Tasks'],['actions','Dashboard'],['topics','Folders'],['brain','Brain'],['rules','Rules']];
+  const tabs=[['home','Home'],['assist','Assistant'],['desk','Desktop'],['tasks','Tasks'],['actions','Dashboard'],['brain','Brain']];
   asstState();sweepRecurring();
   const body=V.doc?viewDoc():{help:viewHelp,field:viewField,desk:viewDesk,rules:viewRules,home:viewHome,tasks:viewTasks,topics:viewTopics,topic:viewTopic,guide:viewGuide,plan:viewPlan,actions:viewActions,brain:viewBrain,settings:viewSettings,assist:viewAssist}[V.view]();
   let bodyHtml=body;
   if(HIST.length&&!V.doc&&['tasks','actions','brain','help','settings','rules','field','assist'].includes(V.view)&&!(V.view==='assist'&&V.paper))bodyHtml=body.replace(/^(\s*<div class="page[^"]*"[^>]*>)/,'$1<div><button class="btn ghost" data-act="back" style="padding-left:0">&larr; Back</button></div>');
   if(!V.doc&&['topic','plan','guide','topics'].includes(V.view))bodyHtml=wsWrap(body);
-  const cp=curPlan(),cur=V.view==='topic'||V.view==='guide'?'topics':V.view==='plan'?'topics':V.view;
+  const cp=curPlan(),cur=V.doc||['topic','guide','plan','topics'].includes(V.view)?'home':V.view==='rules'?'settings':V.view;
   const where=[V.view,V.topic,V.guide,V.plan,V.tab,V.tmode,V.doc,V.btab,V.bsec,V.lib,V.slide,V.dcat,V.dmode,V.atab,V.paper,V.ptab,V.calM,V.hview].join('|'),old=$('main'),keep=old&&where===render.where?old.scrollTop:0;render.where=where;
   const themeBtn=`<button data-act="theme" class="${'T'}" aria-label="Switch to ${isDark()?'light':'dark'} theme" title="Switch to ${isDark()?'light':'dark'} theme">${isDark()?ICON.sun:ICON.moon}</button>`;
   const rail=`<nav aria-label="Main"><button class="create" data-act="create"><i>+</i><span>Create</span></button>${tabs.map(([k,l])=>`<button data-act="nav" data-v="${k}" ${k==='assist'?'class="only-wide"':''} ${cur===k?'aria-current="page"':''}>${ICON[k]}<span>${l}</span>${k==='topics'&&unreadTotal()?'<span class="dot" title="Unread updates"></span>':''}</button>`).join('')}<button class="only-wide capnav" data-act="cap-pin" aria-expanded="${!!S.capPin}" aria-label="Data Capture: photo, voice note, web page note, text note">${ICON.camera}<span>Data Capture</span></button><span class="sp"></span><span class="only-wide mono" style="color:var(--rail-ink);text-align:center;font-size:.7rem;opacity:.8">${VERSION}</span><span class="util only-wide">${themeBtn}<button data-act="rail-hide" aria-label="Hide the sidebar" title="Hide the sidebar">${ICON.hide}</button></span><button class="only-wide" data-act="nav" data-v="help" ${cur==='help'?'aria-current="page"':''}>${ICON.help}<span>Help</span></button><button class="only-wide" data-act="nav" data-v="settings" ${cur==='settings'?'aria-current="page"':''}>${ICON.settings}<span>Settings</span></button></nav>`;
@@ -3075,12 +3077,13 @@ function ensureLib(){
 const rulesText=()=>{const t=S.rules.filter(r=>r.on&&r.text.trim()).map(r=>r.text.trim()).join('\n\n').slice(0,6000);return t?`\n\nHouse rules for documents. Follow them. Where a rule conflicts with the shape asked for in this request, the shape wins.\n<rules>\n${t}\n</rules>`:''};
 const skillText=id=>{const k=S.skills.find(x=>x.id===id&&x.on);return k?`\n\nUse this skill for the task. Follow its steps, output and checks, fitted into the document shape asked for.\n<skill>\n${libBody(k.text).trim().slice(0,5000)}\n</skill>`:''};
 const libCur=()=>{const [k,id]=String(V.lib).split(':');return k==='k'?{kind:'k',it:S.skills.find(x=>x.id===id)}:{kind:'r',it:S.rules.find(x=>x.id===id)}};
+const setTop=on=>`<div class="htabs settop" role="group" aria-label="Settings sections"><button data-act="nav" data-v="settings" aria-pressed="${on==='settings'}">Settings</button><button data-act="nav" data-v="rules" aria-pressed="${on==='rules'}">Rules &amp; Skills</button></div>`;
 function viewRules(){
   ensureLib();let c=libCur();if(!c.it){V.lib=S.rules[0]?'r:'+S.rules[0].id:S.skills[0]?'k:'+S.skills[0].id:'';c=libCur()}
   const it=c.it,isK=c.kind==='k',start=it&&(isK?LIBSTART.skills.find(x=>x.dir===it.dir):LIBSTART.rules.find(x=>x.file===it.file));
   const row=(kind,x)=>`<button class="it" data-act="lib" data-v="${kind}:${x.id}" aria-current="${V.lib===kind+':'+x.id}"><i class="${x.on?'':'off'}" title="${x.on?'In use':'Switched off'}"></i>${esc(libTitle(x.text,kind==='k'?x.dir:x.file))}</button>`;
   const path=it?(isK?'skills/'+it.dir+'/SKILL.md':'rules/'+it.file):'';
-  return `<div class="page wide"><div class="row" style="justify-content:space-between"><div><h1 style="font-size:1.7rem">Rules and skills</h1><p class="muted" style="margin:.2em 0 0">Rules are the dos and don\u2019ts every document follows. A skill is a method for one kind of research, chosen on Home.</p></div><span class="row"><button class="btn" data-act="lib-new" data-v="r">+ New rule</button><button class="btn" data-act="lib-new" data-v="k">+ New skill</button></span></div>
+  return `<div class="page wide">${setTop('rules')}<div class="row" style="justify-content:space-between"><div><p class="muted" style="margin:0">Rules are the dos and don\u2019ts every document follows. A skill is a method for one kind of research, chosen on Home.</p></div><span class="row"><button class="btn" data-act="lib-new" data-v="r">+ New rule</button><button class="btn" data-act="lib-new" data-v="k">+ New skill</button></span></div>
   <select class="kbpick" id="libpick" data-change="lib" aria-label="File"><optgroup label="Rules">${S.rules.map(x=>`<option value="r:${x.id}" ${V.lib==='r:'+x.id?'selected':''}>${esc(libTitle(x.text,x.file))}</option>`).join('')}</optgroup><optgroup label="Skills">${S.skills.map(x=>`<option value="k:${x.id}" ${V.lib==='k:'+x.id?'selected':''}>${esc(libTitle(x.text,x.dir))}</option>`).join('')}</optgroup></select>
   <div class="kb"><aside class="kbside" aria-label="Rule and skill files"><div class="g">Rules · ${S.rules.filter(x=>x.on).length} in use</div>${S.rules.map(x=>row('r',x)).join('')||'<p class="small muted" style="padding:0 10px">No rules.</p>'}<div class="g">Skills · ${S.skills.filter(x=>x.on).length} in use</div>${S.skills.map(x=>row('k',x)).join('')||'<p class="small muted" style="padding:0 10px">No skills.</p>'}</aside>
   <div class="dash">${it?`
@@ -3286,7 +3289,7 @@ function readProfileInputs(){
 
 /* ---------- events ---------- */
 const ACT={
-  nav(v){V.view=v;V.doc=null},
+  nav(v){if(v==='topics'){V.view='home';V.hview='folders';V.doc=null;return}V.view=v;V.doc=null},
   area(v){readProfileInputs();const a=S.profile.areas,i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);S.ideas=[]},
   pdepth(v){readProfileInputs();S.profile.depth=v},
   plevel(v){readProfileInputs();S.profile.level=v},
