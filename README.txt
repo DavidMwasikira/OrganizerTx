@@ -1,9 +1,17 @@
-ORGANIZERTX v0.43
+ORGANIZERTX v0.44
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.44 Task sequence. Tasks are numbered within their project and keep the
+        number when dragged between lanes. A task can depend on other tasks,
+        including tasks in another project, and cannot be completed until
+        they are done. Cards show After, Before, Waiting on and Critical
+        markers. Choosing a project on the board shows its critical path,
+        with "Link tasks in order" and "Let AI work out the sequence".
+        AI-drafted plans now come with their sequence. The Dashboard lists
+        links between projects.
   v0.43 Resources tab (Settings, beside Rules & Skills): a register of people
         (role, availability, hours, pay rate), equipment (capacity, status,
         cost, next service) and other resources (quantity, unit cost,

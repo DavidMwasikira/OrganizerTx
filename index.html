@@ -697,6 +697,17 @@ table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt 
 @media (max-width:760px){.tduo{flex-direction:column;align-items:stretch}.tduo>form{flex:none}.modal .tduo .tsub{flex:none;max-width:none}}
 table.rt td{vertical-align:top;padding-top:10px;padding-bottom:10px}table.rt button.pill{border:0;cursor:pointer}
 .btile>.small{line-height:1.3}
+.tn{font-family:var(--mono);font-weight:700;color:var(--accent);font-size:.9em}
+.deps{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.74rem;color:var(--muted);align-items:center}
+.deps .wait{color:var(--ink);background:var(--signal-soft);border-radius:999px;padding:1px 8px;font-weight:600}
+.deps .crit{color:var(--bad);border:1.5px solid var(--bad);border-radius:999px;padding:0 7px;font-weight:700}
+.depbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px solid var(--line);border-left:3px solid var(--bad);border-radius:4px 12px 12px 4px;background:var(--surface);position:relative;z-index:2}
+.depbar .grow{flex:1;min-width:220px;display:flex;flex-direction:column;gap:4px}
+.cpath{display:flex;flex-wrap:wrap;align-items:center;gap:4px}.cpath i{color:var(--muted);font-style:normal}
+.cpath button{min-width:30px;height:28px;padding:0 8px;border-radius:999px;border:1.5px solid var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface));font:700 .8rem var(--mono);color:var(--ink)}
+.cpath button.done{border-color:var(--s-done);background:color-mix(in srgb,var(--s-done) 16%,var(--surface));text-decoration:line-through}
+.tdeps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.tdeps .pill button{border:0;background:none;font-size:1rem;line-height:1;padding:0 0 0 4px;color:inherit;cursor:pointer}
+.plink{padding:7px 0;border-top:1px solid var(--line);line-height:1.6}.plink:first-of-type{border-top:0}
 .rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}.rgrid>*{min-width:0}
 .rsug{display:flex;flex-direction:column;gap:10px}
 .ttl2{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;font-size:1rem}
@@ -743,7 +754,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.43';
+const VERSION='v0.44';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1464,12 +1475,14 @@ ${p.name}${p.what?': '+p.what:''}
 ${p.guide?G.a+': '+(p.a||'not stated')+'. ':''}The user is starting from zero in ${place()}.
 ${searchLine()}
 Reply with only a JSON object, with no text before or after it:
-{"summary": "two sentences on the approach and what done looks like", "activities": [{"name": "at most 6 words", "detail": "one sentence saying exactly what to do and what it produces", "start": <week number it starts, counting from 1>, "weeks": <how many weeks it takes>, "cost": "estimated cost${moneyFmt()}, or empty"}]}
+{"summary": "two sentences on the approach and what done looks like", "activities": [{"name": "at most 6 words", "detail": "one sentence saying exactly what to do and what it produces", "start": <week number it starts, counting from 1>, "weeks": <how many weeks it takes>, "cost": "estimated cost${moneyFmt()}, or empty", "after": [<numbers of the activities, counting from 1, that must be finished before this one can be finished; empty if none>]}]}
 Give 8 to 12 activities in working order. Let activities overlap where that is realistic. The whole plan must fit in ${G.maxWeeks} weeks.`}]});
     const o=grab(r.text,'{','}')||{},acts=(Array.isArray(o.activities)&&o.activities.length?o.activities:grabList(r.text)).map(a=>{
       const st=Math.min(Math.max(parseInt(a&&a.start,10)||1,1),G.maxWeeks),w=Math.min(Math.max(parseInt(a&&a.weeks,10)||1,1),G.maxWeeks-st+1);
-      return {name:str(a&&a.name),detail:str(a&&a.detail),cost:str(a&&a.cost),start:st,weeks:w,status:'todo'};
+      return {id:uid(),name:str(a&&a.name),detail:str(a&&a.detail),cost:str(a&&a.cost),start:st,weeks:w,status:'todo',_after:Array.isArray(a&&a.after)?a.after:[]};
     }).filter(a=>a.name).slice(0,14);
+    acts.forEach((a,i)=>{a.deps=[];a._after.forEach(k=>{const pre=acts[(+k)-1];if(pre&&pre!==a&&(+k)-1<i&&!a.deps.includes(pre.id))a.deps.push(pre.id)});delete a._after});
+    if(!acts.some(a=>a.deps.length))acts.forEach((a,i)=>{if(i)a.deps=[acts[i-1].id]});
     if(!acts.length)throw new Error('The plan came back in a form that could not be read. Try again.'+snippet(r.text));
     p.acts=acts;p.summary=str(o.summary);p.weeks=Math.max(...acts.map(a=>a.start+a.weeks-1));p.sources=r.sources;
   }).then(()=>{
@@ -1547,7 +1560,7 @@ function dataContext(q){
   const docs=S.topics.flatMap(t=>t.docs.map(d=>({t,d,s:score(d.title+' '+t.title+' '+String(d.md).slice(0,6000))}))).sort((a,b)=>b.s-a.s||b.d.date-a.d.date);
   return {today:dash(Date.now()),weekday:new Date().toLocaleDateString('en-GB',{weekday:'long'}),
     projects:S.plans.filter(onBoard).map(p=>({id:p.id,name:p.name,progress:pct(p)+'%',tasks:p.acts.length})),
-    tasks:allTasks().slice(0,160).map(t=>({id:t.id,task:t.a.name,project:t.p.name,status:stLabel(t.a.status),due:t.due||'',owner:t.a.owner||'',...(t.a.budget?{budget:t.a.budget.cur+' '+num(t.a.budget.amt)}:{}),...((t.a.subs||[]).length?{subTasks:t.a.subs.map(x=>(x.done?'[done] ':'')+x.name)}:{}),notes:clip(t.a.detail||'',120)})),
+    tasks:(TIc=>allTasks().slice(0,160).map(t=>({id:t.id,number:TIc.get(t.a.id).n,...(predsOf(t.a,TIc).length?{dependsOn:predsOf(t.a,TIc).map(x=>depLabel(x,t.p)+'. '+x.a.name),waitingOn:waitingOn(t.a,TIc).map(x=>depLabel(x,t.p))}:{}),task:t.a.name,project:t.p.name,status:stLabel(t.a.status),due:t.due||'',owner:t.a.owner||'',...(t.a.budget?{budget:t.a.budget.cur+' '+num(t.a.budget.amt)}:{}),...((t.a.subs||[]).length?{subTasks:t.a.subs.map(x=>(x.done?'[done] ':'')+x.name)}:{}),notes:clip(t.a.detail||'',120)})))(taskIndex()),
     documents:docs.slice(0,24).map(({t,d,s},i)=>({ref:d.ref,folder:t.title,title:d.title,date:dash(d.date),text:plainMd(d.md).slice(0,i<3&&s?2600:240)})),
     fieldLog:S.plans.flatMap(p=>(p.log||[]).map(e=>({project:p.name,date:dash(e.date),kind:LOGK[e.kind][0],text:clip(e.text||e.title||e.url||'',240)}))).sort((a,b)=>a.date<b.date?1:-1).slice(0,40),
     minutesAndReports:S.papers.map(p=>({p,s:score(p.title+' '+p.md)})).sort((a,b)=>b.s-a.s||b.p.date-a.p.date).slice(0,8).map(({p,s},i)=>({kind:PKIND[p.kind],title:p.title,date:dash(p.date),text:plainMd(p.md).slice(0,i<2&&s?2000:260)})),
@@ -1563,7 +1576,7 @@ function applyActions(list){
     if(x.type==='add_task'&&String(x.name||'').trim()){const p=proj(x.project),a={name:clip(String(x.name).trim(),120),detail:String(x.notes||'').trim(),status:'todo',due:isoOk(x.due),owner:clip(String(x.owner||'').trim(),40)};p.acts.push(a);
       say(`Added "${a.name}" to ${p.name}${a.due?', due '+fmtShort(a.due):''}${a.owner?', owner '+a.owner:''}`,()=>{const i=p.acts.indexOf(a);if(i>=0)p.acts.splice(i,1)});return}
     const t=findTask(x.id);if(!t)return;const a=t.a;
-    if(x.type==='complete_task'||(x.type==='set_status'&&x.status==='done')){const was=a.status,wc=a.closed;a.status='done';a.closed=Date.now();say(`Marked "${a.name}" complete`,()=>{a.status=was;a.closed=wc})}
+    if(x.type==='complete_task'||(x.type==='set_status'&&x.status==='done')){if(!isDone(a)&&blockDone(a))return;const was=a.status,wc=a.closed;a.status='done';a.closed=Date.now();say(`Marked "${a.name}" complete`,()=>{a.status=was;a.closed=wc})}
     else if(x.type==='set_status'&&STATUS.some(s=>s[0]===x.status)){const was=a.status;a.status=x.status;say(`"${a.name}" is now ${stLabel(x.status)}`,()=>{a.status=was})}
     else if(x.type==='set_due'&&(isoOk(x.due)||x.due==='')){const was=a.due;a.due=isoOk(x.due);say(a.due?`"${a.name}" is now due ${fmtShort(a.due)}`:`Removed the due date from "${a.name}"`,()=>{a.due=was})}
     else if(x.type==='set_owner'){const was=a.owner;a.owner=clip(String(x.owner||'').trim(),40);say(`"${a.name}" is now owned by ${a.owner||'nobody'}`,()=>{a.owner=was})}
@@ -1632,7 +1645,7 @@ Reply with only a JSON object:
 }
 function saveMinutes(withTasks){
   const m=V.meet,o=m.out;if(!o)return;const p=S.plans.find(x=>x.id===m.pid)||S.plans.find(x=>x.id==='my'),picked=withTasks?o.actions.filter(a=>a.on):[];
-  picked.forEach(a=>p.acts.push({name:a.task,owner:a.owner,due:a.due,status:'todo',detail:'From the minutes: '+o.title}));
+  picked.forEach(a=>p.acts.push({id:uid(),name:a.task,owner:a.owner,due:a.due,status:'todo',detail:'From the minutes: '+o.title}));
   const paper=savePaper('minutes',o.title,o.md,p.id);V.meet={title:'',date:dash(Date.now()),who:'',notes:'',pid:m.pid,out:null};V.paper=paper.id;
   toast(picked.length?`Minutes saved and ${picked.length} action${picked.length===1?'':'s'} added to ${p.name}.`:'Minutes saved.');
 }
@@ -2003,6 +2016,65 @@ function viewResources(){
     <p class="small muted" style="margin:0">Kept on this device and included in your backup. The Assistant can answer questions from this register, such as who is available or what a team costs per day.</p></div>`;
 }
 
+/* ================= v0.44: task numbers, dependencies and critical path =================
+   A task's number is its position in its project, so it never changes when the card moves between lanes.
+   a.deps holds the ids of the tasks that must be done first (they may belong to another project). */
+function taskIndex(){const m=new Map();S.plans.forEach(p=>p.acts.forEach((a,i)=>{if(!a.id)a.id=uid();m.set(a.id,{a,p,i,n:i+1})}));return m}
+const predsOf=(a,m)=>(a.deps||[]).map(id=>m.get(id)).filter(Boolean);
+const waitingOn=(a,m)=>predsOf(a,m).filter(x=>!isDone(x.a));
+const succsOf=(a,m)=>[...m.values()].filter(x=>(x.a.deps||[]).includes(a.id));
+const depLabel=(x,home)=>x.p===home?String(x.n):x.p.name+' '+x.n;
+const durOf=a=>num(a.days)>0?num(a.days):num(a.weeks)>0?num(a.weeks)*7:1;
+/* would making `a` depend on `cand` create a loop? true when `cand` already (directly or not) depends on `a` */
+function loops(a,cand,m){const seen=new Set(),go=x=>{if(x===a)return true;if(seen.has(x.id))return false;seen.add(x.id);return predsOf(x,m).some(y=>go(y.a))};return go(cand)}
+/* earliest finish of each task (days) and, per project, the chain of tasks that sets its finish date */
+function criticalPaths(m){
+  m=m||taskIndex();const ef=new Map(),busyIds=new Set(),EF=a=>{if(ef.has(a.id))return ef.get(a.id);if(busyIds.has(a.id))return durOf(a);busyIds.add(a.id);const v=durOf(a)+Math.max(0,...predsOf(a,m).map(x=>EF(x.a)));busyIds.delete(a.id);ef.set(a.id,v);return v};
+  const out=new Map();
+  S.plans.forEach(p=>{const linked=p.acts.some(a=>predsOf(a,m).length||succsOf(a,m).length);if(!linked||!p.acts.length)return;
+    let last=p.acts[0];p.acts.forEach(a=>{if(EF(a)>EF(last))last=a});
+    const chain=[],seen=new Set();let cur=last;while(cur&&!seen.has(cur.id)){seen.add(cur.id);chain.unshift(m.get(cur.id));const ps=predsOf(cur,m);cur=ps.length?ps.reduce((b,x)=>EF(x.a)>EF(b.a)?x:b).a:null}
+    out.set(p.id,{days:EF(last),chain,ids:seen})});
+  return out;
+}
+/* the one rule: a task cannot be completed while something it depends on is not done */
+function blockDone(a,quiet){const m=taskIndex(),w=waitingOn(a,m),me=m.get(a.id);if(!w.length)return false;
+  if(!quiet)toast(`Task ${me?me.n+' ':''}"${clip(a.name,36)}" cannot be completed until ${w.map(x=>'task '+depLabel(x,me&&me.p)+' "'+clip(x.a.name,30)+'"').join(' and ')} ${w.length===1?'is':'are'} done.`);return true}
+function linkInOrder(p){p.acts.forEach((a,i)=>{if(!a.id)a.id=uid();a.deps=i?[p.acts[i-1].id]:[]})}
+function aiDeps(p){
+  if(needKey())return;const m=taskIndex();
+  job('deps','Working out the task sequence',async signal=>{
+    const r=await callAI({system:systemPrompt(),depth:'helper',maxTokens:3000,signal,messages:[{role:'user',content:
+`These are the tasks of the project "${p.name}"${p.what?' ('+p.what+')':''}, numbered in their current order:
+${p.acts.map((a,i)=>(i+1)+'. '+a.name+(a.detail?' - '+clip(a.detail,120):'')).join('\n')}
+
+For each task, say which tasks must be finished before it can be finished (its direct predecessors only, by number). Use real-world logic: for example a permit before construction, design before procurement. Tasks that can run side by side must not depend on each other. A task may have no predecessor.
+Reply with only a JSON array, one object per task: [{"n":1,"after":[]},{"n":2,"after":[1]}]`}]});
+    const arr=grab(r.text,'[',']');if(!Array.isArray(arr)||!arr.length)throw new Error('The sequence came back in a form that could not be read. Try again.');
+    p.acts.forEach(a=>{a.deps=[]});let n=0;
+    arr.forEach(o=>{const a=p.acts[(+o.n)-1];if(!a||!Array.isArray(o.after))return;o.after.forEach(k=>{const pre=p.acts[(+k)-1];if(pre&&pre!==a&&!a.deps.includes(pre.id)&&!loops(a,pre,taskIndex())){a.deps.push(pre.id);n++}})});
+    if(!n)throw new Error('No dependencies were suggested. Use "Link tasks in order", or set them by hand in each task.');
+  });
+}
+/* markers shown on a board card and in the list */
+function depMarks(t,m,crit){
+  const a=t.a,ps=predsOf(a,m),w=ps.filter(x=>!isDone(x.a)),ss=succsOf(a,m),c=crit.get(t.p.id);
+  if(!ps.length&&!ss.length)return '';
+  return `<span class="deps">${ps.length?`<span title="Must be done first: ${esc(ps.map(x=>depLabel(x,t.p)+'. '+x.a.name).join('; '))}">After ${esc(ps.map(x=>depLabel(x,t.p)).join(', '))}</span>`:'<span title="Nothing has to be done before this task">Start here</span>'}${ss.length?`<span title="Waiting for this task: ${esc(ss.map(x=>depLabel(x,t.p)+'. '+x.a.name).join('; '))}">Before ${esc(ss.map(x=>depLabel(x,t.p)).join(', '))}</span>`:''}${w.length&&!isDone(a)?`<span class="wait" title="Cannot be completed until these are done">&#128274; Waiting on ${esc(w.map(x=>depLabel(x,t.p)).join(', '))}</span>`:''}${c&&c.ids.has(a.id)&&!isDone(a)?'<span class="crit" title="On the critical path: a delay here delays the whole project">Critical</span>':''}</span>`;
+}
+/* the bar above the board when one project is chosen */
+function depBar(p,m,crit){
+  if(!p||p.acts.length<2)return '';const any=p.acts.some(a=>predsOf(a,m).length),c=crit.get(p.id),mine=busy&&busy.topicId==='deps';
+  if(mine)return `<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`;
+  if(!any)return `<div class="depbar"><span class="grow"><strong>No task sequence yet.</strong> <span class="small muted">Set which tasks come first, so a task cannot be completed before the ones it depends on.</span></span><button class="btn" data-act="dep-order" data-v="${p.id}">Link tasks in order</button><button class="btn primary" data-act="dep-ai" data-v="${p.id}" ${busy?'disabled':''}>Let AI work out the sequence</button></div>`;
+  const cross=c?c.chain.filter(x=>x.p!==p).length:0;
+  return `<div class="depbar"><span class="grow"><span class="lbl">Critical path${c?' · about '+Math.round(c.days)+' day'+(Math.round(c.days)===1?'':'s'):''}</span><span class="cpath">${c?c.chain.map(x=>`<button class="${isDone(x.a)?'done':''}" data-act="task-open" data-v="${x.p.id}:${x.i}" title="${esc(x.a.name)}">${esc(depLabel(x,p))}</button>`).join('<i>&rarr;</i>'):''}</span>${cross?`<span class="small muted">Includes ${cross} task${cross===1?'':'s'} from another project.</span>`:''}${c&&c.chain.some(x=>!(num(x.a.days)>0||num(x.a.weeks)>0))?'<span class="small muted">Tasks with no "days needed" count as 1 day. Open a task to set it.</span>':''}</span><button class="btn ghost small" data-act="dep-ai" data-v="${p.id}" ${busy?'disabled':''}>Rework with AI</button><button class="btn ghost small" data-act="dep-clear" data-v="${p.id}">Clear sequence</button></div>`;
+}
+/* which projects wait on which */
+function projectLinks(m){
+  m=m||taskIndex();const out=[];m.forEach(x=>predsOf(x.a,m).forEach(pr=>{if(pr.p!==x.p)out.push({from:pr,to:x})}));return out;
+}
+
 /* ---------- My Day briefing ----------
    The facts (due, overdue, blocked, what changed) are worked out on this device, so they are always exact and
    always current. The AI is given only those facts and asked to word a short summary and rank three priorities;
@@ -2276,15 +2348,17 @@ function weeklyHtml(){
 function viewTasks(){
   const f=V.tfilter,mode=V.tmode,projs=S.plans.filter(onBoard);
   const who=V.towner&&owners().includes(V.towner)?V.towner:'all',tasks=allTasks().filter(t=>(f==='all'||t.p.id===f)&&(who==='all'||(t.a.owner||'').trim().toLowerCase()===who.toLowerCase()));
-  const card=t=>`<div class="kcard" role="button" tabindex="0" draggable="true" data-s="${t.a.status}" data-act="task-open" data-v="${esc(t.id)}"><span class="tag">${esc(t.p.name)}</span><span class="t">${esc(t.a.name)}</span>${t.a.budget||(t.a.subs||[]).length?`<span class="row small" style="gap:6px">${t.a.budget?`<span class="pill" title="Budget for this task">${esc(t.a.budget.cur)} ${num(t.a.budget.amt).toLocaleString('en-GB')}</span>`:''}${(t.a.subs||[]).length?`<span class="pill ${t.a.subs.every(x=>x.done)?'on':''}" title="Sub-tasks done">&#9745; ${t.a.subs.filter(x=>x.done).length}/${t.a.subs.length}</span>`:''}</span>`:''}${t.a.owner||t.a.repeat||t.a.remind?`<span class="row small muted" style="gap:6px">${t.a.owner?`<span class="ava" title="Owner: ${esc(t.a.owner)}">${esc(initials(t.a.owner))}</span>${esc(t.a.owner)}`:''}${t.a.repeat?`<span title="${REPEAT[t.a.repeat]}">&#8635; ${REPEAT[t.a.repeat].replace('Every ','')}</span>`:''}${t.a.remind&&!t.a.reminded&&!isDone(t.a)?`<span title="Reminder set for ${esc(t.a.remind.replace('T',' '))}" style="display:inline-flex;width:14px;height:14px">${ICON.bell}</span>`:''}</span>`:''}${t.due?`<span>${dueLabel(t.due,isDone(t.a))}</span>`:''}</div>`;
+  const TI=taskIndex(),CR=criticalPaths(TI),selP=f!=='all'?S.plans.find(p=>p.id===f):null;
+  const card=t=>`<div class="kcard" role="button" tabindex="0" draggable="true" data-s="${t.a.status}" data-act="task-open" data-v="${esc(t.id)}"><span class="tag">${esc(t.p.name)}</span><span class="t"><span class="tn">${TI.get(t.a.id).n}.</span> ${esc(t.a.name)}</span>${depMarks(t,TI,CR)}${t.a.budget||(t.a.subs||[]).length?`<span class="row small" style="gap:6px">${t.a.budget?`<span class="pill" title="Budget for this task">${esc(t.a.budget.cur)} ${num(t.a.budget.amt).toLocaleString('en-GB')}</span>`:''}${(t.a.subs||[]).length?`<span class="pill ${t.a.subs.every(x=>x.done)?'on':''}" title="Sub-tasks done">&#9745; ${t.a.subs.filter(x=>x.done).length}/${t.a.subs.length}</span>`:''}</span>`:''}${t.a.owner||t.a.repeat||t.a.remind?`<span class="row small muted" style="gap:6px">${t.a.owner?`<span class="ava" title="Owner: ${esc(t.a.owner)}">${esc(initials(t.a.owner))}</span>${esc(t.a.owner)}`:''}${t.a.repeat?`<span title="${REPEAT[t.a.repeat]}">&#8635; ${REPEAT[t.a.repeat].replace('Every ','')}</span>`:''}${t.a.remind&&!t.a.reminded&&!isDone(t.a)?`<span title="Reminder set for ${esc(t.a.remind.replace('T',' '))}" style="display:inline-flex;width:14px;height:14px">${ICON.bell}</span>`:''}</span>`:''}${t.due?`<span>${dueLabel(t.due,isDone(t.a))}</span>`:''}</div>`;
   const body=mode==='cal'?calendarHtml(tasks):mode==='board'
     ?`<div class="board">${STATUS.map(([k,l])=>{const ts=tasks.filter(t=>t.a.status===k);return `<section class="lane" data-lane="${k}" aria-label="${l}"><header tabindex="0" data-tip="Status: ${l}&#10;${ts.length} card${ts.length===1?'':'s'}"><span class="lh"><i></i>${l}</span><span class="mono muted">(${ts.length})</span></header>${ts.map(card).join('')}<button class="laneadd" data-act="task-new" data-v="${k}" aria-label="Add a task to ${l}" title="Add a task to ${l}">+</button></section>`}).join('')}</div>
       <p class="small muted" style="margin:0">Point at a lane title to highlight its column. Drag a card to another lane, or open it to change its status.</p>`
-    :`<div class="tw"><table class="tl"><thead><tr><th style="width:44px"></th><th>Task</th><th>Project</th><th>Status</th><th>Due</th></tr></thead><tbody>${tasks.length?tasks.slice().sort((a,b)=>(isDone(a.a)-isDone(b.a))||((a.due||'9')<(b.due||'9')?-1:1)).map(t=>`<tr><td><button class="box" role="checkbox" aria-checked="${isDone(t.a)}" aria-label="Mark complete" data-act="task-done" data-v="${esc(t.id)}">${isDone(t.a)?'&#10003;':''}</button></td><td><button class="linkish" data-act="task-open" data-v="${esc(t.id)}" style="font-weight:600">${esc(t.a.name)}</button></td><td class="small">${esc(t.p.name)}</td><td><span class="pill ${t.a.status==='doing'?'on':t.a.status==='blocked'?'due':''}">${stLabel(t.a.status)}</span></td><td>${dueLabel(t.due,isDone(t.a))}</td></tr>`).join(''):'<tr><td colspan="5" class="muted">No tasks yet.</td></tr>'}</tbody></table></div>`;
+    :`<div class="tw"><table class="tl"><thead><tr><th style="width:44px"></th><th>Task</th><th>Project</th><th>Status</th><th>Due</th></tr></thead><tbody>${tasks.length?(selP?tasks:tasks.slice().sort((a,b)=>(isDone(a.a)-isDone(b.a))||((a.due||'9')<(b.due||'9')?-1:1))).map(t=>`<tr><td><button class="box" role="checkbox" aria-checked="${isDone(t.a)}" aria-label="Mark complete" data-act="task-done" data-v="${esc(t.id)}">${isDone(t.a)?'&#10003;':''}</button></td><td><button class="linkish" data-act="task-open" data-v="${esc(t.id)}" style="font-weight:600"><span class="tn">${TI.get(t.a.id).n}.</span> ${esc(t.a.name)}</button>${depMarks(t,TI,CR)}</td><td class="small">${esc(t.p.name)}</td><td><span class="pill ${t.a.status==='doing'?'on':t.a.status==='blocked'?'due':''}">${stLabel(t.a.status)}</span></td><td>${dueLabel(t.due,isDone(t.a))}</td></tr>`).join(''):'<tr><td colspan="5" class="muted">No tasks yet.</td></tr>'}</tbody></table></div>`;
   return `<div class="page wide" style="gap:14px">
   <div class="toolbar"><h1 style="font-size:1.5rem;margin-right:8px">My Tasks</h1><div class="seg" role="group" aria-label="View"><button data-act="tmode" data-v="board" aria-pressed="${mode==='board'}">Board</button><button data-act="tmode" data-v="list" aria-pressed="${mode==='list'}">List</button><button data-act="tmode" data-v="cal" aria-pressed="${mode==='cal'}">Calendar</button></div>
     <select id="tfilter" data-change="tfilter" aria-label="Filter by project" style="width:auto;max-width:60vw"><option value="all">All projects</option>${projs.map(p=>`<option value="${p.id}" ${p.id===f?'selected':''}>${esc(p.name)}</option>`).join('')}</select>${owners().length?`<select id="towner2" data-change="towner" aria-label="Filter by owner" style="width:auto;max-width:50vw"><option value="all">Everyone</option>${owners().map(o=>`<option ${o===who?'selected':''}>${esc(o)}</option>`).join('')}</select>`:''}
     <span class="small muted">${tasks.filter(t=>!isDone(t.a)).length} open · ${tasks.filter(t=>isDone(t.a)).length} complete</span><span style="flex:1"></span><button class="btn" data-act="proj-new">+ New project</button><button class="btn primary" data-act="task-new" data-v="todo">+ Add task</button></div>
+  ${depBar(selP,TI,CR)}
   ${body}</div>`;
 }
 function viewTopics(){
@@ -2410,6 +2484,7 @@ function viewActions(){
     <section class="panel" style="--pc:var(--s-blocked)"><div class="row" style="justify-content:space-between"><h2>Needs attention</h2><span class="small muted">${att.reduce((a,x)=>a+x[1],0)||'Nothing'} waiting</span></div>
       <div class="zbars">${att.map(a=>`<button data-act="${a[3]}" data-v="${a[4]}" title="${a[0]}: ${a[1]}"><span>${a[0]}</span><span class="tr"><i style="width:${a[1]?Math.max(4,100*a[1]/amx):0}%;background:${a[2]}"></i></span><b>${a[1]}</b></button>`).join('')}</div></section>
   </div>
+  ${(L=>L.length?`<section class="panel" style="--pc:var(--k5);gap:8px"><div class="row" style="justify-content:space-between"><h2>Links between projects</h2><span class="small muted">${L.length} dependenc${L.length===1?'y':'ies'}</span></div>${L.slice(0,8).map(l=>`<div class="plink"><button class="linkish" data-act="open-plan" data-v="${l.to.p.id}"><strong>${esc(l.to.p.name)}</strong></button> <span class="small muted">task ${l.to.n}, ${esc(clip(l.to.a.name,40))}, waits on</span> <button class="linkish" data-act="open-plan" data-v="${l.from.p.id}"><strong>${esc(l.from.p.name)}</strong></button> <span class="small muted">task ${l.from.n}, ${esc(clip(l.from.a.name,40))}</span> <span class="pill ${isDone(l.from.a)?'on':'due'}">${isDone(l.from.a)?'Done':'Not done'}</span></div>`).join('')}</section>`:'')(projectLinks())}
   <section class="panel" style="--pc:var(--accent);gap:10px"><div class="htabs" role="group" aria-label="Details">${tabs.map(([k,l,c])=>`<button data-act="dtab2" data-v="${k}" aria-pressed="${tab===k}">${l}${c===''?'':`<b>${c}</b>`}</button>`).join('')}</div><div>${tabBody}</div></section>
   </div></div>`;
 }
@@ -2903,6 +2978,8 @@ function modal(html,handlers){
 function taskModal(id,preset,pid,day){
   const ex=id?findTask(id):null,a=ex?ex.a:{name:'',detail:'',status:preset||'todo',due:day||''};
   const proj=ex?ex.p.id:(pid||(V.tfilter!=='all'&&V.view==='tasks'?V.tfilter:'my'));
+  const TI=taskIndex(),homeP=()=>ex?ex.p:S.plans.find(x=>x.id===(document.querySelector('#tproj')||{}).value)||S.plans.find(x=>x.id===proj);
+  let deps=ex?(a.deps||[]).filter(id=>TI.has(id)):(()=>{const pp=S.plans.find(x=>x.id===proj);return pp&&!pp.builtin&&pp.acts.length?[pp.acts[pp.acts.length-1].id]:[]})();
   const subs=(a.subs||[]).map(x=>({name:x.name,done:!!x.done})),curs=[...new Set([curSym()||'USD','USD','EUR','GBP','Kshs','UGX','TZS','RWF','ZAR',(a.budget&&a.budget.cur)||''].filter(Boolean))],bcur=(a.budget&&a.budget.cur)||curSym()||'USD';
   const el=modal(`<div class="tduo"><form class="card wide"><h2 style="font-size:1.2rem">${ex?'Task':'New task'}</h2>
     <div class="field"><label for="tname">Task</label><input type="text" id="tname" value="${esc(a.name)}" placeholder="What needs doing?"></div>
@@ -2913,6 +2990,8 @@ function taskModal(id,preset,pid,day){
     <div class="row" style="align-items:flex-start"><div class="field" style="flex:1;min-width:150px"><label for="trep">Repeats</label><select id="trep">${Object.entries(REPEAT).map(([k,l])=>`<option value="${k}" ${k===(a.repeat||'')?'selected':''}>${l}</option>`).join('')}</select></div>
     <div class="field" style="flex:1;min-width:150px"><label for="trem">Remind me</label><input type="datetime-local" id="trem" value="${esc(a.remind||'')}"></div></div>
     <span class="small muted" style="margin-top:-8px">A repeating task makes its next copy when you complete it. Reminders appear while OrganizerTX is open${'Notification' in window&&Notification.permission==='granted'?', with a notification on this device':'; turn on notifications in Settings to also get a device notification'}.</span>
+    <div class="field"><label for="tdepadd">Depends on <span class="small muted" style="text-transform:none;letter-spacing:0;font-weight:400">(tasks that must be done before this one can be completed)</span></label><div id="tdeps" class="tdeps"></div>
+      <div class="row" style="align-items:flex-start;flex-wrap:nowrap"><select id="tdepadd" style="flex:1;min-width:0"></select><div class="field" style="flex:0 0 130px;min-width:0"><input type="text" inputmode="decimal" id="tdays" value="${num(a.days)||''}" placeholder="Days needed" aria-label="Days this task needs" title="How many days this task needs. Used to work out the critical path."></div></div></div>
     <div class="row" style="align-items:flex-start"><div class="field" style="flex:1.4;min-width:150px"><label for="tbud">Budget for this task</label><input type="text" inputmode="decimal" id="tbud" value="${a.budget&&num(a.budget.amt)?num(a.budget.amt).toLocaleString('en-GB'):''}" placeholder="Amount, for example 50,000"></div>
     <div class="field" style="flex:1;min-width:110px"><label for="tcur">Currency</label><select id="tcur">${curs.map(c=>`<option ${c===bcur?'selected':''}>${esc(c)}</option>`).join('')}</select></div></div>
     <div class="field"><label for="tnote">Notes</label><textarea id="tnote" rows="3">${esc(a.detail||'')}</textarea></div>
@@ -2928,6 +3007,8 @@ function taskModal(id,preset,pid,day){
     save(el){
       const name=el.querySelector('#tname').value.trim();if(!name){toast('Give the task a name.');return false}
       const p=ex?ex.p:S.plans.find(x=>x.id===el.querySelector('#tproj').value),t=ex?a:{};
+      {const st=el.querySelector('#tstat').value,m=taskIndex(),w=deps.map(id=>m.get(id)).filter(x=>x&&!isDone(x.a));if(st==='done'&&!(ex&&isDone(a))&&w.length){toast('This task cannot be completed until '+w.map(x=>'task '+depLabel(x,p)+' "'+clip(x.a.name,30)+'"').join(' and ')+' '+(w.length===1?'is':'are')+' done.');return false}}
+      if(!t.id)t.id=uid();t.deps=deps.slice();t.days=num(el.querySelector('#tdays').value)||'';
       t.name=name;t.status=el.querySelector('#tstat').value;t.due=el.querySelector('#tdued').value||'';t.owner=el.querySelector('#towner').value.trim();t.repeat=el.querySelector('#trep').value;{const rm=el.querySelector('#trem').value||'';if(rm!==(t.remind||''))t.reminded=false;t.remind=rm}if(t.status==='done'&&!t.closed)t.closed=Date.now();if(t.status!=='done')t.spawned=false;t.detail=el.querySelector('#tnote').value.trim();
       {const amt=num(el.querySelector('#tbud').value);t.budget=amt>0?{amt,cur:el.querySelector('#tcur').value}:null;const pend=el.querySelector('#tsubnew').value.trim();if(pend)subs.push({name:clip(pend,140),done:false});t.subs=subs}
       if(!ex)p.acts.push(t);save();render();
@@ -2954,6 +3035,13 @@ function taskModal(id,preset,pid,day){
       const n=addMany(names);say(n?n+' sub-task'+(n===1?'':'s')+' added from '+f.name+'. Check them, then Save.':'No tasks could be read from '+f.name+'.')}
     catch(err){say(err.message||'Could not read that file.')}});
   paint();if(subs.length)openSub(true);
+  const paintDeps=()=>{const m=taskIndex(),hp=homeP(),self=ex?a:null;
+    q('#tdeps').innerHTML=deps.length?deps.map(id=>{const x=m.get(id);return x?`<span class="pill ${isDone(x.a)?'on':'due'}" title="${isDone(x.a)?'Done':'Not done yet'}">${esc(depLabel(x,hp))}. ${esc(clip(x.a.name,34))} <button type="button" data-dx="${id}" aria-label="Remove this dependency">&times;</button></span>`:''}).join(''):'<span class="small muted">Nothing. This task can be completed at any time.</span>';
+    q('#tdepadd').innerHTML='<option value="">Add a task this one depends on...</option>'+[hp,...S.plans.filter(x=>onBoard(x)&&x!==hp)].filter(Boolean).map(pp=>{const os=pp.acts.map((t2,i)=>({t2,i})).filter(({t2})=>t2!==self&&!deps.includes(t2.id)&&!(self&&loops(self,t2,m)));return os.length?`<optgroup label="${esc(pp.name)}${pp===hp?'':' (another project)'}">${os.map(({t2,i})=>`<option value="${t2.id}">${i+1}. ${esc(clip(t2.name,50))}${isDone(t2)?' (done)':''}</option>`).join('')}</optgroup>`:''}).join('')};
+  q('#tdepadd').addEventListener('change',e=>{if(e.target.value){deps.push(e.target.value);paintDeps()}});
+  q('#tdeps').addEventListener('click',e=>{const b=e.target.closest('[data-dx]');if(b){deps=deps.filter(id=>id!==b.dataset.dx);paintDeps()}});
+  if(!ex)q('#tproj').addEventListener('change',()=>{const pp=homeP();deps=pp&&!pp.builtin&&pp.acts.length?[pp.acts[pp.acts.length-1].id]:[];paintDeps()});
+  paintDeps();
 }
 function projectModal(){
   modal(`<form class="card wide"><h2 style="font-size:1.2rem">New project</h2>
@@ -3335,6 +3423,7 @@ function shareChat(i){
 }
 /* ---------- help: built-in guides, plus an assistant that answers from them ---------- */
 const HELP=[
+ ['Task numbers, dependencies and the critical path','Every task carries its number in its project, and keeps it when you drag the card between lanes. Open a task and use "Depends on" to pick the tasks that must be done first; they can be in another project. A task cannot be completed while one it depends on is not done. On the Tasks board, choose a project to see its critical path: the chain of tasks that sets the finish date. "Link tasks in order" makes each task follow the one before; "Let AI work out the sequence" suggests the dependencies. The Dashboard lists where one project waits on another.'],
  ['Resources: people, equipment and other','Open Settings, then the Resources tab. Add people with their role, availability, hours and pay rate; equipment with capacity, status, cost and next service date; and any other resource such as materials or subcontractors. Staff names appear as owner suggestions on tasks, and each person\'s open tasks are counted. The tiles show who and what is available, the team cost per day, and anything needing attention. Download the register as a spreadsheet at any time.'],
  ['Owners, reminders and repeating tasks','Open any task to set an Owner, a Repeat (daily, weekdays, weekly or monthly) and a reminder date and time. Completing a repeating task creates the next one. Reminders show as a bar at the top while OrganizerTX is open, and as a device notification if notifications are turned on in Settings. On the Tasks page you can filter by owner.'],
  ['Calendar view','On Tasks, choose Calendar to see tasks on their due dates, with project milestones. Use the arrows to change month. Click a date to add a task on that day.'],
@@ -3453,6 +3542,9 @@ const ACT={
   dcat(v){V.dcat=V.dcat===v?'all':v},
   dtab(v){V.dtab=v},
   wsg(v){V.wsg=v},
+  'dep-order'(v){const p=S.plans.find(x=>x.id===v);if(p){linkInOrder(p);toast('Each task now follows the one before it. Open a task to change what it depends on.')}},
+  'dep-ai'(v){const p=S.plans.find(x=>x.id===v);if(p)aiDeps(p)},
+  async 'dep-clear'(v){const p=S.plans.find(x=>x.id===v);if(p&&await confirmBox('Remove every dependency in "'+p.name+'"? The task numbers stay.','Clear sequence'))p.acts.forEach(a=>{a.deps=[]})},
   rtab(v){V.rtab=v},'res-new'(v){resModal(null,v)},'res-open'(v){resModal(v)},
   'res-tasks'(v){V.towner=v;V.tfilter='all';V.tmode='board';V.view='tasks'},
   'res-csv'(){saveFile('organizertx-resources_'+dash(Date.now())+'.csv','\ufeff'+resCsv(),'text/csv')},
@@ -3532,7 +3624,7 @@ const ACT={
   'proj-new'(){projectModal()},
   'task-new'(v){v=v||'todo';if(v.startsWith('p:'))taskModal(null,'todo',v.slice(2));else taskModal(null,v)},
   'task-open'(v){taskModal(v)},
-  'task-done'(v){const t=findTask(v);if(t){t.a.status=isDone(t.a)?'todo':'done';t.a.closed=isDone(t.a)?Date.now():0}},
+  'task-done'(v){const t=findTask(v);if(t){if(!isDone(t.a)&&blockDone(t.a))return;t.a.status=isDone(t.a)?'todo':'done';t.a.closed=isDone(t.a)?Date.now():0}},
   tmode(v){V.tmode=v},
   'plan-board'(){V.tfilter=V.plan;V.tmode='board';V.view='tasks'},
   'plan-draft'(){if(hosted()&&!cred()){toast('Add your '+credName()+' in Settings first.');return}buildPlan(curPlan())},
@@ -3608,7 +3700,7 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('.kcard');if(c){e.dataTransfer.setData('text/plain',c.dataset.v);e.dataTransfer.effectAllowed='move'}});
 document.addEventListener('dragover',e=>{const l=e.target.closest&&e.target.closest('.lane');document.querySelectorAll('.lane.over').forEach(x=>{if(x!==l)x.classList.remove('over')});if(l){e.preventDefault();l.classList.add('over')}});
-document.addEventListener('drop',e=>{const l=e.target.closest&&e.target.closest('.lane');if(!l)return;e.preventDefault();const t=findTask(e.dataTransfer.getData('text/plain'));if(t){t.a.status=l.dataset.lane;t.a.closed=isDone(t.a)?Date.now():0;save()}render()});
+document.addEventListener('drop',e=>{const l=e.target.closest&&e.target.closest('.lane');if(!l)return;e.preventDefault();const t=findTask(e.dataTransfer.getData('text/plain'));if(t&&!(l.dataset.lane==='done'&&!isDone(t.a)&&blockDone(t.a))){t.a.status=l.dataset.lane;t.a.closed=isDone(t.a)?Date.now():0;save()}render()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
 
 /* ---------- start ---------- */
