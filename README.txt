@@ -1,9 +1,15 @@
-ORGANIZERTX v0.45
+ORGANIZERTX v0.46
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.46 Folders list can be hidden so a project or chat uses the full width.
+        Advanced Gantt: Project start and end dates that move the whole plan;
+        a labelled Today line; link tasks by dragging from a bar's end dot to
+        another bar; click a line to remove it; slim red lines for the
+        critical path and blue for the rest; "Link and optimise with AI"
+        connects every task and re-times the plan.
   v0.45 Project views. The timeline area of a project now has four tabs:
         Project Brief (foldable), Simple (the week timeline), Advanced (a
         Gantt chart with an editable table, dependency arrows, critical path

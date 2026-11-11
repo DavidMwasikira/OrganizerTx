@@ -708,6 +708,21 @@ table.rt td{vertical-align:top;padding-top:10px;padding-bottom:10px}table.rt but
 .cpath button.done{border-color:var(--s-done);background:color-mix(in srgb,var(--s-done) 16%,var(--surface));text-decoration:line-through}
 .tdeps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.tdeps .pill button{border:0;background:none;font-size:1rem;line-height:1;padding:0 0 0 4px;color:inherit;cursor:pointer}
 .plink{padding:7px 0;border-top:1px solid var(--line);line-height:1.6}.plink:first-of-type{border-top:0}
+:root{--link:#1F6FD6}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--link:#6FB1FF}}
+:root[data-theme="dark"]{--link:#6FB1FF}
+.ws.nolist{grid-template-columns:minmax(0,1fr)}.ws.nolist .wsside{display:none}.ws.nolist .wscol{border-left:0}
+.wstog{min-height:34px;padding:0 10px;font-size:1.05rem;line-height:1}
+.wstog.show{align-self:flex-start;margin:14px 0 0 28px;font-size:.9rem;gap:6px}
+@media (max-width:860px){.wstog{display:none}}
+.agdates{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}.agdates .field{min-width:150px}.agdates input{min-height:38px}.agdates .grow{flex:1;min-width:200px;padding-bottom:6px}
+.banner.linking{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0}
+.agline .lk{position:absolute;top:12px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--link);background:var(--surface);padding:0;z-index:4;cursor:crosshair;opacity:0;transition:opacity .12s}
+.agline:hover .lk,.agline .lk:focus-visible,.ag.linking .lk{opacity:1}.agline .lk:hover{background:var(--link);transform:scale(1.3)}
+.aglinks path.temp{stroke:var(--link);stroke-width:1.5;stroke-dasharray:4 3;fill:none}
+.aglinks path.hit{stroke:transparent;stroke-width:10;fill:none;pointer-events:stroke;cursor:pointer}.aglinks path.hit:hover{stroke:color-mix(in srgb,var(--link) 22%,transparent)}
+.agnow b{position:absolute;top:2px;left:4px;white-space:nowrap;font:600 .64rem var(--body);color:var(--surface);background:var(--signal);border-radius:4px;padding:1px 5px}
+.agout{position:absolute;top:4px;left:8px;background:var(--surface);padding:1px 6px;border-radius:4px;z-index:3}
 .pviews{display:flex;flex-direction:column;gap:12px;min-width:0}
 .ag{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);min-width:0}
 .agl{flex:0 0 auto;max-width:64%;overflow-x:auto;border-right:2px solid var(--line)}.agr{flex:1;min-width:0;overflow-x:auto}
@@ -731,8 +746,8 @@ table.rt td{vertical-align:top;padding-top:10px;padding-bottom:10px}table.rt but
 .agline .sum::before,.agline .sum::after{content:"";position:absolute;top:0;width:3px;height:14px;background:var(--c)}.agline .sum::before{left:0}.agline .sum::after{right:0}
 .agline .sum b{display:block;height:100%;background:var(--c);border-radius:2px}
 .agline .dia{position:absolute;top:10px;width:13px;height:13px;margin-left:-7px;transform:rotate(45deg);border:2px solid var(--k5);background:var(--surface);z-index:2}.agline .dia.done{background:var(--k5)}
-.aglinks{position:absolute;left:0;top:0;pointer-events:none;z-index:1;overflow:visible}
-.aglinks path{fill:none;stroke:var(--muted);stroke-width:1.3}.aglinks path.c{stroke:var(--bad)}.aglinks marker path{fill:var(--muted);stroke:none}.aglinks marker path.c{fill:var(--bad)}
+.aglinks{position:absolute;left:0;top:0;pointer-events:none;z-index:3;overflow:visible}
+.aglinks path{fill:none;stroke:var(--link);stroke-width:1}.aglinks path.c{stroke:var(--bad)}.aglinks marker path{fill:var(--link);stroke:none}.aglinks marker path.c{fill:var(--bad)}
 .agnow{position:absolute;top:0;bottom:0;width:2px;background:var(--signal);z-index:3}
 .wbswrap{overflow-x:auto;padding:6px 2px 12px}
 .wbs{display:flex;flex-direction:column;align-items:center;min-width:max-content}
@@ -803,7 +818,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.45';
+const VERSION='v0.46';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2090,19 +2105,22 @@ function criticalPaths(m){
 function blockDone(a,quiet){const m=taskIndex(),w=waitingOn(a,m),me=m.get(a.id);if(!w.length)return false;
   if(!quiet)toast(`Task ${me?me.n+' ':''}"${clip(a.name,36)}" cannot be completed until ${w.map(x=>'task '+depLabel(x,me&&me.p)+' "'+clip(x.a.name,30)+'"').join(' and ')} ${w.length===1?'is':'are'} done.`);return true}
 function linkInOrder(p){p.acts.forEach((a,i)=>{if(!a.id)a.id=uid();a.deps=i?[p.acts[i-1].id]:[]})}
-function aiDeps(p){
+function aiDeps(p,retime){
   if(needKey())return;const m=taskIndex();
   job('deps','Working out the task sequence',async signal=>{
     const r=await callAI({system:systemPrompt(),depth:'helper',maxTokens:3000,signal,messages:[{role:'user',content:
 `These are the tasks of the project "${p.name}"${p.what?' ('+p.what+')':''}, numbered in their current order:
 ${p.acts.map((a,i)=>(i+1)+'. '+a.name+(a.detail?' - '+clip(a.detail,120):'')).join('\n')}
 
-For each task, say which tasks must be finished before it can be finished (its direct predecessors only, by number). Use real-world logic: for example a permit before construction, design before procurement. Tasks that can run side by side must not depend on each other. A task may have no predecessor.
+For each task, say which tasks must be finished before it can be finished (its direct predecessors only, by number). Use real-world logic: for example a permit before construction, design before procurement. Tasks that can run side by side must not depend on each other. Connect every task into the plan: only the first task or tasks may have no predecessor, and every other task follows at least one. Keep the plan as short as the logic allows.
 Reply with only a JSON array, one object per task: [{"n":1,"after":[]},{"n":2,"after":[1]}]`}]});
     const arr=grab(r.text,'[',']');if(!Array.isArray(arr)||!arr.length)throw new Error('The sequence came back in a form that could not be read. Try again.');
     p.acts.forEach(a=>{a.deps=[]});let n=0;
     arr.forEach(o=>{const a=p.acts[(+o.n)-1];if(!a||!Array.isArray(o.after))return;o.after.forEach(k=>{const pre=p.acts[(+k)-1];if(pre&&pre!==a&&!a.deps.includes(pre.id)&&!loops(a,pre,taskIndex())){a.deps.push(pre.id);n++}})});
     if(!n)throw new Error('No dependencies were suggested. Use "Link tasks in order", or set them by hand in each task.');
+    /* no task is left on its own: an unconnected task follows the nearest earlier task */
+    {const m2=taskIndex();p.acts.forEach((a,i)=>{if(i&&!predsOf(a,m2).length&&!succsOf(a,m2).length)a.deps=[p.acts[i-1].id]})}
+    if(retime){p.acts.forEach(a=>{delete a.start});const S1=schedOf(p);p.weeks=Math.max(1,...S1.rows.map(r=>r.start+r.weeks-1))}
   });
 }
 /* markers shown on a board card and in the list */
@@ -2159,9 +2177,21 @@ Reply with only a JSON object: {"phases":["name", "..."],"tasks":[{"n":1,"phase"
     p.phases=names;orderActs(p);
   });
 }
+/* move the whole project: tasks are stored as week offsets, so only the start, due dates, reminders and milestones shift */
+function shiftProject(p,days){
+  if(!days)return;const mv=d=>isoOk(d)?dash(new Date(d+'T12:00').getTime()+days*DAY):d;
+  p.started=(p.started||Date.now())+days*DAY;p.acts.forEach(a=>{if(a.due)a.due=mv(a.due);if(a.remind){const t=new Date(a.remind).getTime();if(isFinite(t)){a.remind=localISO(t+days*DAY);a.reminded=false}}});(p.miles||[]).forEach(m=>{if(m.date)m.date=mv(m.date)});
+}
+function addLink(p,fromId,toId){
+  const m=taskIndex(),A=m.get(fromId),B=m.get(toId);if(!A||!B||A.a===B.a)return false;
+  if((B.a.deps||[]).includes(fromId)){toast('Those two tasks are already linked.');return false}
+  if(loops(B.a,A.a,m)){toast('That link would make a loop: task '+A.n+' already waits on task '+B.n+'.');return false}
+  (B.a.deps=B.a.deps||[]).push(fromId);if(num(B.a.start)>0){const S0=schedOf(p),ra=S0.by.get(fromId),rb=S0.by.get(toId);if(ra&&rb&&rb.start<ra.start+ra.weeks)delete B.a.start}
+  save();return true;
+}
 function simpleGantt(p,S0){
   const W=S0.W,step=W<=8?1:W<=16?2:4,ticks=[];for(let w=1;w<=W;w+=step)ticks.push(`<span style="left:${100*(w-1)/W}%">W${w}</span>`);
-  const now=p.active||p.custom?(Date.now()-S0.t0)/(7*DAY)/W*100:-1,mark=now>=0&&now<=100?`<u style="left:${now}%" title="Today"></u>`:'';
+  const now=p.active||p.custom?(Date.now()-S0.t0)/(7*DAY)/W*100:-1,mark=now>=0&&now<=100?`<u style="left:${now}%" title="Today, ${fmtShort(Date.now())}"></u>`:'';
   return `<div class="gantt" style="--wk:${100/W}%" role="img" aria-label="Timeline of ${W} weeks"><span></span><div class="sc">${ticks.join('')}</div>${S0.rows.map((r,i)=>`<span class="gn">${i+1}. ${esc(r.a.name)}</span><div class="tr"><i class="${isDone(r.a)?'done':''}" style="left:${100*(r.start-1)/W}%;width:${100*r.weeks/W}%" title="${esc(r.a.name)}: week ${r.start}${r.weeks>1?' to '+(r.start+r.weeks-1):''}"></i>${mark}</div>`).join('')}</div>
   <p class="small muted" style="margin:10px 0 0">W1 is the first week. Filled bars are finished tasks; the orange line is today.</p>`;
 }
@@ -2177,14 +2207,17 @@ function advGantt(p,S0){
       right.push(`<div class="agline">${rows.length?`<i class="sum" style="--c:${c};left:${(s-1)*WK}px;width:${(e-s)*WK}px" title="${esc(g.name||'Not in a phase')}: ${dn} of ${g.acts.length} done"><b style="width:${g.acts.length?100*dn/g.acts.length:0}%"></b></i>`:''}</div>`);r++}
     g.acts.forEach(({a,i},k)=>{const x=S0.by.get(a.id);pos.set(a.id,{r,x1:(x.start-1)*WK,x2:(x.start-1+x.weeks)*WK});
       left.push(`<div class="agrow ${isDone(a)?'done':''}" style="--c:${c}"><span class="no">${i+1}</span><span class="nm ${named?'in':''}"><input type="text" data-g="${i}|name" value="${esc(a.name)}" title="${esc(a.name)}" aria-label="Task name"></span><span class="x">${wbsCode(p,g,k)}</span><span class="x"><input type="date" data-g="${i}|start" value="${dash(weekDate(S0,x.start))}" aria-label="Planned start"></span><span class="x"><input type="text" inputmode="numeric" data-g="${i}|weeks" value="${x.weeks}" aria-label="Weeks"></span><span class="x"><input type="text" data-g="${i}|cost" value="${esc(a.cost||(a.budget?a.budget.cur+' '+num(a.budget.amt).toLocaleString('en-GB'):''))}" placeholder="-" aria-label="Planned cost"></span><span class="x"><input type="text" inputmode="decimal" data-g="${i}|hours" value="${num(a.hours)||''}" placeholder="-" aria-label="Work hours"></span></div>`);
-      right.push(`<div class="agline"><button class="bar ${isDone(a)?'done':a.status==='doing'?'doing':''} ${crit.has(a.id)&&!isDone(a)?'crit':''}" style="--c:${c};left:${(x.start-1)*WK}px;width:${x.weeks*WK}px" data-act="task-open" data-v="${p.id}:${i}" title="${i+1}. ${esc(a.name)}: ${fmtShort(weekDate(S0,x.start))}, ${x.weeks} week${x.weeks===1?'':'s'}${crit.has(a.id)?' · on the critical path':''}" aria-label="${esc(a.name)}"></button></div>`);r++})});
+      right.push(`<div class="agline"><button class="bar ${isDone(a)?'done':a.status==='doing'?'doing':''} ${crit.has(a.id)&&!isDone(a)?'crit':''}" style="--c:${c};left:${(x.start-1)*WK}px;width:${x.weeks*WK}px" data-act="task-open" data-v="${p.id}:${i}" title="${i+1}. ${esc(a.name)}: ${fmtShort(weekDate(S0,x.start))}, ${x.weeks} week${x.weeks===1?'':'s'}${crit.has(a.id)?' · on the critical path':''}" aria-label="${esc(a.name)}" data-bid="${a.id}"></button><button class="lk" style="left:${(x.start-1+x.weeks)*WK-5}px" data-lk="${a.id}" aria-label="Link from ${esc(a.name)}" title="Drag to another bar, or click and then click the bar that follows"></button></div>`);r++})});
   const links=[];p.acts.forEach(a=>predsOf(a,m).filter(x=>x.p===p).forEach(pr=>{const A=pos.get(pr.a.id),B=pos.get(a.id);if(!A||!B)return;const y1=A.r*RH+RH/2,y2=B.r*RH+RH/2,x1=A.x2,x2=B.x1,cl=crit.has(a.id)&&crit.has(pr.a.id)?'c':'';
-    const d=x2>=x1+12?`M${x1} ${y1}h6V${y2}H${x2-1}`:`M${x1} ${y1}h6V${y2-(y2>y1?RH/2:-RH/2)+0.5}H${x2-8}V${y2}H${x2-1}`;links.push(`<path d="${d}" class="${cl}" marker-end="url(#ah${cl})"/>`)}));
+    const d=x2>=x1+12?`M${x1} ${y1}h6V${y2}H${x2-1}`:`M${x1} ${y1}h6V${y2-(y2>y1?RH/2:-RH/2)+0.5}H${x2-8}V${y2}H${x2-1}`;links.push(`<path d="${d}" class="${cl}" marker-end="url(#ah${cl})"/><path d="${d}" class="hit" data-unlink="${pr.a.id}|${a.id}"><title>Task ${pr.n} must finish before task ${p.acts.indexOf(a)+1}. Click to remove this link.</title></path>`)}));
   const step=W<=12?1:W<=26?2:4,head=[];for(let w=1;w<=W;w++)head.push(`<span style="left:${(w-1)*WK}px;width:${WK}px" class="${(w-1)%step?'':'t'}">${(w-1)%step?'':`<b>W${w}</b><small>${fmtShort(weekDate(S0,w))}</small>`}</span>`);
-  const now=(Date.now()-S0.t0)/(7*DAY)*WK;
-  return `<div class="row" style="justify-content:space-between"><span class="small muted">Type in any cell to change it. Click a bar to open the task. Arrows show what must finish first; red marks the critical path.</span><span class="row">${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small" data-act="gcols" aria-pressed="${!cols}">${cols?'Hide the detail columns':'Show the detail columns'}</button></span></div>
+  const now=(Date.now()-S0.t0)/(7*DAY)*WK,endT=S0.t0+W*7*DAY-DAY,lf=V.linkFrom&&V.linkFrom.pid===p.id?p.acts.find(a=>a.id===V.linkFrom.id):null,depJob=busy&&busy.topicId==='deps';
+  return `<div class="agdates"><div class="field"><label for="pstart">Project start date</label><input type="date" id="pstart" data-change="pstart" value="${dash(S0.t0)}"></div><div class="field"><label for="pend">Project end date</label><input type="date" id="pend" data-change="pend" value="${dash(endT)}"></div><span class="small muted grow">Changing either date moves every task, due date and milestone by the same number of days. The length is ${W} week${W===1?'':'s'}.</span>
+      <span class="row"><button class="btn primary small" data-act="dep-opt" ${busy?'disabled':''} title="The AI works out which tasks depend on which, connects them all and re-times the plan">Link and optimise with AI</button>${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small" data-act="gcols" aria-pressed="${!cols}">${cols?'Hide the detail columns':'Show the detail columns'}</button></span></div>
+    ${depJob?`<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`:''}
+    ${lf?`<div class="banner linking">Linking from task ${p.acts.indexOf(lf)+1}, "${esc(clip(lf.name,50))}". Now click the task that can only finish after it. <button class="btn ghost small" data-act="link-cancel">Cancel</button></div>`:`<span class="small muted">Type in any cell to change it. To link two tasks, drag from the dot at the end of a bar to another bar (or click the dot, then the other bar). Click a line to remove it. Thin red lines are the critical path; blue lines are the rest.</span>`}
   <div class="ag ${cols?'':'nocols'}"><div class="agl"><div class="agrow hd"><span>#</span><span>Task name</span><span class="x">WBS</span><span class="x">Planned start</span><span class="x">Weeks</span><span class="x">Planned cost</span><span class="x">Work hours</span></div>${left.join('')}</div>
-    <div class="agr" tabindex="0" aria-label="Gantt chart, scroll sideways"><div class="agtl" style="width:${W*WK}px"><div class="aghd">${head.join('')}</div><div class="agbody" style="background-size:${WK}px 100%">${right.join('')}<svg class="aglinks" width="${W*WK}" height="${r*RH}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z"/></marker><marker id="ahc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" class="c"/></marker></defs>${links.join('')}</svg>${now>=0&&now<=W*WK?`<u class="agnow" style="left:${now}px" title="Today"></u>`:''}</div></div></div></div>`;
+    <div class="agr" tabindex="0" aria-label="Gantt chart, scroll sideways"><div class="agtl" style="width:${W*WK}px"><div class="aghd">${head.join('')}</div><div class="agbody" style="background-size:${WK}px 100%">${right.join('')}<svg class="aglinks" width="${W*WK}" height="${r*RH}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z"/></marker><marker id="ahc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" class="c"/></marker></defs>${links.join('')}</svg>${now>=0&&now<=W*WK?`<u class="agnow" style="left:${now}px" title="Today, ${fmtShort(Date.now())}"><b>Today ${fmtShort(Date.now())}</b></u>`:`<span class="agout small muted">${now<0?'Today is before the project starts':'Today is after the project ends'}</span>`}</div></div></div></div>`;
 }
 function wbsHtml(p){
   const groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0,s=budSum(p),hrs=p.acts.reduce((t,a)=>t+num(a.hours),0);
@@ -3046,11 +3079,12 @@ function wsItems(){
 function wsWrap(body){
   const wk=[V.view,V.topic,V.plan,V.guide].join('|');if(!['topics','home'].includes(V.view)&&wk!==wsWrap.key)V.wsg='';wsWrap.key=wk;
   const gs=wsItems(),none=V.view==='topics'||V.view==='home',cur=gs.find(g=>g.items.some(x=>x.on)),sel=gs.find(g=>g.label===V.wsg)||cur||gs[0];
-  const side=`<aside class="wsside" aria-label="Your chats and projects">${none&&HIST.length?'<div><button class="btn ghost" data-act="back" style="padding-left:0">&larr; Back</button></div>':''}<div class="row" style="justify-content:space-between"><h1 style="font-size:1.7rem">Folders</h1><button class="btn ghost small" data-act="nav" data-v="settings">${DISK.root&&DISK.ok?'Saved to '+esc(DISK.root.name)+'/projects/':DISK.root?'Computer folder not connected':canDisk()?'Save as folders on this computer':''}</button></div>
+  const side=`<aside class="wsside" aria-label="Your chats and projects">${none&&HIST.length?'<div><button class="btn ghost" data-act="back" style="padding-left:0">&larr; Back</button></div>':''}<div class="row" style="justify-content:space-between"><h1 style="font-size:1.7rem">Folders</h1><span class="row" style="gap:4px"><button class="btn ghost small" data-act="nav" data-v="settings">${DISK.root&&DISK.ok?'Saved to '+esc(DISK.root.name)+'/projects/':DISK.root?'Computer folder not connected':canDisk()?'Save as folders on this computer':''}</button>${none?'':`<button class="btn wstog" data-act="ws-hide" aria-label="Hide the Folders list" title="Hide this list so the page uses the full width">&laquo;</button>`}</span></div>
     <div class="htabs wstabs" role="group" aria-label="Show">${gs.map(g=>`<button data-act="wsg" data-v="${g.label}" aria-pressed="${g===sel}" style="--band:${g.band}"><i></i>${g.label}<b>${g.items.length}</b></button>`).join('')}</div>
     ${(sel?[sel]:[]).map(g=>`${g.items.map(x=>`<button class="it" style="--band:${g.band}" data-act="${x.act}" data-v="${esc(x.v)}" aria-current="${!!x.on}"><span class="n">${x.dot?'<span class="dot" title="Unread update"></span> ':''}${esc(x.name)}</span><span class="m">${esc(x.meta)}${x.bar!==undefined?`<span class="bar"><i style="width:${x.bar}%"></i></span>`:''}</span></button>`).join('')}`).join('')}</aside>`;
   const pick=none?'':`<select class="wspick" id="wspick" data-change="wsgo" aria-label="Switch chat or project">${gs.map(g=>`<optgroup label="${g.label}">${g.items.map(x=>`<option value="${x.act}|${esc(x.v)}" ${x.on?'selected':''}>${esc(x.name)}</option>`).join('')}</optgroup>`).join('')}</select>`;
-  return `<div class="ws ${none?'none':''}">${side}<div class="wscol">${pick}${body}</div></div>`;
+  const shut=!none&&S.wsHidden;
+  return `<div class="ws ${none?'none':''} ${shut?'nolist':''}">${side}<div class="wscol">${shut?`<button class="btn wstog show" data-act="ws-hide" aria-label="Show the Folders list" title="Show the Folders list">&raquo; <span>Folders</span></button>`:''}${pick}${body}</div></div>`;
 }
 const navState=()=>({view:V.view,topic:V.topic,guide:V.guide,plan:V.plan,tab:V.tab,doc:V.doc});
 let HIST=[],lastNav=null,goingBack=false,PUSHED=0;
@@ -3671,6 +3705,9 @@ const ACT={
   dcat(v){V.dcat=V.dcat===v?'all':v},
   dtab(v){V.dtab=v},
   wsg(v){V.wsg=v},
+  'ws-hide'(){S.wsHidden=!S.wsHidden},
+  'link-cancel'(){V.linkFrom=null},
+  async 'dep-opt'(){const p=curPlan();if(!p)return;if(p.acts.some(a=>(a.deps||[]).length||num(a.start)>0)&&!await confirmBox('The AI will replace the current links in "'+p.name+'" and re-time the tasks so each starts when the tasks before it finish. Task names, lengths and phases stay as they are.','Link and optimise'))return;aiDeps(p,true)},
   gtab(v){V.gtab=v},gcols(){V.gcols=V.gcols===false},'brief-fold'(){V.briefShut=V.briefShut!==true},
   'ph-ai'(){const p=curPlan();if(p)suggestPhases(p)},
   'ph-add'(){const p=curPlan();if(!p)return;p.phases=(p.phases||[]).filter(Boolean);let n='New phase',k=2;while(p.phases.includes(n))n='New phase '+k++;if(!p.phases.length&&p.acts.length){p.phases.push('Phase 1');p.acts.forEach(a=>{a.phase='Phase 1'})}p.phases.push(n);V.gtab='wbs';setTimeout(()=>{const e=[...document.querySelectorAll('.wph .ed')].pop();if(e){e.focus();getSelection().selectAllChildren(e)}},60)},
@@ -3816,6 +3853,7 @@ document.addEventListener('change',e=>{
       {const S1=schedOf(P);P.weeks=Math.max(...S1.rows.map(r=>r.start+r.weeks-1),1)}
       save();const key=e.target.dataset.g;setTimeout(()=>{const act=document.activeElement,k2=act&&act.dataset&&act.dataset.g;render();if(k2&&k2!==key){const n=document.querySelector(`[data-g="${k2}"]`);if(n)n.focus()}},0)}}
   if(e.target.dataset.gp!==undefined&&e.target.dataset.gp!==''){const P=curPlan(),i=+e.target.dataset.gp,old=P&&(P.phases||[])[i],v=clip(e.target.value.trim(),40);if(old!==undefined&&v&&v!==old&&!P.phases.includes(v)){P.acts.forEach(a=>{if(a.phase===old)a.phase=v});P.phases[i]=v;save()}setTimeout(render,0)}
+  if(e.target.dataset.change==='pstart'||e.target.dataset.change==='pend'){const P=curPlan(),v=e.target.value;if(P&&isoOk(v)){const S0=schedOf(P),cur=e.target.dataset.change==='pstart'?dash(S0.t0):dash(S0.t0+S0.W*7*DAY-DAY),days=Math.round((new Date(v+'T12:00')-new Date(cur+'T12:00'))/DAY);if(!P.started)P.started=S0.t0;shiftProject(P,days);save();if(days)toast('Project moved '+Math.abs(days)+' day'+(Math.abs(days)===1?'':'s')+(days>0?' later.':' earlier.'))}render()}
   if(e.target.dataset.change==='vatin'){budOf(curPlan()).vatIn=e.target.checked;save();render()}
   if(e.target.dataset.change==='towner'){V.towner=e.target.value;render()}
   if(e.target.dataset.bud){const [i,k]=e.target.dataset.bud.split('|'),l=budOf(curPlan()).lines[+i];if(l){l[k]=k==='planned'||k==='actual'?num(e.target.value):e.target.value.trim();save();setTimeout(()=>{const a=document.activeElement,k2=a&&a.dataset&&a.dataset.bud;render();if(k2){const n=document.querySelector(`[data-bud="${k2}"]`);if(n){n.focus();if(n.select)n.select()}}},0)}}
@@ -3843,6 +3881,21 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('.kcard');if(c){e.dataTransfer.setData('text/plain',c.dataset.v);e.dataTransfer.effectAllowed='move'}});
 document.addEventListener('dragover',e=>{const l=e.target.closest&&e.target.closest('.lane');document.querySelectorAll('.lane.over').forEach(x=>{if(x!==l)x.classList.remove('over')});if(l){e.preventDefault();l.classList.add('over')}});
 document.addEventListener('drop',e=>{const l=e.target.closest&&e.target.closest('.lane');if(!l)return;e.preventDefault();const t=findTask(e.dataTransfer.getData('text/plain'));if(t&&!(l.dataset.lane==='done'&&!isDone(t.a)&&blockDone(t.a))){t.a.status=l.dataset.lane;t.a.closed=isDone(t.a)?Date.now():0;save()}render()});
+/* linking tasks on the Gantt chart */
+let LKDRAG=null;
+document.addEventListener('pointerdown',e=>{const h=e.target.closest&&e.target.closest('.lk');if(!h)return;e.preventDefault();const P=curPlan();if(!P)return;
+  const svg=document.querySelector('.aglinks'),box=svg.getBoundingClientRect(),hb=h.getBoundingClientRect(),x1=hb.left+hb.width/2-box.left,y1=hb.top+hb.height/2-box.top;
+  const line=document.createElementNS('http://www.w3.org/2000/svg','path');line.setAttribute('class','temp');svg.appendChild(line);LKDRAG={id:h.dataset.lk,pid:P.id,x0:e.clientX,y0:e.clientY,moved:false,line,box,x1,y1}});
+document.addEventListener('pointermove',e=>{const d=LKDRAG;if(!d)return;if(Math.abs(e.clientX-d.x0)+Math.abs(e.clientY-d.y0)>6)d.moved=true;d.line.setAttribute('d',`M${d.x1} ${d.y1}L${e.clientX-d.box.left} ${e.clientY-d.box.top}`)});
+document.addEventListener('pointerup',e=>{const d=LKDRAG;if(!d)return;LKDRAG=null;d.line.remove();const P=S.plans.find(x=>x.id===d.pid);if(!P)return;
+  if(!d.moved){V.linkFrom={pid:P.id,id:d.id};render();return}
+  const t=document.elementFromPoint(e.clientX,e.clientY),bar=t&&t.closest&&t.closest('.agline .bar');if(bar&&bar.dataset.bid!==d.id&&addLink(P,d.id,bar.dataset.bid))toast('Linked.');V.linkFrom=null;render()});
+document.addEventListener('click',e=>{
+  const bar=e.target.closest&&e.target.closest('.agline .bar');
+  if(bar&&V.linkFrom){e.preventDefault();e.stopPropagation();const P=S.plans.find(x=>x.id===V.linkFrom.pid);if(P&&bar.dataset.bid!==V.linkFrom.id&&addLink(P,V.linkFrom.id,bar.dataset.bid))toast('Linked.');V.linkFrom=null;render();return}
+  const hit=e.target.closest&&e.target.closest('[data-unlink]');
+  if(hit){const [from,to]=hit.dataset.unlink.split('|'),m=taskIndex(),B=m.get(to),A=m.get(from);if(A&&B)confirmBox('Remove the link from task '+A.n+' to task '+B.n+'?','Remove link').then(ok=>{if(ok){B.a.deps=(B.a.deps||[]).filter(x=>x!==from);save();render()}})}
+},true);
 /* text typed straight into a WBS box is saved when the box loses focus or Enter is pressed */
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('ed')){e.preventDefault();e.target.blur()}});
 document.addEventListener('focusout',e=>{const t=e.target;if(!t.classList||!t.classList.contains('ed'))return;const P=curPlan(),v=clip((t.textContent||'').replace(/\s+/g,' ').trim(),120);if(!P)return;
