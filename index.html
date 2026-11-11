@@ -695,6 +695,8 @@ table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt 
 .tsublist{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;padding-right:2px}
 .tsrow{display:flex;align-items:center;gap:8px}.tsrow input{flex:1;min-width:0;min-height:36px;padding:4px 8px}.tsrow.done input{text-decoration:line-through;color:var(--muted)}
 @media (max-width:760px){.tduo{flex-direction:column;align-items:stretch}.tduo>form{flex:none}.modal .tduo .tsub{flex:none;max-width:none}}
+table.rt td{vertical-align:top;padding-top:10px;padding-bottom:10px}table.rt button.pill{border:0;cursor:pointer}
+.btile>.small{line-height:1.3}
 .rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}.rgrid>*{min-width:0}
 .rsug{display:flex;flex-direction:column;gap:10px}
 .ttl2{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;font-size:1rem}
@@ -741,7 +743,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.42';
+const VERSION='v0.43';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1425,6 +1427,7 @@ const dash=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth(
 const dueOf=(p,a)=>a.due||(p.started&&a.start?dash(p.started+((a.start+(a.weeks||1)-1)*7-1)*DAY):'');
 function ensureShape(){
   ensureLib();
+  if(!Array.isArray(S.resources))S.resources=[];
   if(!Array.isArray(S.papers))S.papers=[];if(!Array.isArray(S.asst))S.asst=[];
   if(!Array.isArray(S.plans))S.plans=[];if(!Array.isArray(S.pins))S.pins=[];if(!S.guides)S.guides={};
   if(!S.plans.find(p=>p.id==='my'))S.plans.unshift({id:'my',builtin:true,custom:true,guide:null,name:'My tasks',what:'Day-to-day tasks that do not belong to a project.',active:true,started:0,created:Date.now(),weeks:0,summary:'',acts:[]});
@@ -1549,6 +1552,7 @@ function dataContext(q){
     fieldLog:S.plans.flatMap(p=>(p.log||[]).map(e=>({project:p.name,date:dash(e.date),kind:LOGK[e.kind][0],text:clip(e.text||e.title||e.url||'',240)}))).sort((a,b)=>a.date<b.date?1:-1).slice(0,40),
     minutesAndReports:S.papers.map(p=>({p,s:score(p.title+' '+p.md)})).sort((a,b)=>b.s-a.s||b.p.date-a.p.date).slice(0,8).map(({p,s},i)=>({kind:PKIND[p.kind],title:p.title,date:dash(p.date),text:plainMd(p.md).slice(0,i<2&&s?2000:260)})),
     projectControls:S.plans.filter(p=>onBoard(p)&&!p.builtin).map(p=>({project:p.name,budget:budSum(p).n?{planned:budSum(p).planned,spent:budSum(p).actual,currency:curSym(),vatIncludedInFigures:budOf(p).vatIn!==false,lines:budOf(p).lines.slice(0,40).map(l=>({category:l.cat,item:l.item,planned:num(l.planned),spent:Math.round(lineSpent(p,l))})),spendLog:p.spend.slice(-40).map(e=>({date:e.date,paidFor:e.desc,milestone:((p.miles||[]).find(m=>m.id===e.mileId)||{}).name||'',beforeVAT:num(e.net),vatPercent:+e.vat||0,total:Math.round(grossOf(e))}))}:null,risksAndIssues:(p.risks||[]).map(r=>({type:r.type,level:r.level,status:r.status,title:r.title,owner:r.owner||'',response:r.action||''})),milestones:(p.miles||[]).map(m=>({name:m.name,date:m.date||'',state:mileState(m)[0]}))})).filter(c=>c.budget||c.risksAndIssues.length||c.milestones.length),
+    resources:(S.resources||[]).slice(0,80).map(r=>r.type==='person'?{type:'person',name:r.name,role:r.role||'',availability:RAVAIL[r.avail||'yes'][0],hoursPerWeek:r.hours||'',availableFrom:r.from||'',payRate:num(r.rate)?(r.cur+' '+num(r.rate)+' per '+r.unit):'',openTasks:openFor(r.name),project:(S.plans.find(p=>p.id===r.pid)||{}).name||''}:r.type==='equipment'?{type:'equipment',name:r.name,capacity:r.capacity||'',quantity:r.qty,status:RSTAT[r.stat||'ok'][0],ownedOrHired:r.own,cost:num(r.rate)?(r.cur+' '+num(r.rate)+' per '+r.unit):'',nextService:r.service||''}:{type:'other',name:r.name,category:r.category||'',onHand:r.qty+' '+(r.unit||''),unitCost:num(r.rate)?(r.cur+' '+num(r.rate)+' per '+r.unit):'',supplier:r.supplier||''}),
     brainNotes:String(S.brain.organized||'').slice(0,5000)};
 }
 const UNDO={};
@@ -1813,7 +1817,7 @@ function checkReminders(){
   if(hit){save();const typing=$('.modal')||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'');if(!typing)render();toast('Reminder: '+S.rems[0].name)}
 }
 const remBar=()=>(S.rems||[]).length?`<div class="rembar" role="status">${S.rems.map((r,i)=>`<div><span class="ic">${ICON.bell}</span><span class="grow"><strong>Reminder:</strong> ${esc(r.name)} <span class="small muted">${esc(r.proj)}${r.due?' · due '+fmtShort(r.due):''}</span></span><button class="btn ghost small" data-act="nav" data-v="tasks">Open board</button><button class="btn ghost small" data-act="rem-x" data-v="${i}" aria-label="Dismiss reminder">Dismiss</button></div>`).join('')}</div>`:'';
-const owners=()=>[...new Set(S.plans.flatMap(p=>p.acts.map(a=>(a.owner||'').trim())).concat(S.plans.flatMap(p=>(p.risks||[]).map(r=>(r.owner||'').trim()))).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+const owners=()=>{const seen=new Set();return ((S.resources||[]).filter(r=>r.type==='person').map(r=>r.name.trim()).concat(S.plans.flatMap(p=>p.acts.map(a=>(a.owner||'').trim()))).concat(S.plans.flatMap(p=>(p.risks||[]).map(r=>(r.owner||'').trim()))).filter(Boolean)).filter(n=>{const k=n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>a.localeCompare(b))};
 const initials=n=>String(n||'').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
 function calendarHtml(tasks){
   const ym=/^\d{4}-\d\d$/.test(V.calM||'')?V.calM:dash(Date.now()).slice(0,7),[Y,M]=ym.split('-').map(Number),first=new Date(Y,M-1,1),start=new Date(Y,M-1,1-((first.getDay()+6)%7)),today=dash(Date.now());
@@ -1939,6 +1943,64 @@ function controlsHtml(p,tab){
       ${M.map(({m,i})=>`<div class="mact" style="align-items:center"><button class="box" role="checkbox" aria-checked="${!!m.done}" aria-label="Mark reached" data-act="mile-tick" data-v="${i}">${m.done?'&#10003;':''}</button><input type="text" data-mile="${i}|name" value="${esc(m.name)}" aria-label="Milestone" style="flex:1;min-width:120px"><input type="date" data-mile="${i}|date" value="${esc(m.date||'')}" aria-label="Date" style="width:auto"><span class="pill ${mileState(m)[1]}" style="min-width:86px;text-align:center">${mileState(m)[0]}</span><span class="small" style="min-width:120px;text-align:right" title="Spend recorded against this milestone">${mileSpent(p,m)?money(mileSpent(p,m)):'<span class="muted">No spend</span>'}</span><button class="btn small" data-act="spend-new" data-v="mile:${m.id}" title="Record a payment made for this milestone">+ Spend</button><button class="btn ghost small" data-act="mile-del" data-v="${i}" aria-label="Delete milestone" title="Delete">&times;</button></div>`).join('')}
       <div class="row" style="margin-top:12px;align-items:flex-end"><div class="field" style="flex:1;min-width:160px"><label for="mname">New milestone</label><input type="text" id="mname" placeholder="For example: drilling complete"></div><div class="field"><label for="mdate2">Date</label><input type="date" id="mdate2"></div><button class="btn primary" data-act="mile-add">Add</button></div>
       <p class="small muted" style="margin:10px 0 0">When a milestone is reached, press + Spend to record what was paid for it. Milestones also show on the Tasks calendar.</p></section>`;
+}
+
+/* ================= v0.43: resource register (people, equipment, other) ================= */
+const RTYPE={person:['People','Person'],equipment:['Equipment','Equipment'],other:['Other resources','Other resource']};
+const RAVAIL={yes:['Available','on'],part:['Partly available','due'],no:['Not available','']};
+const RSTAT={ok:['Available','on'],use:['In use','due'],repair:['Under repair','']};
+const RUNITS={person:['hour','day','week','month'],equipment:['hour','day','week','month','trip'],other:['unit','kg','tonne','bag','litre','metre','m2','m3','trip','month']};
+const rCurs=()=>[...new Set([curSym()||'USD','USD','EUR','GBP','Kshs','UGX','TZS','RWF','ZAR'])];
+const rRate=r=>num(r.rate)?`${esc(r.cur||curSym())} ${num(r.rate).toLocaleString('en-GB')} <span class="small muted">per ${esc(r.unit||'day')}</span>`:'<span class="muted">-</span>';
+const dayRate=r=>{const v=num(r.rate);return !v?0:r.unit==='hour'?v*8:r.unit==='week'?v/5:r.unit==='month'?v/22:r.unit==='day'?v:0};
+const openFor=name=>allTasks().filter(t=>!isDone(t.a)&&(t.a.owner||'').trim().toLowerCase()===String(name||'').trim().toLowerCase()).length;
+const serviceDue=r=>r.type==='equipment'&&isoOk(r.service)&&r.service<=dash(Date.now()+14*DAY);
+function resModal(id,type){
+  const ex=id?S.resources.find(r=>r.id===id):null,r=ex||{type:type||'person',name:'',role:'',contact:'',avail:'yes',hours:'',from:'',rate:'',unit:type==='other'?'unit':'day',cur:curSym()||'USD',capacity:'',qty:type==='person'?'':1,own:'owned',stat:'ok',service:'',category:'',supplier:'',pid:'',notes:''},T=r.type;
+  const f=(id2,label,inner,flex)=>`<div class="field" style="flex:${flex||1};min-width:140px"><label for="${id2}">${label}</label>${inner}</div>`,inp=(id2,val,ph,extra)=>`<input type="text" id="${id2}" value="${esc(val==null?'':val)}" placeholder="${ph||''}" ${extra||''}>`;
+  const sel=(id2,opts,val)=>`<select id="${id2}">${opts.map(([k,l])=>`<option value="${esc(k)}" ${String(k)===String(val)?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
+  const money2=`<div class="row" style="align-items:flex-start">${f('rrate',T==='person'?'Pay rate':T==='equipment'?'Cost (hire or running)':'Unit cost',inp('rrate',num(r.rate)?num(r.rate).toLocaleString('en-GB'):'','0','inputmode="decimal"'),1.2)}${f('runit','Per',sel('runit',RUNITS[T].map(u=>[u,u]),r.unit))}${f('rcur','Currency',sel('rcur',[...new Set([...rCurs(),r.cur].filter(Boolean))].map(c=>[c,c]),r.cur))}</div>`;
+  modal(`<form class="card wide"><h2 style="font-size:1.2rem">${ex?'Edit':'Add'}: ${RTYPE[T][1].toLowerCase()}</h2>
+    ${T==='person'?`<div class="row" style="align-items:flex-start">${f('rname','Name',inp('rname',r.name,'Full name'),1.3)}${f('rrole','Role or skill',inp('rrole',r.role,'For example: site engineer'))}</div>
+      <div class="row" style="align-items:flex-start">${f('ravail','Availability',sel('ravail',Object.entries(RAVAIL).map(([k,v])=>[k,v[0]]),r.avail))}${f('rhours','Hours per week',inp('rhours',r.hours,'40','inputmode="decimal"'))}${f('rfrom','Available from',`<input type="date" id="rfrom" value="${esc(r.from||'')}">`)}</div>
+      ${money2}${f('rcontact','Phone or email (optional)',inp('rcontact',r.contact,''))}`
+    :T==='equipment'?`<div class="row" style="align-items:flex-start">${f('rname','Equipment',inp('rname',r.name,'For example: excavator, 20 t'),1.3)}${f('rcap','Capacity',inp('rcap',r.capacity,'For example: 60 m per day'))}</div>
+      <div class="row" style="align-items:flex-start">${f('rqty','Quantity',inp('rqty',r.qty,'1','inputmode="decimal"'))}${f('rown','Owned or hired',sel('rown',[['owned','Owned'],['hired','Hired']],r.own))}${f('rstat','Status',sel('rstat',Object.entries(RSTAT).map(([k,v])=>[k,v[0]]),r.stat))}</div>
+      ${money2}<div class="row" style="align-items:flex-start">${f('rservice','Next service or inspection',`<input type="date" id="rservice" value="${esc(r.service||'')}">`)}${f('rsupplier','Supplier or hirer (optional)',inp('rsupplier',r.supplier,''))}</div>`
+    :`<div class="row" style="align-items:flex-start">${f('rname','Resource',inp('rname',r.name,'For example: cement, 50 kg bags'),1.3)}${f('rcat','Category',inp('rcat',r.category,'Materials, vehicle, subcontractor, licence...','list="rcats"')+`<datalist id="rcats">${['Materials','Vehicle','Subcontractor','Tools','Software','Licence or permit','Fuel','Office'].map(c=>`<option value="${c}">`).join('')}</datalist>`)}</div>
+      <div class="row" style="align-items:flex-start">${f('rqty','Quantity on hand',inp('rqty',r.qty,'0','inputmode="decimal"'))}${f('rsupplier','Supplier (optional)',inp('rsupplier',r.supplier,''),1.6)}</div>${money2}`}
+    <div class="row" style="align-items:flex-start">${f('rpid','Assigned to project',sel('rpid',[['','Not assigned'],...S.plans.filter(p=>onBoard(p)&&!p.builtin).map(p=>[p.id,p.name])],r.pid))}</div>
+    ${f('rnotes','Notes',`<textarea id="rnotes" rows="2">${esc(r.notes||'')}</textarea>`)}
+    <div class="row" style="justify-content:space-between">${ex?'<button type="button" class="btn danger" data-x="del">Delete</button>':'<span></span>'}<span class="row"><button type="button" class="btn" data-x="cancel">Cancel</button><button type="submit" class="btn primary" data-x="save">Save</button></span></div></form>`,{
+    cancel(){},
+    save(el){const q=x=>{const e=el.querySelector('#'+x);return e?e.value.trim():undefined},name=q('rname');if(!name){toast('Give it a name.');return false}
+      const set=(k,v)=>{if(v!==undefined)r[k]=v};r.name=clip(name,80);set('role',q('rrole'));set('contact',q('rcontact'));set('avail',q('ravail'));set('hours',q('rhours'));set('from',q('rfrom'));r.rate=num(q('rrate'));set('unit',q('runit'));set('cur',q('rcur'));
+      set('capacity',q('rcap'));if(q('rqty')!==undefined)r.qty=q('rqty')===''?'':num(q('rqty'));set('own',q('rown'));set('stat',q('rstat'));set('service',q('rservice'));set('category',q('rcat'));set('supplier',q('rsupplier'));set('pid',q('rpid'));set('notes',q('rnotes'));
+      if(!ex){r.id=uid();S.resources.push(r)}save();render()},
+    del(){S.resources=S.resources.filter(x=>x!==ex);save();render()}
+  });
+}
+function resCsv(){
+  const c=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"',pn=id=>(S.plans.find(p=>p.id===id)||{}).name||'';
+  return [['Type','Name','Role / capacity / category','Availability or status','Hours per week','Available from','Quantity','Rate','Per','Currency','Owned or hired','Next service','Supplier','Project','Contact','Notes'].map(c).join(','),
+    ...S.resources.map(r=>[RTYPE[r.type][1],r.name,r.type==='person'?r.role:r.type==='equipment'?r.capacity:r.category,r.type==='person'?RAVAIL[r.avail||'yes'][0]:r.type==='equipment'?RSTAT[r.stat||'ok'][0]:'',r.hours,r.from,r.qty,num(r.rate)||'',r.unit,r.cur,r.type==='equipment'?r.own:'',r.service,r.supplier,pn(r.pid),r.contact,r.notes].map(c).join(','))].join('\r\n');
+}
+function viewResources(){
+  const R=S.resources,f=['person','equipment','other'].includes(V.rtab)?V.rtab:'all',ppl=R.filter(r=>r.type==='person'),eq=R.filter(r=>r.type==='equipment'),oth=R.filter(r=>r.type==='other'),pn=id=>(S.plans.find(p=>p.id===id)||{}).name||'';
+  const availP=ppl.filter(r=>r.avail!=='no'&&!(isoOk(r.from)&&r.from>dash(Date.now()))),byCur={};availP.forEach(r=>{const d=dayRate(r);if(d)byCur[r.cur||curSym()]=(byCur[r.cur||curSym()]||0)+d});
+  const mainCur=Object.keys(byCur).sort((a,b)=>byCur[b]-byCur[a])[0],due=eq.filter(serviceDue),over=ppl.filter(r=>openFor(r.name)>5);
+  const tile=(l,v,sub)=>`<div class="btile"><span class="lbl">${l}</span><b>${v}</b><span class="small muted">${sub}</span></div>`;
+  const sect=(t,rows,head,none)=>f!=='all'&&f!==t?'':`<section class="card"><div class="row" style="justify-content:space-between"><h2 style="font-size:1.1rem">${RTYPE[t][0]} <span class="small muted" style="font-weight:400">${R.filter(r=>r.type===t).length}</span></h2><button class="btn primary" data-act="res-new" data-v="${t}">+ Add ${RTYPE[t][1].toLowerCase()}</button></div>
+    ${rows.length?`<div class="tw"><table class="dt rt"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`:`<p class="small muted" style="margin:10px 0 0">${none}</p>`}</section>`;
+  const nm=(r,sub)=>`<td><button class="linkish" data-act="res-open" data-v="${r.id}"><span class="b" style="font-weight:600">${esc(r.name)}</span>${sub?`<span class="b small muted">${esc(sub)}</span>`:''}</button></td>`;
+  return `<div class="page wide">${setTop('resources')}
+    <div class="row" style="justify-content:space-between"><p class="muted" style="margin:0">Your register of people, equipment and anything else your projects need: who and what is available, and what it costs.</p><span class="row">${R.length?'<button class="btn" data-act="res-csv">Download as a spreadsheet</button>':''}</span></div>
+    <div class="btiles">${tile('People',ppl.length,ppl.length?availP.length+' available now':'none added yet')}${tile('Equipment',eq.length,eq.length?eq.filter(r=>r.stat==='ok'||!r.stat).length+' available now':'none added yet')}${tile('Team cost per day',mainCur?`<small>${esc(mainCur)}</small>${Math.round(byCur[mainCur]).toLocaleString('en-GB')}`:'-',mainCur?'available people, 8-hour day'+(Object.keys(byCur).length>1?' ('+esc(mainCur)+' rates only)':''):'add pay rates to see this')}${tile('Needs attention',due.length+over.length,(due.length?due.length+' service due':'no service due')+(over.length?' · '+over.length+' overloaded':''))}</div>
+    <div class="htabs" role="group" aria-label="Show">${[['all','All',R.length],['person','People',ppl.length],['equipment','Equipment',eq.length],['other','Other',oth.length]].map(([k,l,n])=>`<button data-act="rtab" data-v="${k}" aria-pressed="${f===k}">${l}<b>${n}</b></button>`).join('')}</div>
+    ${sect('person',ppl.map(r=>{const n=openFor(r.name),a=RAVAIL[r.avail||'yes'];return `<tr>${nm(r,[r.role,r.contact].filter(Boolean).join(' · '))}<td><span class="pill ${a[1]}">${a[0]}</span>${r.hours?` <span class="small muted">${esc(r.hours)} h/week</span>`:''}${isoOk(r.from)&&r.from>dash(Date.now())?`<br><span class="small muted">from ${fmtShort(r.from)}</span>`:''}</td><td>${rRate(r)}</td><td>${n?`<button class="pill ${n>5?'due':''}" data-act="res-tasks" data-v="${esc(r.name)}" title="Show this person's tasks on the board">${n} open${n>5?' · heavy load':''}</button>`:'<span class="small muted">None</span>'}</td><td>${esc(pn(r.pid))||'<span class="muted">-</span>'}</td></tr>`}),['Name','Availability','Pay rate','Open tasks','Project'],'Add the people you can call on, with their role, availability and pay rate. Their names then appear as owner suggestions on tasks, and their open tasks are counted here.')}
+    ${sect('equipment',eq.map(r=>{const st=RSTAT[r.stat||'ok'];return `<tr>${nm(r,[r.own==='hired'?'Hired':'Owned',r.supplier].filter(Boolean).join(' · '))}<td>${esc(r.capacity)||'<span class="muted">-</span>'}</td><td>${r.qty===''||r.qty==null?'-':esc(r.qty)}</td><td><span class="pill ${st[1]}">${st[0]}</span></td><td>${rRate(r)}</td><td>${isoOk(r.service)?`<span class="${serviceDue(r)?'pill due':''}">${fmtShort(r.service)}${r.service<dash(Date.now())?' · overdue':serviceDue(r)?' · due soon':''}</span>`:'<span class="muted">-</span>'}</td><td>${esc(pn(r.pid))||'<span class="muted">-</span>'}</td></tr>`}),['Equipment','Capacity','Qty','Status','Cost','Next service','Project'],'Add machines, vehicles and tools with their capacity, cost and next service date, so you know what is free and what is due for attention.')}
+    ${sect('other',oth.map(r=>`<tr>${nm(r,r.category)}<td>${r.qty===''||r.qty==null?'-':esc(r.qty)+' '+esc(r.unit||'')}</td><td>${rRate(r)}</td><td>${esc(r.supplier)||'<span class="muted">-</span>'}</td><td>${esc(pn(r.pid))||'<span class="muted">-</span>'}</td></tr>`),['Resource','On hand','Unit cost','Supplier','Project'],'Add anything else a project depends on: materials, subcontractors, licences, software or fuel, with quantity, unit cost and supplier.')}
+    <p class="small muted" style="margin:0">Kept on this device and included in your backup. The Assistant can answer questions from this register, such as who is available or what a team costs per day.</p></div>`;
 }
 
 /* ---------- My Day briefing ----------
@@ -2213,7 +2275,7 @@ function weeklyHtml(){
 }
 function viewTasks(){
   const f=V.tfilter,mode=V.tmode,projs=S.plans.filter(onBoard);
-  const who=V.towner&&owners().includes(V.towner)?V.towner:'all',tasks=allTasks().filter(t=>(f==='all'||t.p.id===f)&&(who==='all'||(t.a.owner||'')===who));
+  const who=V.towner&&owners().includes(V.towner)?V.towner:'all',tasks=allTasks().filter(t=>(f==='all'||t.p.id===f)&&(who==='all'||(t.a.owner||'').trim().toLowerCase()===who.toLowerCase()));
   const card=t=>`<div class="kcard" role="button" tabindex="0" draggable="true" data-s="${t.a.status}" data-act="task-open" data-v="${esc(t.id)}"><span class="tag">${esc(t.p.name)}</span><span class="t">${esc(t.a.name)}</span>${t.a.budget||(t.a.subs||[]).length?`<span class="row small" style="gap:6px">${t.a.budget?`<span class="pill" title="Budget for this task">${esc(t.a.budget.cur)} ${num(t.a.budget.amt).toLocaleString('en-GB')}</span>`:''}${(t.a.subs||[]).length?`<span class="pill ${t.a.subs.every(x=>x.done)?'on':''}" title="Sub-tasks done">&#9745; ${t.a.subs.filter(x=>x.done).length}/${t.a.subs.length}</span>`:''}</span>`:''}${t.a.owner||t.a.repeat||t.a.remind?`<span class="row small muted" style="gap:6px">${t.a.owner?`<span class="ava" title="Owner: ${esc(t.a.owner)}">${esc(initials(t.a.owner))}</span>${esc(t.a.owner)}`:''}${t.a.repeat?`<span title="${REPEAT[t.a.repeat]}">&#8635; ${REPEAT[t.a.repeat].replace('Every ','')}</span>`:''}${t.a.remind&&!t.a.reminded&&!isDone(t.a)?`<span title="Reminder set for ${esc(t.a.remind.replace('T',' '))}" style="display:inline-flex;width:14px;height:14px">${ICON.bell}</span>`:''}</span>`:''}${t.due?`<span>${dueLabel(t.due,isDone(t.a))}</span>`:''}</div>`;
   const body=mode==='cal'?calendarHtml(tasks):mode==='board'
     ?`<div class="board">${STATUS.map(([k,l])=>{const ts=tasks.filter(t=>t.a.status===k);return `<section class="lane" data-lane="${k}" aria-label="${l}"><header tabindex="0" data-tip="Status: ${l}&#10;${ts.length} card${ts.length===1?'':'s'}"><span class="lh"><i></i>${l}</span><span class="mono muted">(${ts.length})</span></header>${ts.map(card).join('')}<button class="laneadd" data-act="task-new" data-v="${k}" aria-label="Add a task to ${l}" title="Add a task to ${l}">+</button></section>`}).join('')}</div>
@@ -2799,12 +2861,12 @@ function render(){
   lastNav=ns;goingBack=false;
   const tabs=[['home','Home'],['assist','Assistant'],['desk','Desktop'],['tasks','Tasks'],['actions','Dashboard'],['brain','Brain']];
   asstState();sweepRecurring();
-  const body=V.doc?viewDoc():{help:viewHelp,field:viewField,desk:viewDesk,rules:viewRules,home:viewHome,tasks:viewTasks,topics:viewTopics,topic:viewTopic,guide:viewGuide,plan:viewPlan,actions:viewActions,brain:viewBrain,settings:viewSettings,assist:viewAssist}[V.view]();
+  const body=V.doc?viewDoc():{help:viewHelp,field:viewField,desk:viewDesk,rules:viewRules,home:viewHome,tasks:viewTasks,topics:viewTopics,topic:viewTopic,guide:viewGuide,plan:viewPlan,actions:viewActions,brain:viewBrain,settings:viewSettings,assist:viewAssist,resources:viewResources}[V.view]();
   let bodyHtml=body;
-  if(HIST.length&&!V.doc&&['tasks','actions','brain','help','settings','rules','field','assist'].includes(V.view)&&!(V.view==='assist'&&V.paper))bodyHtml=body.replace(/^(\s*<div class="page[^"]*"[^>]*>)/,'$1<div><button class="btn ghost" data-act="back" style="padding-left:0">&larr; Back</button></div>');
+  if(HIST.length&&!V.doc&&['tasks','actions','brain','help','settings','rules','field','assist','resources'].includes(V.view)&&!(V.view==='assist'&&V.paper))bodyHtml=body.replace(/^(\s*<div class="page[^"]*"[^>]*>)/,'$1<div><button class="btn ghost" data-act="back" style="padding-left:0">&larr; Back</button></div>');
   if(!V.doc&&['topic','plan','guide','topics'].includes(V.view))bodyHtml=wsWrap(body);
-  const cp=curPlan(),cur=V.doc||['topic','guide','plan','topics'].includes(V.view)?'home':V.view==='rules'?'settings':V.view;
-  const where=[V.view,V.topic,V.guide,V.plan,V.tab,V.tmode,V.doc,V.btab,V.bsec,V.lib,V.slide,V.dcat,V.dmode,V.atab,V.paper,V.ptab,V.calM,V.hview].join('|'),old=$('main'),keep=old&&where===render.where?old.scrollTop:0;render.where=where;
+  const cp=curPlan(),cur=V.doc||['topic','guide','plan','topics'].includes(V.view)?'home':V.view==='rules'||V.view==='resources'?'settings':V.view;
+  const where=[V.view,V.topic,V.guide,V.plan,V.tab,V.tmode,V.doc,V.btab,V.bsec,V.lib,V.slide,V.dcat,V.dmode,V.atab,V.paper,V.ptab,V.calM,V.hview,V.rtab].join('|'),old=$('main'),keep=old&&where===render.where?old.scrollTop:0;render.where=where;
   const themeBtn=`<button data-act="theme" class="${'T'}" aria-label="Switch to ${isDark()?'light':'dark'} theme" title="Switch to ${isDark()?'light':'dark'} theme">${isDark()?ICON.sun:ICON.moon}</button>`;
   const rail=`<nav aria-label="Main"><button class="create" data-act="create"><i>+</i><span>Create</span></button>${tabs.map(([k,l])=>`<button data-act="nav" data-v="${k}" ${k==='assist'?'class="only-wide"':''} ${cur===k?'aria-current="page"':''}>${ICON[k]}<span>${l}</span>${k==='topics'&&unreadTotal()?'<span class="dot" title="Unread updates"></span>':''}</button>`).join('')}<button class="only-wide capnav" data-act="cap-pin" aria-expanded="${!!S.capPin}" aria-label="Data Capture: photo, voice note, web page note, text note">${ICON.camera}<span>Data Capture</span></button><span class="sp"></span><span class="only-wide mono" style="color:var(--rail-ink);text-align:center;font-size:.7rem;opacity:.8">${VERSION}</span><span class="util only-wide">${themeBtn}<button data-act="rail-hide" aria-label="Hide the sidebar" title="Hide the sidebar">${ICON.hide}</button></span><button class="only-wide" data-act="nav" data-v="help" ${cur==='help'?'aria-current="page"':''}>${ICON.help}<span>Help</span></button><button class="only-wide" data-act="nav" data-v="settings" ${cur==='settings'?'aria-current="page"':''}>${ICON.settings}<span>Settings</span></button></nav>`;
   const strip=`<div class="topstrip only-narrow"><span class="mono small">OrganizerTX ${VERSION}</span><span class="row" style="gap:6px"><button class="btn" data-act="theme" aria-label="Switch theme">${isDark()?ICON.sun:ICON.moon}</button><button class="btn" data-act="nav" data-v="assist" aria-label="Assistant" title="Assistant">${ICON.assist}</button><button class="btn" data-act="nav" data-v="help" aria-label="Help">${ICON.help}</button><button class="btn" data-act="nav" data-v="settings" aria-label="Settings">${ICON.settings}</button></span></div>`;
@@ -3134,7 +3196,7 @@ function ensureLib(){
 const rulesText=()=>{const t=S.rules.filter(r=>r.on&&r.text.trim()).map(r=>r.text.trim()).join('\n\n').slice(0,6000);return t?`\n\nHouse rules for documents. Follow them. Where a rule conflicts with the shape asked for in this request, the shape wins.\n<rules>\n${t}\n</rules>`:''};
 const skillText=id=>{const k=S.skills.find(x=>x.id===id&&x.on);return k?`\n\nUse this skill for the task. Follow its steps, output and checks, fitted into the document shape asked for.\n<skill>\n${libBody(k.text).trim().slice(0,5000)}\n</skill>`:''};
 const libCur=()=>{const [k,id]=String(V.lib).split(':');return k==='k'?{kind:'k',it:S.skills.find(x=>x.id===id)}:{kind:'r',it:S.rules.find(x=>x.id===id)}};
-const setTop=on=>`<div class="htabs settop" role="group" aria-label="Settings sections"><button data-act="nav" data-v="settings" aria-pressed="${on==='settings'}">Settings</button><button data-act="nav" data-v="rules" aria-pressed="${on==='rules'}">Rules &amp; Skills</button></div>`;
+const setTop=on=>`<div class="htabs settop" role="group" aria-label="Settings sections"><button data-act="nav" data-v="settings" aria-pressed="${on==='settings'}">Settings</button><button data-act="nav" data-v="rules" aria-pressed="${on==='rules'}">Rules &amp; Skills</button><button data-act="nav" data-v="resources" aria-pressed="${on==='resources'}">Resources</button></div>`;
 function viewRules(){
   ensureLib();let c=libCur();if(!c.it){V.lib=S.rules[0]?'r:'+S.rules[0].id:S.skills[0]?'k:'+S.skills[0].id:'';c=libCur()}
   const it=c.it,isK=c.kind==='k',start=it&&(isK?LIBSTART.skills.find(x=>x.dir===it.dir):LIBSTART.rules.find(x=>x.file===it.file));
@@ -3273,6 +3335,7 @@ function shareChat(i){
 }
 /* ---------- help: built-in guides, plus an assistant that answers from them ---------- */
 const HELP=[
+ ['Resources: people, equipment and other','Open Settings, then the Resources tab. Add people with their role, availability, hours and pay rate; equipment with capacity, status, cost and next service date; and any other resource such as materials or subcontractors. Staff names appear as owner suggestions on tasks, and each person\'s open tasks are counted. The tiles show who and what is available, the team cost per day, and anything needing attention. Download the register as a spreadsheet at any time.'],
  ['Owners, reminders and repeating tasks','Open any task to set an Owner, a Repeat (daily, weekdays, weekly or monthly) and a reminder date and time. Completing a repeating task creates the next one. Reminders show as a bar at the top while OrganizerTX is open, and as a device notification if notifications are turned on in Settings. On the Tasks page you can filter by owner.'],
  ['Calendar view','On Tasks, choose Calendar to see tasks on their due dates, with project milestones. Use the arrows to change month. Click a date to add a task on that day.'],
  ['Project budget, risks and milestones','Open a project from the Dashboard or Folders. Its tabs are Plan and tasks, Budget, Risks and issues, and Milestones. In Budget, add lines by hand or import an Excel sheet, a PDF or a photo: the lines are titled and sorted into categories, and you check them against the document total before accepting.'],
@@ -3390,6 +3453,9 @@ const ACT={
   dcat(v){V.dcat=V.dcat===v?'all':v},
   dtab(v){V.dtab=v},
   wsg(v){V.wsg=v},
+  rtab(v){V.rtab=v},'res-new'(v){resModal(null,v)},'res-open'(v){resModal(v)},
+  'res-tasks'(v){V.towner=v;V.tfilter='all';V.tmode='board';V.view='tasks'},
+  'res-csv'(){saveFile('organizertx-resources_'+dash(Date.now())+'.csv','\ufeff'+resCsv(),'text/csv')},
   hview(v){V.hview=v;V.view='home';V.doc=null},
   ptab(v){V.ptab=v},
   'cal-nav'(v){if(v==='0'){V.calM=dash(Date.now()).slice(0,7);return}const [Y,M]=(/^\d{4}-\d\d$/.test(V.calM||'')?V.calM:dash(Date.now()).slice(0,7)).split('-').map(Number),d=new Date(Y,M-1+ +v,1);V.calM=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')},
@@ -3489,7 +3555,7 @@ document.addEventListener('click',async e=>{
   const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
   const fn=ACT[el.dataset.act];if(!fn)return;
   await fn(el.dataset.v);save();
-  if(!['stop','print','dl-doc','copy-doc','save-chat','backup','wk-scroll','sug-scroll','brief-copy','paper-word','paper-copy','fa-copy','meet-dictate','weekly-email','share-kb','share-chat','share-msg','share-doc','deck-dl','cap','cap-menu','log-open'].includes(el.dataset.act))render();
+  if(!['stop','print','dl-doc','copy-doc','save-chat','backup','wk-scroll','sug-scroll','brief-copy','res-csv','paper-word','paper-copy','fa-copy','meet-dictate','weekly-email','share-kb','share-chat','share-msg','share-doc','deck-dl','cap','cap-menu','log-open'].includes(el.dataset.act))render();
   if(el.dataset.act==='idea'){const a=$('#ask');if(a)a.focus()}
 });
 document.addEventListener('input',e=>{

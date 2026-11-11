@@ -1,9 +1,16 @@
-ORGANIZERTX v0.42
+ORGANIZERTX v0.43
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.43 Resources tab (Settings, beside Rules & Skills): a register of people
+        (role, availability, hours, pay rate), equipment (capacity, status,
+        cost, next service) and other resources (quantity, unit cost,
+        supplier), each with currency and an optional project. Summary tiles,
+        open-task counts per person, service-due flags, spreadsheet download.
+        Staff names become owner suggestions on tasks and the Assistant can
+        answer from the register.
   v0.42 Task dialog: a budget amount with currency, and sub-tasks in a panel
         that opens beside the dialog. Sub-tasks can be typed, or read from an
         attached list (text, Word, Excel, CSV; PDF or photo with the AI).
