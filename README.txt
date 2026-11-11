@@ -1,9 +1,11 @@
-ORGANIZERTX v0.40
+ORGANIZERTX v0.41
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.41 "Current News Flash" suggestions are a vertical list with a scroll
+        bar, and each suggestion has its own heading.
   v0.40 Research tab: two columns under the research box. Left: "Current News
         Flash" (Suggested for you). Right: "Week NN: Tidbits" (10 best AI
         business ideas).
