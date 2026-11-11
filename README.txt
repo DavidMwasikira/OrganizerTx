@@ -1,9 +1,13 @@
-ORGANIZERTX v0.50
+ORGANIZERTX v0.51
 (formerly Fuatilia; data saved under the old name on a device carries over)
 
 VERSION HISTORY
   (Numbering: v0.12 follows v1.1 at the owner's request and runs to v0.30;
    v1.0 will be the public release.)
+  v0.51 The copy button on the Gantt charts and WBS copies the chart as a
+        picture, exactly as shown (whole chart, not just the visible
+        part). The icon flickers while it works, then shows a green tick
+        that fades away.
   v0.50 Resolve now returns a concrete proposal with figures (for example
         floor area in m2 and cost in Kshs) that you can edit and accept,
         states its assumptions instead of asking, and can raise the

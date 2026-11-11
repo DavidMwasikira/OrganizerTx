@@ -675,6 +675,14 @@ table.bt td{padding:5px 6px 5px 0;vertical-align:middle}table.bt input,table.bt 
 .rrow{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:10px 0}.rrow:first-child{border-top:0}
 .rrow .rmain{display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;background:none;border:0;padding:0;color:inherit;font:inherit}
 .rrow .res{margin-top:3px;color:var(--ink)}.rrow .res i{color:var(--signal);font-style:normal;font-weight:600}.rrow.closed .res{color:var(--muted)}
+.shot-only{display:none}.shot .shot-only{display:block}
+.shot .btn,.shot .agdates,.shot .aghelp,.shot .working,.shot .banner,.shot .lk,.shot .agout,.shot .wbstools{display:none!important}
+.shot .wbs .wadd,.shot .wbs .x,.shot .wbs .o,.shot .pviews>.row>.small.muted,.shot.pviews>.row>.small.muted{display:none!important}
+.shot .agl,.shot .agr,.shot .wbswrap{overflow:visible!important;max-width:none!important;flex:none!important}.shot .ag{width:max-content;overflow:visible}
+.pviews.shot:has(.ag),.pviews.shot:has(.wbswrap){width:max-content;max-width:none}
+.cpy.busy svg{animation:cpyf .28s steps(2,jump-none) infinite}.cpy.ok{color:#fff;background:var(--s-done);border-color:var(--s-done)}.cpy.ok svg{animation:cpyt 2.2s ease-out forwards}
+@keyframes cpyf{0%{opacity:1}50%{opacity:.15}100%{opacity:1}}@keyframes cpyt{0%{opacity:0;transform:scale(.4)}12%{opacity:1;transform:scale(1.15)}22%{transform:scale(1)}60%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cpy.busy svg,.cpy.ok svg{animation:none}}
 .fix .prop{font-size:1.02rem;font-weight:700}.fxs{display:flex;flex-wrap:wrap;gap:10px}.fxs label{display:flex;flex-direction:column;gap:3px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);flex:1 1 150px;max-width:240px}
 .fxs input{min-height:38px;font-size:.95rem;font-weight:600;text-transform:none;letter-spacing:0}
 .rrow .figs{display:inline-flex;flex-wrap:wrap;gap:4px 12px;margin-left:4px}.rrow .figs i{color:var(--muted);font-weight:500}
@@ -860,7 +868,7 @@ nav .create i{animation:pulse 3.2s ease-in-out infinite}
 <div id="layer"></div>
 <script>
 "use strict";
-const VERSION='v0.50';
+const VERSION='v0.51';
 /* ---------- small helpers ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2316,6 +2324,7 @@ function advGantt(p,S0){
       <span class="row" style="margin-left:auto"><button class="btn primary small" data-act="dep-opt" ${busy?'disabled':''} title="The AI works out which tasks depend on which, connects them all and re-times the plan">Link and optimise with AI</button>${named?'':`<button class="btn small" data-act="ph-ai" ${busy?'disabled':''}>Group into phases with AI</button>`}<button class="btn small" data-act="gcols" aria-pressed="${!cols}" title="${cols?'Hide the WBS, start, weeks, cost and hours columns':'Show the WBS, start, weeks, cost and hours columns'}">${cols?'Hide columns':'Show columns'}</button>${copyBtn('gantt')}</span></div>
     ${depJob?`<div class="working"><span class="spin"></span><span id="joblabel">${esc(busy.label)}...</span><button class="btn ghost small" data-act="stop">Stop</button></div>`:''}
     ${lf?`<div class="banner linking">Linking from task ${p.acts.indexOf(lf)+1}, "${esc(clip(lf.name,50))}". Now click the task that can only finish after it. <button class="btn ghost small" data-act="link-cancel">Cancel</button></div>`:''}
+    <h2 class="shot-only" style="font-size:1.1rem">${esc(p.name)} <span class="small muted" style="font-weight:500">${fmtDate(S0.t0)} to ${fmtDate(endT)}</span></h2>
     <div class="gleg">${stLegend()}<span><i class="ln crit"></i>Critical path</span><span><i class="ln"></i>Other links</span><span><i class="dm"></i>Milestone</span>
       <details class="aghelp"><summary>How to use this chart</summary><p>Changing the start or end date moves every task, due date and milestone by the same number of days. The project is ${W} week${W===1?'':'s'} long. Type in any cell to change it. To link two tasks, drag from the dot at the end of a bar to another bar, or click the dot and then the other bar. Click a line to remove it. Bar colour shows the task status; a red underline marks a task on the critical path.</p></details></div>
   <div class="ag ${cols?'':'nocols'}"><div class="agl"><div class="agrow hd"><span>#</span><span>Task name</span><span class="x">WBS</span><span class="x">Planned start</span><span class="x">Weeks</span><span class="x">Planned cost</span><span class="x">Work hours</span></div>${left.join('')}</div>
@@ -2330,7 +2339,51 @@ function wbsHtml(p){
       return `<div class="wcol" data-ph="${g.idx}" style="--c:${c}"><div class="wph">${g.idx<0?`<b>${named?(p.phases.length+1)+'. Not in a phase':'Tasks'}</b>`:`<span class="code">${g.idx+1}.</span><span class="ed" contenteditable="plaintext-only" spellcheck="false" role="textbox" aria-label="Phase name" data-gpe="${g.idx}">${esc(g.name)}</span><button class="x" data-act="ph-del" data-v="${g.idx}" aria-label="Remove this phase" title="Remove this phase (its tasks are kept)">&times;</button>`}<span class="small">${g.acts.length?Math.round(100*dn/g.acts.length):0}% · ${g.acts.length} task${g.acts.length===1?'':'s'}</span></div>
         <div class="wts">${g.acts.map(({a,i},k)=>`<div class="wt ${isDone(a)?'done':''}" draggable="true" data-wi="${i}" title="Drag to move"><span class="code">${wbsCode(p,g,k)}</span><span class="ed" contenteditable="plaintext-only" spellcheck="false" role="textbox" aria-label="Task name" data-ge="${i}">${esc(a.name)}</span><button class="o" data-act="task-open" data-v="${p.id}:${i}" aria-label="Open this task" title="Open this task">&rsaquo;</button></div>`).join('')}<button class="wadd" data-act="ph-task" data-v="${g.idx}">+ Add task</button></div></div>`}).join('')}</div></div></div>`;
 }
-const copyBtn=k=>`<button class="btn small icon" data-act="pv-copy" data-v="${k}" aria-label="Copy as text" title="Copy as text, to paste into Excel, Word, an email or WhatsApp">${ICON.copy}</button>`;
+const copyBtn=k=>`<button class="btn small icon cpy" data-act="pv-copy" data-v="${k}" aria-label="Copy as a picture" title="Copy this chart as a picture, exactly as shown, to paste into Word, PowerPoint, an email or WhatsApp">${ICON.copy}</button>`;
+/* ---- copy a chart as a picture: the live chart is redrawn into an image with every style kept ---- */
+const SHOTP=['display','position','top','left','right','bottom','width','height','min-width','min-height','max-width','max-height','margin-top','margin-right','margin-bottom','margin-left','padding-top','padding-right','padding-bottom','padding-left','box-sizing','border-top','border-right','border-bottom','border-left','border-radius','background-color','background-image','background-size','background-position','background-repeat','color','font-family','font-size','font-weight','font-style','line-height','letter-spacing','text-align','text-transform','text-decoration','text-overflow','white-space','overflow-wrap','overflow','flex-direction','flex-wrap','flex-grow','flex-shrink','flex-basis','align-items','align-self','justify-content','gap','grid-template-columns','grid-column','grid-row','opacity','transform','transform-origin','z-index','box-shadow','outline','outline-offset','vertical-align','fill','stroke','stroke-width','stroke-dasharray','visibility','font-variant-numeric'];
+const shotCss=cs=>SHOTP.map(k=>{const v=cs.getPropertyValue(k);return v?k+':'+v:''}).filter(Boolean).join(';');
+function shotClone(el){
+  if(el.nodeType===3)return document.createTextNode(el.nodeValue);
+  if(el.nodeType!==1)return null;
+  const cs=getComputedStyle(el);if(cs.display==='none'&&el.namespaceURI==='http://www.w3.org/1999/xhtml')return null;
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)){const sp=document.createElement('span');sp.setAttribute('style',shotCss(cs)+';display:inline-block;overflow:hidden;white-space:nowrap');sp.textContent=el.type==='date'?(el.value?fmtShort(el.value):''):(el.value||el.placeholder||'');return sp}
+  const c=el.cloneNode(false);c.removeAttribute('class');c.removeAttribute('title');c.removeAttribute('contenteditable');c.removeAttribute('tabindex');[...c.attributes].filter(a=>/^data-|^aria-/.test(a.name)).forEach(a=>c.removeAttribute(a.name));
+  if(el.tagName!=='defs'&&el.tagName!=='marker')c.setAttribute('style',shotCss(cs));
+  const pseudo=w=>{const ps=getComputedStyle(el,w);if(!ps.content||ps.content==='none'||ps.content==='normal')return null;const sp=document.createElement('span');sp.setAttribute('style',shotCss(ps));sp.textContent=ps.content.replace(/^["']|["']$/g,'');return sp};
+  const html=el.namespaceURI==='http://www.w3.org/1999/xhtml',b=html&&pseudo('::before'),a=html&&pseudo('::after');
+  if(b)c.appendChild(b);el.childNodes.forEach(n=>{const k=shotClone(n);if(k)c.appendChild(k)});if(a)c.appendChild(a);
+  return c;
+}
+let SHOTFONTS=null;
+async function shotFonts(){
+  if(SHOTFONTS!==null)return SHOTFONTS;
+  try{const link=document.querySelector('link[href*="fonts.googleapis.com/css"]');if(!link)return SHOTFONTS='';
+    const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),3500),css=await (await fetch(link.href,{signal:ctl.signal})).text();
+    const blocks=(css.match(/@font-face\s*{[^}]*}/g)||[]).filter(b=>!/unicode-range/.test(b)||/U\+0000-00FF/i.test(b));
+    const out=await Promise.all(blocks.map(async b=>{const u=(b.match(/url\((https:[^)]+)\)/)||[])[1];if(!u)return '';const bl=await (await fetch(u,{signal:ctl.signal})).blob();const d=await new Promise((ok,no)=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.onerror=no;fr.readAsDataURL(bl)});return b.replace(u,d)}));
+    clearTimeout(tm);return SHOTFONTS=out.join('\n')}catch(e){return SHOTFONTS=''}
+}
+async function chartPng(root){
+  const fonts=await shotFonts();
+  root.classList.add('shot');let clone,W,H,bg;
+  try{const r=root.getBoundingClientRect();W=Math.ceil(Math.max(r.width,root.scrollWidth));H=Math.ceil(Math.max(r.height,root.scrollHeight));bg=getComputedStyle(root).backgroundColor;clone=shotClone(root)}finally{root.classList.remove('shot')}
+  clone.style.margin='0';clone.style.width=W+'px';clone.style.height=H+'px';clone.style.boxShadow='none';
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${fonts?'<style>'+fonts.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</style>':''}<foreignObject x="0" y="0" width="100%" height="100%">${new XMLSerializer().serializeToString(clone)}</foreignObject></svg>`;
+  const url='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg),load=()=>new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>no(new Error('The picture could not be drawn.'));im.src=url});
+  let im=await load();if(fonts){await new Promise(r=>setTimeout(r,120));im=await load()}
+  const sc=Math.max(1,Math.min(2,7000/W,7000/H)),cv=document.createElement('canvas');cv.width=Math.round(W*sc);cv.height=Math.round(H*sc);const g=cv.getContext('2d');g.fillStyle=bg&&bg!=='rgba(0, 0, 0, 0)'?bg:'#fff';g.fillRect(0,0,cv.width,cv.height);g.scale(sc,sc);g.drawImage(im,0,0,W,H);
+  return new Promise((ok,no)=>cv.toBlob(b=>b?ok(b):no(new Error('The picture could not be made.')),'image/png'));
+}
+function copyChart(btn,p,kind){
+  const root=btn.closest('.pviews');if(!root||btn.classList.contains('busy'))return;
+  const icon=btn.innerHTML,done=(ok,msg)=>{btn.classList.remove('busy');if(ok){btn.classList.add('ok');btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';setTimeout(()=>{btn.classList.remove('ok');btn.innerHTML=icon},2200)}toast(msg)};
+  btn.classList.add('busy');
+  const name=brief(p.name)+(kind==='wbs'?'-wbs':'-gantt')+'.png',png=chartPng(root);
+  const viaFile=()=>png.then(b=>{saveFile(name,b);done(true,'This device cannot copy pictures, so the chart was saved as '+name+'.')});
+  if(navigator.clipboard&&window.ClipboardItem)navigator.clipboard.write([new ClipboardItem({'image/png':png})]).then(()=>done(true,'Chart copied as a picture. Paste it into Word, PowerPoint, an email or WhatsApp.')).catch(()=>viaFile().catch(()=>navigator.clipboard.writeText(planText(p,kind)).then(()=>done(true,'The picture could not be made here, so the chart was copied as a text table instead.')).catch(()=>done(false,'Could not copy on this device.'))));
+  else viaFile().catch(()=>done(false,'Could not copy on this device.'));
+}
 function planText(p,kind){
   const S0=schedOf(p),m=taskIndex(),groups=phasesOf(p),named=(p.phases||[]).filter(Boolean).length>0;
   if(kind==='wbs')return [p.name,...groups.flatMap(g=>[...(named?[(g.idx<0?p.phases.length+1:g.idx+1)+'. '+(g.name||'Not in a phase')]:[]),...g.acts.map(({a},k)=>(named?'    ':'')+wbsCode(p,g,k)+' '+a.name+(isDone(a)?' (done)':''))])].join('\n');
@@ -3823,7 +3876,7 @@ const ACT={
   'link-cancel'(){V.linkFrom=null},
   async 'dep-opt'(){const p=curPlan();if(!p)return;if(p.acts.some(a=>(a.deps||[]).length||num(a.start)>0)&&!await confirmBox('The AI will replace the current links in "'+p.name+'" and re-time the tasks so each starts when the tasks before it finish. Task names, lengths and phases stay as they are.','Link and optimise'))return;aiDeps(p,true)},
   gcols(){V.gcols=V.gcols===false},gscale(v){V.gscale=v},
-  'pv-copy'(v){const p=curPlan();if(p)(navigator.clipboard?navigator.clipboard.writeText(planText(p,v)):Promise.reject()).then(()=>toast(v==='wbs'?'WBS copied as an outline.':'Gantt chart copied as a table. Paste it into Excel or Word.')).catch(()=>toast('Could not copy on this device.'))},'brief-fold'(){V.briefShut=V.briefShut!==true},
+  'pv-copy'(v,el){const p=curPlan(),b=el&&el.closest?el.closest('[data-act=pv-copy]'):document.querySelector('[data-act=pv-copy]');if(p&&b)copyChart(b,p,v)},
   'ph-ai'(){const p=curPlan();if(p)suggestPhases(p)},
   'ph-add'(){const p=curPlan();if(!p)return;p.phases=(p.phases||[]).filter(Boolean);let n='New phase',k=2;while(p.phases.includes(n))n='New phase '+k++;if(!p.phases.length&&p.acts.length){p.phases.push('Phase 1');p.acts.forEach(a=>{a.phase='Phase 1'})}p.phases.push(n);V.ptab='wbs';setTimeout(()=>{const e=[...document.querySelectorAll('.wph .ed')].pop();if(e){e.focus();getSelection().selectAllChildren(e)}},60)},
   async 'ph-del'(v){const p=curPlan(),n=p&&(p.phases||[])[+v];if(n===undefined)return;if(p.acts.some(a=>a.phase===n)&&!await confirmBox('Remove the phase "'+n+'"? Its tasks are kept and move to "Not in a phase".','Remove phase'))return;p.acts.forEach(a=>{if(a.phase===n)a.phase=''});p.phases.splice(+v,1);orderActs(p)},
@@ -3936,7 +3989,7 @@ document.addEventListener('click',async e=>{
   if(e.target.closest('[data-stop]'))return;
   const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
   const fn=ACT[el.dataset.act];if(!fn)return;
-  await fn(el.dataset.v);save();
+  await fn(el.dataset.v,el);save();
   if(!['stop','print','dl-doc','copy-doc','save-chat','backup','wk-scroll','sug-scroll','brief-copy','res-csv','pv-copy','paper-word','paper-copy','fa-copy','meet-dictate','weekly-email','share-kb','share-chat','share-msg','share-doc','deck-dl','cap','cap-menu','log-open'].includes(el.dataset.act))render();
   if(el.dataset.act==='idea'){const a=$('#ask');if(a)a.focus()}
 });
